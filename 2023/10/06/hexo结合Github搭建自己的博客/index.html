@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="John Doe">
+
+
+
+
+
+<title>hexo结合Github搭建自己的博客 | Hexo</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+    <script>
+        !
+        function() {
+            function n(n, e, t) {
+                return n.getAttribute(e) || t
+            }
+            function e(n) {
+                return document.getElementsByTagName(n)
+            }
+            function t() {
+                var t = e("script"),
+                o = t.length,
+                i = t[o - 1];
+                return {
+                    l: o,
+                    z: n(i, "zIndex", -1), //置于主页面背后
+                    o: n(i, "opacity", .5), //线条透明度
+                    c: n(i, "color", "0,0,0"), //线条颜色
+                    n: n(i, "count", 100) //线条数量
+                }
+            }
+            function o() {
+                a = m.width = window.innerWidth ||
+        document.documentElement.clientWidth || document.body.clientWidth,
+                c = m.height = window.innerHeight ||
+        document.documentElement.clientHeight || document.body.clientHeight
+            }
+            function i() {
+                r.clearRect(0, 0, a, c);
+                var n, e, t, o, m, l;
+                s.forEach(function(i, x) {
+                    for (i.x += i.xa, i.y += i.ya, i.xa *= i.x > a || i.x < 0 ? -1 :
+        1, i.ya *= i.y > c || i.y < 0 ? -1 : 1, r.fillRect(i.x - .5, i.y - .5, 1,
+        1), e = x + 1; e < u.length; e++) n = u[e],
+                    null !== n.x && null !== n.y && (o = i.x - n.x, m = i.y - n.y, l
+        = o * o + m * m, l < n.max && (n === y && l >= n.max / 2 && (i.x -= .03 * o,
+        i.y -= .03 * m), t = (n.max - l) / n.max, r.beginPath(), r.lineWidth = t /
+        2, r.strokeStyle = "rgba(" + d.c + "," + (t + .2) + ")", r.moveTo(i.x, i.y),
+        r.lineTo(n.x, n.y), r.stroke()))
+                }),
+                x(i)
+            }
+            var a, c, u, m = document.createElement("canvas"),
+            d = t(),
+            l = "c_n" + d.l,
+            r = m.getContext("2d"),
+            x = window.requestAnimationFrame || window.webkitRequestAnimationFrame
+        || window.mozRequestAnimationFrame || window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+            function(n) {
+                window.setTimeout(n, 1e3 / 45)
+            },
+            w = Math.random,
+            y = {
+                x: null,
+                y: null,
+                max: 2e4
+            };
+            m.id = l,
+            m.style.cssText = "position:fixed;top:0;left:0;z-index:" + d.z +
+        ";opacity:" + d.o,
+            e("body")[0].appendChild(m),
+            o(),
+            window.onresize = o,
+            window.onmousemove = function(n) {
+                n = n || window.event,
+                y.x = n.clientX,
+                y.y = n.clientY
+            },
+            window.onmouseout = function() {
+                y.x = null,
+                y.y = null
+            };
+            for (var s = [], f = 0; d.n > f; f++) {
+                var h = w() * a,
+                g = w() * c,
+                v = 2 * w() - 1,
+                p = 2 * w() - 1;
+                s.push({
+                    x: h,
+                    y: g,
+                    xa: v,
+                    ya: p,
+                    max: 6e3
+                })
+            }
+            u = s.concat([y]),
+            setTimeout(function() {
+                i()
+            },
+            100)
+        } ();
+        </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jiaqi Li&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jiaqi Li&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">hexo结合Github搭建自己的博客</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">John Doe</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">October 6, 2023&nbsp;&nbsp;9:06:17</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="配置Github主页"><a href="#配置Github主页" class="headerlink" title="配置Github主页"></a><strong>配置Github主页</strong></h1><h2 id="连接Github与本地"><a href="#连接Github与本地" class="headerlink" title="连接Github与本地"></a><strong>连接Github与本地</strong></h2><p>右键打开git bash</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name <span class="string">&quot;godweiyang&quot;</span></span><br><span class="line">git config --global user.email <span class="string">&quot;792321264@qq.com&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>将上面的用户名和邮箱替换为自己的。<br>然后生成密钥SSH key：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &quot;792321264@qq.com&quot;</span><br></pre></td></tr></table></figure>
+
+<p>打开<a target="_blank" rel="noopener" href="http://github.com/">github</a>，在头像下面点击<code>settings</code>，再点击<code>SSH and GPG keys</code>，新建一个SSH，名字随便。<br>git bash中输入</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat ~/.ssh/id_rsa.pub</span><br></pre></td></tr></table></figure>
+
+<p>将输出的内容复制到框中，点击确定保存。<br>输入<code>ssh -T git@github.com</code>，如果如下图所示，出现你的用户名，那就成功了。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">ssh -T git@github.com</span></span><br><span class="line">Hi Mrljq! You&#x27;ve successfully authenticated, but GitHub does not provide shell access.</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="下载所需的包"><a href="#下载所需的包" class="headerlink" title="下载所需的包"></a>下载所需的包</h2><h3 id="1-Node：从如下官网下载所需的node版本。node下载官网"><a href="#1-Node：从如下官网下载所需的node版本。node下载官网" class="headerlink" title="1. Node：从如下官网下载所需的node版本。node下载官网"></a>1. Node：从如下官网下载所需的node版本。<a target="_blank" rel="noopener" href="https://nodejs.org/en/download/">node下载官网</a></h3><ul>
+<li>下载完成后全部选择next安装即可。下载完成后在git bash里输入下列命令查看是否安装完成。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">node -v</span><br><span class="line">npm -v</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-安装Hexo"><a href="#2-安装Hexo" class="headerlink" title="2.安装Hexo"></a>2.安装Hexo</h3><ul>
+<li>在命令行输入以下命令</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>可以输入以下命令查看是否安装到位</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo -v</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>安装Hexo完成后，在<strong>指定文件夹</strong>下打开”Git Bash”，再执行下列命令，Hexo将会在指定文件夹中新建所须要的文件:</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo init myBlog</span><br><span class="line"><span class="built_in">cd</span> myBlog</span><br><span class="line">npm insta11</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>之后即可输入命令 在浏览器中输入localhost:4000即可看见效果。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo s</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-下载主题"><a href="#3-下载主题" class="headerlink" title="3. 下载主题"></a>3. 下载主题</h3><ul>
+<li><p>大家可以去官网上找自己喜欢的主题下载<a target="_blank" rel="noopener" href="https://hexo.io/themes/%EF%BC%8C%E8%87%AA%E5%B7%B1%E9%87%87%E7%94%A8%E7%9A%84%E4%B8%BB%E9%A2%98%E6%98%AFhttps://github.com/Siricee/hexo-theme-Chic%EF%BC%8C%E8%BF%99%E6%AC%BE%E6%9C%89%E6%98%8E%E6%9A%97%E4%B8%A4%E7%A7%8D%E9%A2%9C%E8%89%B2%E3%80%82">https://hexo.io/themes/，自己采用的主题是https://github.com/Siricee/hexo-theme-Chic，这款有明暗两种颜色。</a></p>
+</li>
+<li><p>基本大家用的最多的是NEXT主题: <a target="_blank" rel="noopener" href="https://github.com/next-theme/hexo-theme-next">https://github.com/next-theme/hexo-theme-next</a></p>
+</li>
+<li><p>随后将下载的主题文件夹放在myblog&#x2F;themes中，在_config.yml文件中修改theme为hexo-theme-Chic(注意和主题文件名一致)</p>
+</li>
+</ul>
+<p>![](....\public\image\blog_image\屏幕截图 2023-10-05 142449.png)</p>
+<ul>
+<li>修改好之后在”Git Bash”中执行&#x3D;&#x3D;hexo g命令，然后再hexo s&#x3D;&#x3D;，在浏览器中输入<a href="http://localhost:4000回车就能够预览修改主题后的效果了。">http://localhost:4000回车就能够预览修改主题后的效果了。</a></li>
+</ul>
+<h2 id="将博客放到Github上"><a href="#将博客放到Github上" class="headerlink" title="将博客放到Github上"></a>将博客放到Github上</h2><ul>
+<li>进入根目录下的config文件（不是这个主题的），按照下面的方式修改。</li>
+</ul>
+<p>![](....\public\image\blog_image\屏幕截图 2023-10-05 160823.png)</p>
+<ul>
+<li>第二要安装一个部署插件hexo-deployer-git，打开”Git Bach”，输如以下指令:</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>最后执行如下两条命令就能够部署上传啦，如下g是generate缩写，d是deploy缩写。</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo g #先生成</span><br><span class="line">hexo d #部署到Github上</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>这时用浏览器输入用户名.github.io就可以访问刚才的网站啦。</li>
+<li><strong>这里要把io的setting中关于page的branch设置为master。</strong></li>
+</ul>
+<h2 id="写文章并上传"><a href="#写文章并上传" class="headerlink" title="写文章并上传"></a>写文章并上传</h2><ul>
+<li>博客搭好了，就开始写文章了，这里简单介绍一下，详细的文档能够看 hexo 官网。新建文章，输入如下命令便可</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new <span class="string">&#x27;文章标题&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>执行完成后能够在 &#x2F;source&#x2F;_posts 下看到一个文章标题.md的文章文件啦。.md 就是 Markdown 格式的文件，具体用法能够在网上找一下，语法仍是比较简单的。</p>
+</li>
+<li><p>之后依次输入以下命令:</p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo g #生成文件</span><br><span class="line">hexo s #本地服务器查看网站</span><br><span class="line">hexo d #部署到Github 上</span><br></pre></td></tr></table></figure>
+
+<h2 id="创建’Tag’-‘Category’-页面"><a href="#创建’Tag’-‘Category’-页面" class="headerlink" title="创建’Tag’, ‘Category’ 页面"></a>创建’Tag’, ‘Category’ 页面</h2><p>There is no ‘tag’ or ‘category’ page in</p>
+<ol>
+<li>execute commands</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo new page tag</span><br><span class="line">hexo new page category</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>enter the dictionary<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd source/tag</span><br></pre></td></tr></table></figure></li>
+<li>add ‘layout’ key</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// source\tag\index.md</span><br><span class="line">——-</span><br><span class="line">title: Tag</span><br><span class="line">layout: tag</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置一些特效"><a href="#配置一些特效" class="headerlink" title="配置一些特效"></a>配置一些特效</h2><ul>
+<li>雪花特效： themes\hexo-theme-Chic\layout\index.ejs 中添加如下代码：</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 雪花特效 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span></span></span><br><span class="line"><span class="tag"><span class="attr">src</span>=<span class="string">&quot;https://libs.baidu.com/jquery/1.8.3/jquery.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span></span></span><br><span class="line"><span class="tag"><span class="attr">src</span>=<span class="string">&quot;https://libs.baidu.com/jquery/1.8.3/jquery.min.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span> <span class="attr">src</span>=<span class="string">&quot;/js/snow.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>蜘蛛网特效： themes\hexo-theme-Chic\layout\layout.ejs 中添加如下代码：</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">!</span></span><br><span class="line"><span class="language-javascript"><span class="keyword">function</span>(<span class="params"></span>) &#123;</span></span><br><span class="line"><span class="language-javascript">	<span class="keyword">function</span> <span class="title function_">n</span>(<span class="params">n, e, t</span>) &#123;</span></span><br><span class="line"><span class="language-javascript">		<span class="keyword">return</span> n.<span class="title function_">getAttribute</span>(e) || t</span></span><br><span class="line"><span class="language-javascript">	&#125;</span></span><br><span class="line"><span class="language-javascript">	<span class="keyword">function</span> <span class="title function_">e</span>(<span class="params">n</span>) &#123;</span></span><br><span class="line"><span class="language-javascript">		<span class="keyword">return</span> <span class="variable language_">document</span>.<span class="title function_">getElementsByTagName</span>(n)</span></span><br><span class="line"><span class="language-javascript">	&#125;</span></span><br><span class="line"><span class="language-javascript">	<span class="keyword">function</span> <span class="title function_">t</span>(<span class="params"></span>) &#123;</span></span><br><span class="line"><span class="language-javascript">		<span class="keyword">var</span> t = <span class="title function_">e</span>(<span class="string">&quot;script&quot;</span>),</span></span><br><span class="line"><span class="language-javascript">		o = t.<span class="property">length</span>,</span></span><br><span class="line"><span class="language-javascript">		i = t[o - <span class="number">1</span>];</span></span><br><span class="line"><span class="language-javascript">		<span class="keyword">return</span> &#123;</span></span><br><span class="line"><span class="language-javascript">			<span class="attr">l</span>: o,</span></span><br><span class="line"><span class="language-javascript">			<span class="attr">z</span>: <span class="title function_">n</span>(i, <span class="string">&quot;zIndex&quot;</span>, -<span class="number">1</span>), <span class="comment">//置于主页面背后</span></span></span><br><span class="line"><span class="language-javascript">			<span class="attr">o</span>: <span class="title function_">n</span>(i, <span class="string">&quot;opacity&quot;</span>, <span class="number">.5</span>), <span class="comment">//线条透明度</span></span></span><br><span class="line"><span class="language-javascript">			<span class="attr">c</span>: <span class="title function_">n</span>(i, <span class="string">&quot;color&quot;</span>, <span class="string">&quot;0,0,0&quot;</span>), <span class="comment">//线条颜色</span></span></span><br><span class="line"><span class="language-javascript">			<span class="attr">n</span>: <span class="title function_">n</span>(i, <span class="string">&quot;count&quot;</span>, <span class="number">100</span>) <span class="comment">//线条数量</span></span></span><br><span class="line"><span class="language-javascript">		&#125;</span></span><br><span class="line"><span class="language-javascript">	&#125;</span></span><br><span class="line"><span class="language-javascript">	<span class="keyword">function</span> <span class="title function_">o</span>(<span class="params"></span>) &#123;</span></span><br><span class="line"><span class="language-javascript">		a = m.<span class="property">width</span> = <span class="variable language_">window</span>.<span class="property">innerWidth</span> ||</span></span><br><span class="line"><span class="language-javascript"><span class="variable language_">document</span>.<span class="property">documentElement</span>.<span class="property">clientWidth</span> || <span class="variable language_">document</span>.<span class="property">body</span>.<span class="property">clientWidth</span>,</span></span><br><span class="line"><span class="language-javascript">		c = m.<span class="property">height</span> = <span class="variable language_">window</span>.<span class="property">innerHeight</span> ||</span></span><br><span class="line"><span class="language-javascript"><span class="variable language_">document</span>.<span class="property">documentElement</span>.<span class="property">clientHeight</span> || <span class="variable language_">document</span>.<span class="property">body</span>.<span class="property">clientHeight</span></span></span><br><span class="line"><span class="language-javascript">	&#125;</span></span><br><span class="line"><span class="language-javascript">	<span class="keyword">function</span> <span class="title function_">i</span>(<span class="params"></span>) &#123;</span></span><br><span class="line"><span class="language-javascript">		r.<span class="title function_">clearRect</span>(<span class="number">0</span>, <span class="number">0</span>, a, c);</span></span><br><span class="line"><span class="language-javascript">		<span class="keyword">var</span> n, e, t, o, m, l;</span></span><br><span class="line"><span class="language-javascript">		s.<span class="title function_">forEach</span>(<span class="keyword">function</span>(<span class="params">i, x</span>) &#123;</span></span><br><span class="line"><span class="language-javascript">			<span class="keyword">for</span> (i.<span class="property">x</span> += i.<span class="property">xa</span>, i.<span class="property">y</span> += i.<span class="property">ya</span>, i.<span class="property">xa</span> *= i.<span class="property">x</span> &gt; a || i.<span class="property">x</span> &lt; <span class="number">0</span> ? -<span class="number">1</span> :</span></span><br><span class="line"><span class="language-javascript"><span class="number">1</span>, i.<span class="property">ya</span> *= i.<span class="property">y</span> &gt; c || i.<span class="property">y</span> &lt; <span class="number">0</span> ? -<span class="number">1</span> : <span class="number">1</span>, r.<span class="title function_">fillRect</span>(i.<span class="property">x</span> - <span class="number">.5</span>, i.<span class="property">y</span> - <span class="number">.5</span>, <span class="number">1</span>,</span></span><br><span class="line"><span class="language-javascript"><span class="number">1</span>), e = x + <span class="number">1</span>; e &lt; u.<span class="property">length</span>; e++) n = u[e],</span></span><br><span class="line"><span class="language-javascript">			<span class="literal">null</span> !== n.<span class="property">x</span> &amp;&amp; <span class="literal">null</span> !== n.<span class="property">y</span> &amp;&amp; (o = i.<span class="property">x</span> - n.<span class="property">x</span>, m = i.<span class="property">y</span> - n.<span class="property">y</span>, l</span></span><br><span class="line"><span class="language-javascript">= o * o + m * m, l &lt; n.<span class="property">max</span> &amp;&amp; (n === y &amp;&amp; l &gt;= n.<span class="property">max</span> / <span class="number">2</span> &amp;&amp; (i.<span class="property">x</span> -= <span class="number">.03</span> * o,</span></span><br><span class="line"><span class="language-javascript">i.<span class="property">y</span> -= <span class="number">.03</span> * m), t = (n.<span class="property">max</span> - l) / n.<span class="property">max</span>, r.<span class="title function_">beginPath</span>(), r.<span class="property">lineWidth</span> = t /</span></span><br><span class="line"><span class="language-javascript"><span class="number">2</span>, r.<span class="property">strokeStyle</span> = <span class="string">&quot;rgba(&quot;</span> + d.<span class="property">c</span> + <span class="string">&quot;,&quot;</span> + (t + <span class="number">.2</span>) + <span class="string">&quot;)&quot;</span>, r.<span class="title function_">moveTo</span>(i.<span class="property">x</span>, i.<span class="property">y</span>),</span></span><br><span class="line"><span class="language-javascript">r.<span class="title function_">lineTo</span>(n.<span class="property">x</span>, n.<span class="property">y</span>), r.<span class="title function_">stroke</span>()))</span></span><br><span class="line"><span class="language-javascript">		&#125;),</span></span><br><span class="line"><span class="language-javascript">		<span class="title function_">x</span>(i)</span></span><br><span class="line"><span class="language-javascript">	&#125;</span></span><br><span class="line"><span class="language-javascript">	<span class="keyword">var</span> a, c, u, m = <span class="variable language_">document</span>.<span class="title function_">createElement</span>(<span class="string">&quot;canvas&quot;</span>),</span></span><br><span class="line"><span class="language-javascript">	d = <span class="title function_">t</span>(),</span></span><br><span class="line"><span class="language-javascript">	l = <span class="string">&quot;c_n&quot;</span> + d.<span class="property">l</span>,</span></span><br><span class="line"><span class="language-javascript">	r = m.<span class="title function_">getContext</span>(<span class="string">&quot;2d&quot;</span>),</span></span><br><span class="line"><span class="language-javascript">	x = <span class="variable language_">window</span>.<span class="property">requestAnimationFrame</span> || <span class="variable language_">window</span>.<span class="property">webkitRequestAnimationFrame</span></span></span><br><span class="line"><span class="language-javascript">|| <span class="variable language_">window</span>.<span class="property">mozRequestAnimationFrame</span> || <span class="variable language_">window</span>.<span class="property">oRequestAnimationFrame</span> ||</span></span><br><span class="line"><span class="language-javascript"><span class="variable language_">window</span>.<span class="property">msRequestAnimationFrame</span> ||</span></span><br><span class="line"><span class="language-javascript">	<span class="keyword">function</span>(<span class="params">n</span>) &#123;</span></span><br><span class="line"><span class="language-javascript">		<span class="variable language_">window</span>.<span class="built_in">setTimeout</span>(n, <span class="number">1e3</span> / <span class="number">45</span>)</span></span><br><span class="line"><span class="language-javascript">	&#125;,</span></span><br><span class="line"><span class="language-javascript">	w = <span class="title class_">Math</span>.<span class="property">random</span>,</span></span><br><span class="line"><span class="language-javascript">	y = &#123;</span></span><br><span class="line"><span class="language-javascript">		<span class="attr">x</span>: <span class="literal">null</span>,</span></span><br><span class="line"><span class="language-javascript">		<span class="attr">y</span>: <span class="literal">null</span>,</span></span><br><span class="line"><span class="language-javascript">		<span class="attr">max</span>: <span class="number">2e4</span></span></span><br><span class="line"><span class="language-javascript">	&#125;;</span></span><br><span class="line"><span class="language-javascript">	m.<span class="property">id</span> = l,</span></span><br><span class="line"><span class="language-javascript">	m.<span class="property">style</span>.<span class="property">cssText</span> = <span class="string">&quot;position:fixed;top:0;left:0;z-index:&quot;</span> + d.<span class="property">z</span> +</span></span><br><span class="line"><span class="language-javascript"><span class="string">&quot;;opacity:&quot;</span> + d.<span class="property">o</span>,</span></span><br><span class="line"><span class="language-javascript">	<span class="title function_">e</span>(<span class="string">&quot;body&quot;</span>)[<span class="number">0</span>].<span class="title function_">appendChild</span>(m),</span></span><br><span class="line"><span class="language-javascript">	<span class="title function_">o</span>(),</span></span><br><span class="line"><span class="language-javascript">	<span class="variable language_">window</span>.<span class="property">onresize</span> = o,</span></span><br><span class="line"><span class="language-javascript">	<span class="variable language_">window</span>.<span class="property">onmousemove</span> = <span class="keyword">function</span>(<span class="params">n</span>) &#123;</span></span><br><span class="line"><span class="language-javascript">		n = n || <span class="variable language_">window</span>.<span class="property">event</span>,</span></span><br><span class="line"><span class="language-javascript">		y.<span class="property">x</span> = n.<span class="property">clientX</span>,</span></span><br><span class="line"><span class="language-javascript">		y.<span class="property">y</span> = n.<span class="property">clientY</span></span></span><br><span class="line"><span class="language-javascript">	&#125;,</span></span><br><span class="line"><span class="language-javascript">	<span class="variable language_">window</span>.<span class="property">onmouseout</span> = <span class="keyword">function</span>(<span class="params"></span>) &#123;</span></span><br><span class="line"><span class="language-javascript">		y.<span class="property">x</span> = <span class="literal">null</span>,</span></span><br><span class="line"><span class="language-javascript">		y.<span class="property">y</span> = <span class="literal">null</span></span></span><br><span class="line"><span class="language-javascript">	&#125;;</span></span><br><span class="line"><span class="language-javascript">	<span class="keyword">for</span> (<span class="keyword">var</span> s = [], f = <span class="number">0</span>; d.<span class="property">n</span> &gt; f; f++) &#123;</span></span><br><span class="line"><span class="language-javascript">		<span class="keyword">var</span> h = <span class="title function_">w</span>() * a,</span></span><br><span class="line"><span class="language-javascript">		g = <span class="title function_">w</span>() * c,</span></span><br><span class="line"><span class="language-javascript">		v = <span class="number">2</span> * <span class="title function_">w</span>() - <span class="number">1</span>,</span></span><br><span class="line"><span class="language-javascript">		p = <span class="number">2</span> * <span class="title function_">w</span>() - <span class="number">1</span>;</span></span><br><span class="line"><span class="language-javascript">		s.<span class="title function_">push</span>(&#123;</span></span><br><span class="line"><span class="language-javascript">			<span class="attr">x</span>: h,</span></span><br><span class="line"><span class="language-javascript">			<span class="attr">y</span>: g,</span></span><br><span class="line"><span class="language-javascript">			<span class="attr">xa</span>: v,</span></span><br><span class="line"><span class="language-javascript">			<span class="attr">ya</span>: p,</span></span><br><span class="line"><span class="language-javascript">			<span class="attr">max</span>: <span class="number">6e3</span></span></span><br><span class="line"><span class="language-javascript">		&#125;)</span></span><br><span class="line"><span class="language-javascript">	&#125;</span></span><br><span class="line"><span class="language-javascript">	u = s.<span class="title function_">concat</span>([y]),</span></span><br><span class="line"><span class="language-javascript">	<span class="built_in">setTimeout</span>(<span class="keyword">function</span>(<span class="params"></span>) &#123;</span></span><br><span class="line"><span class="language-javascript">		<span class="title function_">i</span>()</span></span><br><span class="line"><span class="language-javascript">	&#125;,</span></span><br><span class="line"><span class="language-javascript">	<span class="number">100</span>)</span></span><br><span class="line"><span class="language-javascript">&#125; ();</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>John Doe</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://example.com/2023/10/06/hexo%E7%BB%93%E5%90%88Github%E6%90%AD%E5%BB%BA%E8%87%AA%E5%B7%B1%E7%9A%84%E5%8D%9A%E5%AE%A2/">http://example.com/2023/10/06/hexo%E7%BB%93%E5%90%88Github%E6%90%AD%E5%BB%BA%E8%87%AA%E5%B7%B1%E7%9A%84%E5%8D%9A%E5%AE%A2/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2023/10/05/hello-world/">Hello World</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© John Doe | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
