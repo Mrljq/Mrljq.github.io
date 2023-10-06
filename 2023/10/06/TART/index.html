@@ -13,7 +13,7 @@
 
 
 
-<title>VLMo | Hexo</title>
+<title>TART | Hexo</title>
 
 
 
@@ -289,7 +289,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">VLMo</h1>
+            <h1 class="post-title">TART</h1>
             
                 <div class="post-meta">
                     
@@ -298,7 +298,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">October 6, 2023&nbsp;&nbsp;14:28:27</a>
+                        Date: <a href="#">October 6, 2023&nbsp;&nbsp;15:04:58</a>
                         </span>
                     
                     
@@ -307,58 +307,77 @@
         </header>
 
         <div class="post-content">
-            <h1 id="VLMo"><a href="#VLMo" class="headerlink" title="VLMo"></a>VLMo</h1><h2 id="模型架构"><a href="#模型架构" class="headerlink" title="模型架构"></a>模型架构</h2><p><img src="/../images/Multimodal/2_1.png"></p>
+            <h1 id="TART"><a href="#TART" class="headerlink" title="TART"></a>TART</h1><h2 id="模型结构"><a href="#模型结构" class="headerlink" title="模型结构"></a>模型结构</h2><p><img src="/../images/Multimodal/4_1.png"></p>
+<h3 id="网络的核心做法即目的"><a href="#网络的核心做法即目的" class="headerlink" title="网络的核心做法即目的"></a>网络的核心做法即目的</h3><ul>
+<li>通过将每类原型转换到任务自适应度量空间的固定参考点上来提高泛化能力。</li>
+</ul>
+<h3 id="分类任务现状"><a href="#分类任务现状" class="headerlink" title="分类任务现状"></a>分类任务现状</h3><ul>
+<li>对应那些在单个特征空间独立表现每个特征的方法，他们的表现很大程度上&#x3D;&#x3D;取决于类间方差&#x3D;&#x3D;，他们处理在少样本学习的过拟合问题通过直接采用支持样本的隐藏特征作为分类器。但是&#x3D;&#x3D;当类间的区别过小就会出现分类失败的情况&#x3D;&#x3D;。(如图中Task1，很难分辨Science和Tech这两个类)</li>
+</ul>
+<p><img src="/../images/Multimodal/4_2.png"></p>
 <ul>
-<li>Multiway Transformer结构包含3个模态专家：<ol>
-<li>V-FFN专门用于处理图像编码。</li>
-<li>L-FFN专门用于处理文本编码。</li>
-<li>VL-FFN专门用于处理图像文本对编码。</li>
-</ol>
-</li>
-<li>权重共享</li>
+<li>但是将分类任务中的Tech换成Taste就可以发现分类的准确性大大提高。（如上图Task2）</li>
 </ul>
-<h2 id="模型输入"><a href="#模型输入" class="headerlink" title="模型输入"></a>模型输入</h2><ul>
-<li><p>图像部分</p>
-</li>
-<li><p>图像的输入是采用像素块这样的结构。一张2D图像的大小为（H，W，C），（H，W）为图像的输入分辨率，C是通道数。</p>
-</li>
-<li><p>假如一个像素块的大小是（P，P），一张图片可以塞下N&#x3D;HW&#x2F;P^2^个像素块，图像又有C个通道也就是最后会有N个像素块，每个像素块的分辨率为P^2^C，将其表示为一个N X（P^2^C），然后将图像补丁平铺成矢量，并进行线性投影，以获得补丁嵌入。最后加入一个[cls]标记，可学习的一维位置嵌入，和图像类型嵌入。</p>
-</li>
-<li><p><img src="/../images/Multimodal/2_2.png"></p>
-</li>
-<li><p><img src="/../images/Multimodal/2_3.png"></p>
-</li>
-<li><p>文本部分</p>
-</li>
-<li><p>遵循BERT，通过WordPiece 将文本标记为子词单元。序列开始标记([T_CLS])和特殊边界标记([T_SEP])被添加到文本序列中。文本输入表示 Hw 0 &#x3D;<br>R(M+2)×D通过对相应的单词嵌入、文本位置嵌入和文本类型嵌入求和来计算</p>
-</li>
-<li><p><img src="/../images/Multimodal/2_4.png"></p>
-</li>
-<li><p>M表示标记化子字单元的长度。</p>
-</li>
-<li><p>文本图像表示</p>
-</li>
-<li><p>(H<del>0</del>)^vl^&#x3D;[(H<del>0</del>)^w^,(H<del>0</del>)^v^]</p>
-</li>
-</ul>
-<h2 id="模型训练"><a href="#模型训练" class="headerlink" title="模型训练"></a>模型训练</h2><h3 id="分阶段训练"><a href="#分阶段训练" class="headerlink" title="分阶段训练"></a>分阶段训练</h3><p>目的是为了更高效的利用更多数据（纯图像，纯文本），而不仅仅利用图像-文本对。可以学习到更具通用性表征。</p>
-<p><img src="/../images/Multimodal/2_5.png"></p>
+<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p><img src="/../images/Multimodal/4_3.png"></p>
 <ul>
-<li>第一阶段<ol>
-<li>&#x3D;&#x3D;使用BEiT中提过的遮蔽图像建模技术对V-FFN进行训练。&#x3D;&#x3D;</li>
-<li>之后使用遮蔽文本（BERT）技术对L-FFN进行训练。</li>
-</ol>
-</li>
-<li>第二阶段<ol>
-<li>用预训练好的视觉和文本网络来初始化文本-图像的预训练。训练时使用的3个loss函数与ALBEF相同。</li>
-</ol>
-</li>
+<li>对于在原始特征空间中无法区分的可比类别，如果&#x3D;&#x3D;我们能将它们的类别原型投影到另一个小空间中的每个类别的固定点（称为参考点）上&#x3D;&#x3D;，则有助于增强转换空间中类别原型之间的发散性。</li>
+<li>提出了一种&#x3D;&#x3D;新的判别参考正则化方法，以最大限度地提高任务适应性度量空间中变换原型之间的发散性&#x3D;&#x3D;，从而进一步提高性能。</li>
 </ul>
-<p><img src="/../images/Multimodal/2_6.png"></p>
-<h2 id="亮点"><a href="#亮点" class="headerlink" title="亮点"></a>亮点</h2><ul>
-<li>在预训练环节，作者首先&#x3D;&#x3D;在图像数据上对attention结构进行了训练，而在文本数据上却直接选择将attention层冻住&#x3D;&#x3D;，甚至不进行微调。但效果依然及其出色，作者在文中也做了实验，发现如果先&#x3D;&#x3D;在文本数据上训练在图像训练时将attention冻住效果就会变得很差。&#x3D;&#x3D;这个现象或许可以为后续的工作进行极大的训练时间和资源的减轻。</li>
-<li>这篇文章作者提出的共享权重确实亮眼，相较于双塔结构，这更像是单塔结构，参数量大大下降，效果却也很好。</li>
+<h3 id="网络构成"><a href="#网络构成" class="headerlink" title="网络构成"></a>网络构成</h3><ol>
+<li>Task-Adaptive Reference Transfer Module（任务自适应参考转移模块） ：用于构建一个任务自适应度量空间，并将上下文嵌入从任务无关空间投射到任务特定空间。</li>
+<li>Discriminative Reference Regularization (判别参考正则化)：用于测量转换原型之间的距离。</li>
+</ol>
+<h4 id="方式"><a href="#方式" class="headerlink" title="方式"></a>方式</h4><ul>
+<li>首先，我们引入一组参考向量 {r1, .rN } 作为变换空间的固定点，通过线性层（reference layer称为参考层）学习。我们使用参考层的权重矩阵和支持上下文嵌入的原型集来计算变换矩阵。形式上，&#x3D;&#x3D;让 R 表示参考层的权重矩阵，P 表示支持文本的原型矩阵。我们通过找到 P W &#x3D; R 的矩阵来构建转换矩阵 W。&#x3D;&#x3D;</li>
+<li>每一类原型可通过&#x3D;&#x3D;平均情景嵌入&#x3D;&#x3D;得到。（如下）</li>
 </ul>
+<p><img src="/../images/Multimodal/4_4.png"></p>
+<blockquote>
+<ol>
+<li>S<del>c</del>代表c类样本。</li>
+<li>参考权重矩阵被定义为<img src="/../images/Multimodal/4_5.png">，R ∈ R^N×E^。其中R的每一行都是在&#x3D;&#x3D;训练阶段学到的&#x3D;&#x3D;参考向量。</li>
+</ol>
+</blockquote>
+<ul>
+<li>对于每一个查询输入，给定一个距离函数d可以用d结合softmax函数作为每一个查询与原型的概率来区分。</li>
+</ul>
+<p><img src="/../images/Multimodal/4_6.png"></p>
+<blockquote>
+<ol>
+<li>x<del>q</del>是查询输入。</li>
+<li>p<del>c</del>是原型向量。</li>
+</ol>
+</blockquote>
+<h2 id="LOSS函数"><a href="#LOSS函数" class="headerlink" title="LOSS函数"></a>LOSS函数</h2><ul>
+<li>距离函数：通常使用&#x3D;&#x3D;余弦距离或欧氏平方距离&#x3D;&#x3D;，通过最小化分类损失L<del>cls</del>来最小化距离。</li>
+</ul>
+<p><img src="/../images/Multimodal/4_7.png"></p>
+<blockquote>
+<ol>
+<li>针对这个函数，x<del>q</del>和p<del>c</del>是一对对应向量，损失函数实际就是CrossEntropy。</li>
+<li>前面的概率实际代表在输入为x<del>p</del>的情况下，对应标签为c的概率。</li>
+<li>由于标签类是一个长度为c的one-hot向量除了c之外的标签为0，所以根据CrossEntropy算法，实际结果只有对应标签的概率，加一个log就成中括号里的部分，前面的求和实际是对所有的输入进行考虑。</li>
+</ol>
+</blockquote>
+<ul>
+<li>参考向量的训练：P &#x3D; {p1, . . . , pN }是原型集，W是转换矩阵。通过下面的损失函数即可最大化参考层。</li>
+</ul>
+<p><img src="/../images/Multimodal/4_8.png"></p>
+<h3 id="总loss函数：L-Lcls-λLdrr"><a href="#总loss函数：L-Lcls-λLdrr" class="headerlink" title="总loss函数：L &#x3D; Lcls + λLdrr"></a>总loss函数：L &#x3D; Lcls + λLdrr</h3><ul>
+<li>本文设置λ为0.5。</li>
+</ul>
+<h2 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h2><p><img src="/../images/Multimodal/4_9.png"></p>
+<ol>
+<li>&#x3D;&#x3D;模型参数和参考层是随机初始化的&#x3D;&#x3D;。</li>
+<li>给定每个训练集，我们从训练数据集中随机选择支持集和查询集中的 T 个集。</li>
+<li>每个集由 N 个类别中的 K 个标记样本组成。</li>
+<li>利用类别 c 的支持集 S<del>c</del>，得到每个类别的原型 p<del>c</del>（第 5 行）。</li>
+<li>转换矩阵 W 是作为任务适应性投影矩阵计算的（第 7-9 行）。</li>
+<li>对于每个查询输入，转换后的查询嵌入和每个转换后的原型之间的距离都是在任务适应性度量空间中测量的，并利用这些距离计算分类损失 Lcls（第 10-12 行）。</li>
+<li>判别损失是通过每一集的原型集获得的（第 15 行）。根</li>
+<li>据总损失 L 更新特征编码器和参考层的可学习参数（第 16 行）。这一过程在每一集剩余的新文本和新查询中重复进行。</li>
+</ol>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>实际上第一轮就是用随机初始的参考层，和提取的原型来计算W，再用W去算loss最后&#x3D;&#x3D;每一轮更新一下初始层（不更新W，W是算出来的）&#x3D;&#x3D;。</p>
 
         </div>
 
@@ -373,7 +392,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2023/10/06/VLMo/">http://example.com/2023/10/06/VLMo/</a></span>
+                        <span><a href="http://example.com/2023/10/06/TART/">http://example.com/2023/10/06/TART/</a></span>
                     </p>
                 
                 
@@ -406,10 +425,10 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2023/10/06/Blip/">Blip</a>
+                <a class="prev" rel="prev" href="/2023/10/06/ViLT/">ViLT</a>
             
             
-            <a class="next" rel="next" href="/2023/10/06/ALBEF/">ALBEF</a>
+            <a class="next" rel="next" href="/2023/10/06/Blip/">Blip</a>
             
         </section>
 

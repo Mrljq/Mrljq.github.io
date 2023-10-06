@@ -307,7 +307,7 @@
         </header>
 
         <div class="post-content">
-            <h1 id="Blip"><a href="#Blip" class="headerlink" title="Blip"></a>Blip</h1><h2 id="模型架构"><a href="#模型架构" class="headerlink" title="模型架构"></a>模型架构</h2><p><img src="C:\Users\lijia\Desktop\多模态笔记\pic\XS6}@7~YVI411G6R~WT5CPM.png" alt="模型架构"></p>
+            <h1 id="Blip"><a href="#Blip" class="headerlink" title="Blip"></a>Blip</h1><h2 id="模型架构"><a href="#模型架构" class="headerlink" title="模型架构"></a>模型架构</h2><p><img src="/../images/Multimodal/XS6%7D@7~YVI411G6R~WT5CPM.png" alt="模型架构"></p>
 <h3 id="3种模块"><a href="#3种模块" class="headerlink" title="3种模块"></a>3种模块</h3><ol>
 <li>单模态编码器，在上图中就表现为左侧的两个模型，就是SA和FF。</li>
 <li>基于图像的文本编码器，对应上图第三个，在单模态基础上多加了一个CS。</li>
@@ -330,7 +330,7 @@
 <li>ITM</li>
 <li>&#x3D;&#x3D;LM（这里与ALBEF和VLMo不同）&#x3D;&#x3D;：文本编码器和文本解码器共享除 SA 层以外的所有参数，嵌入层、CA 层和 FFN 在编码和解码任务之间的功能类似，因此共享这些层可以提高训练效率。</li>
 </ul>
-<h2 id="Filter-Captioner"><a href="#Filter-Captioner" class="headerlink" title="Filter Captioner"></a>Filter Captioner</h2><p>![](C:\Users\lijia\Desktop\多模态笔记\pic\屏幕截图 2023-09-13 093917.png)</p>
+<h2 id="Filter-Captioner"><a href="#Filter-Captioner" class="headerlink" title="Filter Captioner"></a>Filter Captioner</h2><p><img src="/../images/Multimodal/3_1.png"></p>
 <p>由于注释成本过高，高质量的人工注释图像文本数量有限。而从网上自动下载的图像文本对中的文本又很难准确的描述的图像</p>
 <p>引入Filter 和 Captioner的目的是：从带有噪声的图像-文本对中学习。</p>
 <h3 id="两部分"><a href="#两部分" class="headerlink" title="两部分"></a>两部分</h3><ul>
@@ -347,12 +347,12 @@
 <li><p>image transformer使用ViT-B，Text transformer使用BERT<del>base</del></p>
 </li>
 </ul>
-<h3 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h3><p>![](C:\Users\lijia\Desktop\多模态笔记\pic\屏幕截图 2023-09-25 183755.png)</p>
+<h3 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h3><p><img src="/../images/Multimodal/3_2.png"></p>
 <ul>
 <li>该表展示了在Captioner和Filter在不同预训练数据集以及不同下游任务上的表现，可以看出当单独使用Captioner或Filter时效果都有上升，同时使用效果更好。</li>
 <li>TR代表text retrieval，IR代表image retrieval。B&#x2F;L是ViT-B和ViT-L。</li>
 </ul>
-<p>![](C:\Users\lijia\Desktop\多模态笔记\pic\屏幕截图 2023-09-25 184909.png)</p>
+<p><img src="/../images/Multimodal/3_3.png"></p>
 <ul>
 <li>该表展示了不同共享方式下在下游任务上的表现，可以发现当共享除了self attention层以外的其他全部层时效果变好。（对于encoder和decoder）</li>
 </ul>
@@ -415,6 +415,8 @@
             </div>
         </section>
         <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/10/06/TART/">TART</a>
             
             
             <a class="next" rel="next" href="/2023/10/06/VLMo/">VLMo</a>

@@ -13,7 +13,7 @@
 
 
 
-<title>VLMo | Hexo</title>
+<title>ViLT | Hexo</title>
 
 
 
@@ -289,7 +289,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">VLMo</h1>
+            <h1 class="post-title">ViLT</h1>
             
                 <div class="post-meta">
                     
@@ -298,7 +298,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">October 6, 2023&nbsp;&nbsp;14:28:27</a>
+                        Date: <a href="#">October 6, 2023&nbsp;&nbsp;15:10:42</a>
                         </span>
                     
                     
@@ -307,58 +307,45 @@
         </header>
 
         <div class="post-content">
-            <h1 id="VLMo"><a href="#VLMo" class="headerlink" title="VLMo"></a>VLMo</h1><h2 id="模型架构"><a href="#模型架构" class="headerlink" title="模型架构"></a>模型架构</h2><p><img src="/../images/Multimodal/2_1.png"></p>
-<ul>
-<li>Multiway Transformer结构包含3个模态专家：<ol>
-<li>V-FFN专门用于处理图像编码。</li>
-<li>L-FFN专门用于处理文本编码。</li>
-<li>VL-FFN专门用于处理图像文本对编码。</li>
+            <h1 id="ViLT"><a href="#ViLT" class="headerlink" title="ViLT"></a>ViLT</h1><h2 id="现有研究"><a href="#现有研究" class="headerlink" title="现有研究"></a>现有研究</h2><p><img src="/../images/Multimodal/5_1.png"></p>
+<p>目前的 视觉语言预训练（VLP ）方法&#x3D;&#x3D;严重依赖于图像特征提取过程&#x3D;&#x3D;，其中大部分涉及区域监督（如物体检测）和卷积架构（如 ResNet）。</p>
+<p>上图中第一列就是引入CNN和目标识别的网络，第二列只使用CNN Backbone提取特征图再使用一个线性层将特征图处理一下即可。</p>
+<p>引入区域性特征提取的原因：transformer无法接受图片这么长的序列，需要将图片处理成可以被接受的序列长度，类似文本的token，再将这些&#x3D;&#x3D;离散的特征&#x3D;&#x3D;进行自监督学习。</p>
+<p>这样的区域性特征带来了如下问题：</p>
+<ol>
+<li>运行速度慢，需要把图片先过一遍目标检测。</li>
+<li>特征分类少，现有的分类模型最多也就几千类，coco只有80类，这样势必无法充分满足对于图片提取的需求。</li>
 </ol>
-</li>
-<li>权重共享</li>
-</ul>
-<h2 id="模型输入"><a href="#模型输入" class="headerlink" title="模型输入"></a>模型输入</h2><ul>
-<li><p>图像部分</p>
-</li>
-<li><p>图像的输入是采用像素块这样的结构。一张2D图像的大小为（H，W，C），（H，W）为图像的输入分辨率，C是通道数。</p>
-</li>
-<li><p>假如一个像素块的大小是（P，P），一张图片可以塞下N&#x3D;HW&#x2F;P^2^个像素块，图像又有C个通道也就是最后会有N个像素块，每个像素块的分辨率为P^2^C，将其表示为一个N X（P^2^C），然后将图像补丁平铺成矢量，并进行线性投影，以获得补丁嵌入。最后加入一个[cls]标记，可学习的一维位置嵌入，和图像类型嵌入。</p>
-</li>
-<li><p><img src="/../images/Multimodal/2_2.png"></p>
-</li>
-<li><p><img src="/../images/Multimodal/2_3.png"></p>
-</li>
-<li><p>文本部分</p>
-</li>
-<li><p>遵循BERT，通过WordPiece 将文本标记为子词单元。序列开始标记([T_CLS])和特殊边界标记([T_SEP])被添加到文本序列中。文本输入表示 Hw 0 &#x3D;<br>R(M+2)×D通过对相应的单词嵌入、文本位置嵌入和文本类型嵌入求和来计算</p>
-</li>
-<li><p><img src="/../images/Multimodal/2_4.png"></p>
-</li>
-<li><p>M表示标记化子字单元的长度。</p>
-</li>
-<li><p>文本图像表示</p>
-</li>
-<li><p>(H<del>0</del>)^vl^&#x3D;[(H<del>0</del>)^w^,(H<del>0</del>)^v^]</p>
-</li>
-</ul>
-<h2 id="模型训练"><a href="#模型训练" class="headerlink" title="模型训练"></a>模型训练</h2><h3 id="分阶段训练"><a href="#分阶段训练" class="headerlink" title="分阶段训练"></a>分阶段训练</h3><p>目的是为了更高效的利用更多数据（纯图像，纯文本），而不仅仅利用图像-文本对。可以学习到更具通用性表征。</p>
-<p><img src="/../images/Multimodal/2_5.png"></p>
-<ul>
-<li>第一阶段<ol>
-<li>&#x3D;&#x3D;使用BEiT中提过的遮蔽图像建模技术对V-FFN进行训练。&#x3D;&#x3D;</li>
-<li>之后使用遮蔽文本（BERT）技术对L-FFN进行训练。</li>
+<p><img src="/../images/Multimodal/5_2.png"></p>
+<p>根据上图可以看出来，使用目标检测的网络效果是最优的，而第二列使用像素分割的方式明显效果大大下降。</p>
+<p><img src="/../images/Multimodal/5_3.png"></p>
+<p>从左到右依次是目前不同类型VLP模型的结构图，&#x3D;&#x3D;应该加大模态融合层&#x3D;&#x3D;的存在才能提高效果。</p>
+<p>简单模态交互都无法有效完成NLVR2的任务。即使是来自表现优异的单模态嵌入器(CLIP)的简单融合输出，也可能不足以学习复杂的视觉和语言任务，这就更需要一种更严格的跨模态交互方案。</p>
+<h2 id="本文做法"><a href="#本文做法" class="headerlink" title="本文做法"></a>本文做法</h2><p>不使用卷积或者区域特征</p>
+<ol>
+<li>委托转换器模块来提取和处理视觉特征，而不是单独的深度视觉嵌入器。这种设计从本质上大大提高了运行时间和参数效率。</li>
+<li>首次通过实证研究表明，VLP 训练方案中前所未有的&#x3D;&#x3D;全词屏蔽和图像增强技术&#x3D;&#x3D;进一步推动了下游性能的提高。</li>
 </ol>
-</li>
-<li>第二阶段<ol>
-<li>用预训练好的视觉和文本网络来初始化文本-图像的预训练。训练时使用的3个loss函数与ALBEF相同。</li>
+<h2 id="模型结构"><a href="#模型结构" class="headerlink" title="模型结构"></a>模型结构</h2><p><img src="/../images/Multimodal/5_4.png"></p>
+<p>对图像补丁进行线性投影。补丁投影嵌入由ViT引入。</p>
+<p><img src="/../images/Multimodal/5_5.png"></p>
+<p>文本 t ∈ R^L×|V|^ 以单词嵌入矩阵 T∈ R^|V|×H^ 和位置嵌入矩阵 T^pos^∈ R^(L+1)×H^ 嵌入到 ̄ t∈ R^L×H^ 中。</p>
+<p>输入图像 I ∈ R^C×H×W^ 被切片为图块并展平为 v ∈ R^N×(P^^2^^·C)^，其中 (P, P ) 是图块分辨率，N &#x3D; HW&#x2F;P 2。随后是线性投影 V ∈ R^(P2·C)×H^ 和位置嵌入 V pos ∈ R^(N+1)×H^ ，v 嵌入到 ̄ v ∈ R^N×H^ 中。</p>
+<p>文本和图像嵌入与其相应的模态类型嵌入向量 t^type^, v^type^ ∈ R^H^ 相加，然后连接成组合序列 z0。上下文向量 z 通过 D (transformer layer)深度变换层迭代更新，直到最终的上下文序列 z^D^。 p 是整个多模态输入的池化表示，通过对序列 z^D^ 的第一个索引应用线性投影 Wpool ∈ R^H×H^ 和双曲正切来获得。</p>
+<h2 id="创新"><a href="#创新" class="headerlink" title="创新"></a>创新</h2><h3 id="全词屏蔽："><a href="#全词屏蔽：" class="headerlink" title="全词屏蔽："></a>全词屏蔽：</h3><p>为了充分利用来自其他模态的信息，全字掩码对于 VLP 特别重要。例如，使用预先训练的 bert-base-uncased 分词器将单词“giraffe”分词为三个单词标记 [“gi”、“##raf”、“##fe”]。&#x3D;&#x3D;如果并非所有标记都被屏蔽，例如 [“gi”、“[MASK]”、“##fe”]，则模型可能仅依赖于附近的两个语言标记 [“gi”、“##fe”] 来预测屏蔽的“##raf”，而不是使用图像中的信息&#x3D;&#x3D;。</p>
+<h3 id="图像增强"><a href="#图像增强" class="headerlink" title="图像增强"></a>图像增强</h3><p>应用&#x3D;&#x3D;RandAugment&#x3D;&#x3D;。我们使用了除以下两个方法之外的所有方法：</p>
+<ol>
+<li>颜色反转，因为文本通常也包含颜色信息。</li>
+<li>剪切，因为它可能清除分散在整个图像中的小但重要的对象。我们使用 N &#x3D; 2、M &#x3D; 9 作为超参数。我们将在第 4.5 节和第 5 节中讨论其影响。</li>
 </ol>
+<h2 id="训练"><a href="#训练" class="headerlink" title="训练"></a>训练</h2><h3 id="优化器：-AdamW"><a href="#优化器：-AdamW" class="headerlink" title="优化器： AdamW"></a>优化器： AdamW</h3><p>learning rate&#x3D;10^-4^</p>
+<p>weight decay&#x3D;10^-2^</p>
+<h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><h3 id="Classification-Tasks"><a href="#Classification-Tasks" class="headerlink" title="Classification Tasks"></a>Classification Tasks</h3><ol>
+<li><p>视觉问题解答。VQAv2 任务要求用自然语言给出图像和问题对的答案。注释的答案原本是自由形式的自然语言，但通常的做法是将该任务转换为具有 3129 个答案类别的分类任务。按照这种做法，我们在 VQAv2 训练集和验证集上对 ViLT-B&#x2F;32 进行了微调，同时为内部验证保留了 1,000 张验证图片及其相关问题。</p>
 </li>
-</ul>
-<p><img src="/../images/Multimodal/2_6.png"></p>
-<h2 id="亮点"><a href="#亮点" class="headerlink" title="亮点"></a>亮点</h2><ul>
-<li>在预训练环节，作者首先&#x3D;&#x3D;在图像数据上对attention结构进行了训练，而在文本数据上却直接选择将attention层冻住&#x3D;&#x3D;，甚至不进行微调。但效果依然及其出色，作者在文中也做了实验，发现如果先&#x3D;&#x3D;在文本数据上训练在图像训练时将attention冻住效果就会变得很差。&#x3D;&#x3D;这个现象或许可以为后续的工作进行极大的训练时间和资源的减轻。</li>
-<li>这篇文章作者提出的共享权重确实亮眼，相较于双塔结构，这更像是单塔结构，参数量大大下降，效果却也很好。</li>
-</ul>
+<li><p>自然语言视觉推理。NLVR2 任务是一项二元分类任务，由两幅图像和一个自然语言问题组成。由于与预训练设置不同，有两幅输入图像，我们采用了配对法。在这里，&#x3D;&#x3D;三连输入被重新组合为两对（问题、图像 1）和（问题、图像 2）&#x3D;&#x3D;，每对都要经过 ViLT。头部将两个池化表示的连接（p）作为输入，并输出二进制预测结果。</p>
+</li>
+</ol>
 
         </div>
 
@@ -373,7 +360,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2023/10/06/VLMo/">http://example.com/2023/10/06/VLMo/</a></span>
+                        <span><a href="http://example.com/2023/10/06/ViLT/">http://example.com/2023/10/06/ViLT/</a></span>
                     </p>
                 
                 
@@ -406,10 +393,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2023/10/06/Blip/">Blip</a>
             
-            
-            <a class="next" rel="next" href="/2023/10/06/ALBEF/">ALBEF</a>
+            <a class="next" rel="next" href="/2023/10/06/TART/">TART</a>
             
         </section>
 
