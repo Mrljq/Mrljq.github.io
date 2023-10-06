@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jiaqi Li">
+
+
+
+
+
+<title>ALBEF | Hexo</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+    <script>
+        !
+        function() {
+            function n(n, e, t) {
+                return n.getAttribute(e) || t
+            }
+            function e(n) {
+                return document.getElementsByTagName(n)
+            }
+            function t() {
+                var t = e("script"),
+                o = t.length,
+                i = t[o - 1];
+                return {
+                    l: o,
+                    z: n(i, "zIndex", -1), //置于主页面背后
+                    o: n(i, "opacity", .5), //线条透明度
+                    c: n(i, "color", "0,0,0"), //线条颜色
+                    n: n(i, "count", 100) //线条数量
+                }
+            }
+            function o() {
+                a = m.width = window.innerWidth ||
+        document.documentElement.clientWidth || document.body.clientWidth,
+                c = m.height = window.innerHeight ||
+        document.documentElement.clientHeight || document.body.clientHeight
+            }
+            function i() {
+                r.clearRect(0, 0, a, c);
+                var n, e, t, o, m, l;
+                s.forEach(function(i, x) {
+                    for (i.x += i.xa, i.y += i.ya, i.xa *= i.x > a || i.x < 0 ? -1 :
+        1, i.ya *= i.y > c || i.y < 0 ? -1 : 1, r.fillRect(i.x - .5, i.y - .5, 1,
+        1), e = x + 1; e < u.length; e++) n = u[e],
+                    null !== n.x && null !== n.y && (o = i.x - n.x, m = i.y - n.y, l
+        = o * o + m * m, l < n.max && (n === y && l >= n.max / 2 && (i.x -= .03 * o,
+        i.y -= .03 * m), t = (n.max - l) / n.max, r.beginPath(), r.lineWidth = t /
+        2, r.strokeStyle = "rgba(" + d.c + "," + (t + .2) + ")", r.moveTo(i.x, i.y),
+        r.lineTo(n.x, n.y), r.stroke()))
+                }),
+                x(i)
+            }
+            var a, c, u, m = document.createElement("canvas"),
+            d = t(),
+            l = "c_n" + d.l,
+            r = m.getContext("2d"),
+            x = window.requestAnimationFrame || window.webkitRequestAnimationFrame
+        || window.mozRequestAnimationFrame || window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+            function(n) {
+                window.setTimeout(n, 1e3 / 45)
+            },
+            w = Math.random,
+            y = {
+                x: null,
+                y: null,
+                max: 2e4
+            };
+            m.id = l,
+            m.style.cssText = "position:fixed;top:0;left:0;z-index:" + d.z +
+        ";opacity:" + d.o,
+            e("body")[0].appendChild(m),
+            o(),
+            window.onresize = o,
+            window.onmousemove = function(n) {
+                n = n || window.event,
+                y.x = n.clientX,
+                y.y = n.clientY
+            },
+            window.onmouseout = function() {
+                y.x = null,
+                y.y = null
+            };
+            for (var s = [], f = 0; d.n > f; f++) {
+                var h = w() * a,
+                g = w() * c,
+                v = 2 * w() - 1,
+                p = 2 * w() - 1;
+                s.push({
+                    x: h,
+                    y: g,
+                    xa: v,
+                    ya: p,
+                    max: 6e3
+                })
+            }
+            u = s.concat([y]),
+            setTimeout(function() {
+                i()
+            },
+            100)
+        } ();
+        </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jiaqi Li&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jiaqi Li&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">ALBEF</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jiaqi Li</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">October 6, 2023&nbsp;&nbsp;13:22:34</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="AlBEF"><a href="#AlBEF" class="headerlink" title="AlBEF"></a>AlBEF</h1><h2 id="模型架构"><a href="#模型架构" class="headerlink" title="模型架构"></a>模型架构</h2><p><img src="/../images/Multimodal/1.png"></p>
+<ul>
+<li>图像编码器使用的是12层visual transformer encoder &#x3D;&#x3D;ViT-B&#x2F;16&#x3D;&#x3D;, 并且用在ImageNet-1k预训练好的权重用于初始化。</li>
+<li>图像编码器部分使用6层transformer encoder，使用&#x3D;&#x3D;BERTbase&#x3D;&#x3D;模型的前六层用于初始化。</li>
+<li>模态融合层也使用6层transformer encoder，使用&#x3D;&#x3D;BERTbase&#x3D;&#x3D;模型的后六层进行初始化。</li>
+</ul>
+<h2 id="输入"><a href="#输入" class="headerlink" title="输入"></a>输入</h2><ul>
+<li>图像 <em><strong>I</strong></em> 被图像编码器转换为一串嵌入序列: {&#x3D;&#x3D;vcls&#x3D;&#x3D;, v1,…,vN }</li>
+<li>输入文本 <em><strong>T</strong></em> 被文本编码器编码为一串嵌入序列:{&#x3D;&#x3D;wcls&#x3D;&#x3D;, w1,…,wN }</li>
+</ul>
+<h2 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h2><ul>
+<li>在单模态编码器上进行图像-文本对比学习(ITC)，</li>
+<li>在多模态编码器上进行屏蔽语言建模(MLM)和图像-文本匹配(ITM)。&#x3D;&#x3D;(hard negatives)&#x3D;&#x3D;</li>
+<li>由于ITM的特性，将前期ITC获得的对比结果的匹配度第二高的图像-文本对当成&#x3D;&#x3D;不匹配&#x3D;&#x3D;来强行训练ITM。</li>
+</ul>
+<h3 id="损失函数详解"><a href="#损失函数详解" class="headerlink" title="损失函数详解"></a>损失函数详解</h3><h4 id="1-ITC-："><a href="#1-ITC-：" class="headerlink" title="1. ITC ："></a>1. ITC ：</h4><p><img src="/../images/Multimodal/2.png"></p>
+<p><img src="/../images/Multimodal/2.png"></p>
+<p><img src="/../images/Multimodal/3.png"></p>
+<p>g<del>v</del>(v<del>cls</del>)^T^代表图像的特征g<del>w</del>(w<del>cls</del>)^T^代表文本的特征，g^&#x2F;^<del>v</del>(v^&#x2F;^<del>cls</del>)^T^则是来自动量模型的图像特征，g^&#x2F;^<del>w</del>(w^&#x2F;^<del>cls</del>)^T^是来自动量模型的文本特征。<br>gv和gw是将[CLS]嵌入映射到归化低维(256-d)表示的线性变换。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">p中的M代表动量模型中生成的最新M个图像文本表示。</span><br><span class="line">而函数p本质上就是个softmax用于计算该文本或者图像与生成的M个表示的概率。</span><br><span class="line">L就是cross-entropy损失函数。</span><br><span class="line">H代表只有0，1代表匹配与否。</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-MLM："><a href="#2-MLM：" class="headerlink" title="2. MLM："></a>2. MLM：</h4><p>   <img src="/../images/Multimodal/5.png"></p>
+<p>采用的依然是cross-entropy损失函数，T^^^代表被mask掉的文本，p^msk^代表预测的概率。（就是bert）</p>
+<p> mask的概率是15%。</p>
+<h4 id="3-ITM"><a href="#3-ITM" class="headerlink" title="3. ITM:"></a>3. ITM:</h4><ul>
+<li><p>图像-文本匹配预测的是—对图像和文本是积极的(匹配)还是消极的(不匹配)也就是&#x3D;&#x3D;二分类&#x3D;&#x3D;。我们使用多模态编码器对[CLS]标记的输出嵌入作为图像-文本对的联合表示，并附加一个全连接(FC）层，然后使用softmax预测两类概率p^itm^。ITM损失为:</p>
+<p><img src="/../images/Multimodal/1NZFN8WCKCLXJ_%7B@7ERTA58.png"></p>
+<p>&#x3D;&#x3D;这里的二分类就出现了使用ITC的第二匹配度的加强训练&#x3D;&#x3D; ，因为正常的ITM只需要评价是否匹配上了但错误匹配太容易了，因此该函数会很快降下去。</p>
+</li>
+</ul>
+<h4 id="4-总损失函数"><a href="#4-总损失函数" class="headerlink" title="4. 总损失函数"></a>4. 总损失函数</h4><p> <img src="/../images/Multimodal/123.png"></p>
+<h2 id="Momentum-Distillation-动量蒸馏"><a href="#Momentum-Distillation-动量蒸馏" class="headerlink" title="Momentum Distillation 动量蒸馏"></a>Momentum Distillation 动量蒸馏</h2><p>用于预训练的图像-文本配对大多是从网络上收集的，它们往往是有噪声的。正文本对通常是弱相关的:文本可能包含与图像无关的词语，或者图像可能包含文本中没有描述的实体。&#x3D;&#x3D;对于ITC学习来说，图像的负文本也可能与图像内容相匹配。对于MLM来说，可能存在与注释不同的基他词语，它们对图像的描述同样出色(或更好)。但是，ITC和MLM的单点标签会对所有负面预测进行惩罚，无论其正确与否&#x3D;&#x3D;。</p>
+<h2 id="引入新loss"><a href="#引入新loss" class="headerlink" title="引入新loss"></a>引入新loss</h2><h3 id="1-Litc-mod"><a href="#1-Litc-mod" class="headerlink" title="1.(Litc)^mod^"></a>1.(L<del>itc</del>)^mod^</h3><ul>
+<li>首先利用动量单模态编码器的特征计算图像-文本相似度，即<img src="/../images/Multimodal/9.png"></li>
+<li>然后，我们用&#x3D;&#x3D;s^&#x2F;^代替softmax(就是上面ITC的p计算公式)中的s0，从而计算软伪目标q^i2t^和q^t2i^&#x3D;&#x3D;。ITC<del>MoD</del>损失定义为</li>
+<li><img src="/../images/Multimodal/8.png"></li>
+<li>这里的q^i2t^和q^t2i^实际上就是&#x3D;&#x3D;<strong>软化</strong>&#x3D;&#x3D;的one-hot。以期在训练时遇到噪声标签时可以有一个调整。</li>
+</ul>
+<h3 id="2-Lmlm-mod"><a href="#2-Lmlm-mod" class="headerlink" title="2.(Lmlm)^mod"></a>2.(L<del>mlm</del>)^mod</h3><ul>
+<li><p>与上文类似替换。</p>
+<p><img src="/../images/Multimodal/7.png"></p>
+</li>
+</ul>
+<h2 id="下游任务"><a href="#下游任务" class="headerlink" title="下游任务"></a>下游任务</h2><h4 id="可以把这个模型看成是一个提取特征的元器件，在不同的任务中只需要添加不同的输出头，或者把模块之间的组合稍加改变即可。"><a href="#可以把这个模型看成是一个提取特征的元器件，在不同的任务中只需要添加不同的输出头，或者把模块之间的组合稍加改变即可。" class="headerlink" title="可以把这个模型看成是一个提取特征的元器件，在不同的任务中只需要添加不同的输出头，或者把模块之间的组合稍加改变即可。"></a>可以把这个模型看成是一个提取特征的元器件，在不同的任务中只需要添加不同的输出头，或者把模块之间的组合稍加改变即可。</h4><p> <img src="/../images/Multimodal/6.png"></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Jiaqi Li</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://example.com/2023/10/06/ALBEF/">http://example.com/2023/10/06/ALBEF/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/10/06/VLMo/">VLMo</a>
+            
+            
+            <a class="next" rel="next" href="/2023/10/06/hexo%E7%BB%93%E5%90%88Github%E6%90%AD%E5%BB%BA%E8%87%AA%E5%B7%B1%E7%9A%84%E5%8D%9A%E5%AE%A2/">hexo结合Github搭建自己的博客</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jiaqi Li | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

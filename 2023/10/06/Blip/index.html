@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jiaqi Li">
+
+
+
+
+
+<title>Blip | Hexo</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+    <script>
+        !
+        function() {
+            function n(n, e, t) {
+                return n.getAttribute(e) || t
+            }
+            function e(n) {
+                return document.getElementsByTagName(n)
+            }
+            function t() {
+                var t = e("script"),
+                o = t.length,
+                i = t[o - 1];
+                return {
+                    l: o,
+                    z: n(i, "zIndex", -1), //置于主页面背后
+                    o: n(i, "opacity", .5), //线条透明度
+                    c: n(i, "color", "0,0,0"), //线条颜色
+                    n: n(i, "count", 100) //线条数量
+                }
+            }
+            function o() {
+                a = m.width = window.innerWidth ||
+        document.documentElement.clientWidth || document.body.clientWidth,
+                c = m.height = window.innerHeight ||
+        document.documentElement.clientHeight || document.body.clientHeight
+            }
+            function i() {
+                r.clearRect(0, 0, a, c);
+                var n, e, t, o, m, l;
+                s.forEach(function(i, x) {
+                    for (i.x += i.xa, i.y += i.ya, i.xa *= i.x > a || i.x < 0 ? -1 :
+        1, i.ya *= i.y > c || i.y < 0 ? -1 : 1, r.fillRect(i.x - .5, i.y - .5, 1,
+        1), e = x + 1; e < u.length; e++) n = u[e],
+                    null !== n.x && null !== n.y && (o = i.x - n.x, m = i.y - n.y, l
+        = o * o + m * m, l < n.max && (n === y && l >= n.max / 2 && (i.x -= .03 * o,
+        i.y -= .03 * m), t = (n.max - l) / n.max, r.beginPath(), r.lineWidth = t /
+        2, r.strokeStyle = "rgba(" + d.c + "," + (t + .2) + ")", r.moveTo(i.x, i.y),
+        r.lineTo(n.x, n.y), r.stroke()))
+                }),
+                x(i)
+            }
+            var a, c, u, m = document.createElement("canvas"),
+            d = t(),
+            l = "c_n" + d.l,
+            r = m.getContext("2d"),
+            x = window.requestAnimationFrame || window.webkitRequestAnimationFrame
+        || window.mozRequestAnimationFrame || window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+            function(n) {
+                window.setTimeout(n, 1e3 / 45)
+            },
+            w = Math.random,
+            y = {
+                x: null,
+                y: null,
+                max: 2e4
+            };
+            m.id = l,
+            m.style.cssText = "position:fixed;top:0;left:0;z-index:" + d.z +
+        ";opacity:" + d.o,
+            e("body")[0].appendChild(m),
+            o(),
+            window.onresize = o,
+            window.onmousemove = function(n) {
+                n = n || window.event,
+                y.x = n.clientX,
+                y.y = n.clientY
+            },
+            window.onmouseout = function() {
+                y.x = null,
+                y.y = null
+            };
+            for (var s = [], f = 0; d.n > f; f++) {
+                var h = w() * a,
+                g = w() * c,
+                v = 2 * w() - 1,
+                p = 2 * w() - 1;
+                s.push({
+                    x: h,
+                    y: g,
+                    xa: v,
+                    ya: p,
+                    max: 6e3
+                })
+            }
+            u = s.concat([y]),
+            setTimeout(function() {
+                i()
+            },
+            100)
+        } ();
+        </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jiaqi Li&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jiaqi Li&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Blip</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jiaqi Li</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">October 6, 2023&nbsp;&nbsp;14:34:50</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="Blip"><a href="#Blip" class="headerlink" title="Blip"></a>Blip</h1><h2 id="模型架构"><a href="#模型架构" class="headerlink" title="模型架构"></a>模型架构</h2><p><img src="C:\Users\lijia\Desktop\多模态笔记\pic\XS6}@7~YVI411G6R~WT5CPM.png" alt="模型架构"></p>
+<h3 id="3种模块"><a href="#3种模块" class="headerlink" title="3种模块"></a>3种模块</h3><ol>
+<li>单模态编码器，在上图中就表现为左侧的两个模型，就是SA和FF。</li>
+<li>基于图像的文本编码器，对应上图第三个，在单模态基础上多加了一个CS。</li>
+<li>基于图像的文本解码器，结构与基于图像的文本编码器类似，就是SA带有mask变成解码器，用来完成文本生成任务。</li>
+</ol>
+<h2 id="模型训练"><a href="#模型训练" class="headerlink" title="模型训练"></a>模型训练</h2><ul>
+<li>由于本次任务是做文本生成，因此完全使用encoder结构肯定就不行，需要引入decoder结构。</li>
+<li>使用vision transformer将图像编码并使用[CLS]token来表示全局图像特征。</li>
+<li>&#x3D;&#x3D;文本编码器与 BERT&#x3D;&#x3D;相同，在文本输入的开头附加一个 [CLS] 标记，以概括句子内容。</li>
+<li><strong>Image-grounded text encoder</strong>：一个特殊[Encode]标记被附加在文本中，[Encode] 的输出嵌入被用于作为图像-文本对的多模态表示。</li>
+<li><strong>Image-grounded text decoder</strong>：[Decode]标记被用于表示序列的开始。用因果自注意层取代了图像基础文本编码器中的双向自注意层</li>
+</ul>
+<h2 id="输入"><a href="#输入" class="headerlink" title="输入"></a>输入</h2><ul>
+<li>图像：将输入图像划分为多个片段，并将其编码为嵌入序列，再加上一个 [CLS] 标记来表示全局图像特征。</li>
+</ul>
+<h2 id="loss"><a href="#loss" class="headerlink" title="loss"></a>loss</h2><p>每个图像-文本对只需通过一次计算量较大的视觉转换器，以及通过三次文本转换器，其中不同的功能将被激活，以计算三种损失。</p>
+<p>3种loss：</p>
+<ul>
+<li>ITC</li>
+<li>ITM</li>
+<li>&#x3D;&#x3D;LM（这里与ALBEF和VLMo不同）&#x3D;&#x3D;：文本编码器和文本解码器共享除 SA 层以外的所有参数，嵌入层、CA 层和 FFN 在编码和解码任务之间的功能类似，因此共享这些层可以提高训练效率。</li>
+</ul>
+<h2 id="Filter-Captioner"><a href="#Filter-Captioner" class="headerlink" title="Filter Captioner"></a>Filter Captioner</h2><p>![](C:\Users\lijia\Desktop\多模态笔记\pic\屏幕截图 2023-09-13 093917.png)</p>
+<p>由于注释成本过高，高质量的人工注释图像文本数量有限。而从网上自动下载的图像文本对中的文本又很难准确的描述的图像</p>
+<p>引入Filter 和 Captioner的目的是：从带有噪声的图像-文本对中学习。</p>
+<h3 id="两部分"><a href="#两部分" class="headerlink" title="两部分"></a>两部分</h3><ul>
+<li><p>Captioner：为网络图片生成标题。是一种<strong>Image-grounded text decoder</strong>。给定图像生成文本用LM目标来微调。</p>
+<ul>
+<li>使用LM作为目标进行微调，来解码给定图像的文本，每张图片生成一个标题。</li>
+</ul>
+</li>
+<li><p>Filter去除噪声图片-文本对。是一种<strong>Image-grounded text encoder</strong>。</p>
+<ul>
+<li>使用ITC和ITM目标进行微调来学习文本和图像是否吻合。</li>
+</ul>
+</li>
+<li><p>image transformer使用ViT-B，Text transformer使用BERT<del>base</del></p>
+</li>
+</ul>
+<h3 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h3><p>![](C:\Users\lijia\Desktop\多模态笔记\pic\屏幕截图 2023-09-25 183755.png)</p>
+<ul>
+<li>该表展示了在Captioner和Filter在不同预训练数据集以及不同下游任务上的表现，可以看出当单独使用Captioner或Filter时效果都有上升，同时使用效果更好。</li>
+<li>TR代表text retrieval，IR代表image retrieval。B&#x2F;L是ViT-B和ViT-L。</li>
+</ul>
+<p>![](C:\Users\lijia\Desktop\多模态笔记\pic\屏幕截图 2023-09-25 184909.png)</p>
+<ul>
+<li>该表展示了不同共享方式下在下游任务上的表现，可以发现当共享除了self attention层以外的其他全部层时效果变好。（对于encoder和decoder）</li>
+</ul>
+<h3 id="训练方式"><a href="#训练方式" class="headerlink" title="训练方式"></a>训练方式</h3><p>* </p>
+<h3 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h3><ul>
+<li>coco</li>
+<li>LAION</li>
+<li>Visual Genome</li>
+<li>Conceptual Captions</li>
+<li>Conceptual 12M</li>
+<li>SBU captions</li>
+</ul>
+<h2 id="亮点"><a href="#亮点" class="headerlink" title="亮点"></a>亮点</h2><ul>
+<li>使用了VLMo中的共享参数机制。</li>
+<li>结合了ALBEF和VLMo</li>
+</ul>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Jiaqi Li</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://example.com/2023/10/06/Blip/">http://example.com/2023/10/06/Blip/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2023/10/06/VLMo/">VLMo</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jiaqi Li | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
