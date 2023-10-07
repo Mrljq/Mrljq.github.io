@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jiaqi Li">
+
+
+
+
+
+<title>All in Tokens Unifying Output Space of Visual Tasks via Soft Token | Hexo</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+    <script>
+        !
+        function() {
+            function n(n, e, t) {
+                return n.getAttribute(e) || t
+            }
+            function e(n) {
+                return document.getElementsByTagName(n)
+            }
+            function t() {
+                var t = e("script"),
+                o = t.length,
+                i = t[o - 1];
+                return {
+                    l: o,
+                    z: n(i, "zIndex", -1), //置于主页面背后
+                    o: n(i, "opacity", .5), //线条透明度
+                    c: n(i, "color", "0,0,0"), //线条颜色
+                    n: n(i, "count", 100) //线条数量
+                }
+            }
+            function o() {
+                a = m.width = window.innerWidth ||
+        document.documentElement.clientWidth || document.body.clientWidth,
+                c = m.height = window.innerHeight ||
+        document.documentElement.clientHeight || document.body.clientHeight
+            }
+            function i() {
+                r.clearRect(0, 0, a, c);
+                var n, e, t, o, m, l;
+                s.forEach(function(i, x) {
+                    for (i.x += i.xa, i.y += i.ya, i.xa *= i.x > a || i.x < 0 ? -1 :
+        1, i.ya *= i.y > c || i.y < 0 ? -1 : 1, r.fillRect(i.x - .5, i.y - .5, 1,
+        1), e = x + 1; e < u.length; e++) n = u[e],
+                    null !== n.x && null !== n.y && (o = i.x - n.x, m = i.y - n.y, l
+        = o * o + m * m, l < n.max && (n === y && l >= n.max / 2 && (i.x -= .03 * o,
+        i.y -= .03 * m), t = (n.max - l) / n.max, r.beginPath(), r.lineWidth = t /
+        2, r.strokeStyle = "rgba(" + d.c + "," + (t + .2) + ")", r.moveTo(i.x, i.y),
+        r.lineTo(n.x, n.y), r.stroke()))
+                }),
+                x(i)
+            }
+            var a, c, u, m = document.createElement("canvas"),
+            d = t(),
+            l = "c_n" + d.l,
+            r = m.getContext("2d"),
+            x = window.requestAnimationFrame || window.webkitRequestAnimationFrame
+        || window.mozRequestAnimationFrame || window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+            function(n) {
+                window.setTimeout(n, 1e3 / 45)
+            },
+            w = Math.random,
+            y = {
+                x: null,
+                y: null,
+                max: 2e4
+            };
+            m.id = l,
+            m.style.cssText = "position:fixed;top:0;left:0;z-index:" + d.z +
+        ";opacity:" + d.o,
+            e("body")[0].appendChild(m),
+            o(),
+            window.onresize = o,
+            window.onmousemove = function(n) {
+                n = n || window.event,
+                y.x = n.clientX,
+                y.y = n.clientY
+            },
+            window.onmouseout = function() {
+                y.x = null,
+                y.y = null
+            };
+            for (var s = [], f = 0; d.n > f; f++) {
+                var h = w() * a,
+                g = w() * c,
+                v = 2 * w() - 1,
+                p = 2 * w() - 1;
+                s.push({
+                    x: h,
+                    y: g,
+                    xa: v,
+                    ya: p,
+                    max: 6e3
+                })
+            }
+            u = s.concat([y]),
+            setTimeout(function() {
+                i()
+            },
+            100)
+        } ();
+        </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jiaqi Li&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jiaqi Li&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">All in Tokens Unifying Output Space of Visual Tasks via Soft Token</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jiaqi Li</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">October 7, 2023&nbsp;&nbsp;18:47:09</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/CV/">CV</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="Visual-Tasks-via-Soft-Token"><a href="#Visual-Tasks-via-Soft-Token" class="headerlink" title="Visual Tasks via Soft Token"></a>Visual Tasks via Soft Token</h1><h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h2><ul>
+<li><p>关于通用计算机视觉模型的现有相关研究大多集中于统一架构和预训练。少数研究旨在为多种视觉任务开发一种模型，但它们通常只适用于有限的任务。在本文中，我们的目标是为各种视觉任务提供真正通用的求解器。为此，我们首先注意到一个被忽视和未充分探索的关键障碍：语言任务的输入和输出由相同形式的语言标记表示，而不同计算机视觉任务的输出形式则更加多样化。例如，物体检测的输出是一组坐标和标签；语义分割的输出是一个离散标签图；深度估计的输出是一个带有浮点数值的图像；而流量估计的输出则是一个向量场。</p>
+</li>
+<li><p>本文通过一个通用标记化器将各种视觉任务的输出空间统一编码为一组标记，从而解决了这一障碍。</p>
+</li>
+</ul>
+<h2 id="模型结构"><a href="#模型结构" class="headerlink" title="模型结构"></a>模型结构</h2><p>框架由三部分组成：</p>
+<ol>
+<li>tokenizer（标记化器）</li>
+<li>detokenizer （解标记化器）</li>
+<li>task solver （任务求解器）</li>
+</ol>
+<ul>
+<li>tokenizer和detokenizer由VQ-VAE实例化，任务求解器由auto-regressive encoderdecoder model(自回归编码器解码器模型)实例化。</li>
+<li>在训练过程中，任务注释首先由标记化器映射为离散标记，并用作训练任务求解器的监督。在推理过程中，任务求解器预测的标记由解码器解码为任务输出。</li>
+</ul>
+<p><img src="/../images/CV/1_1.png"></p>
+<h3 id="模型内部结构"><a href="#模型内部结构" class="headerlink" title="模型内部结构"></a>模型内部结构</h3><ol>
+<li>Task-solver：<ul>
+<li>encoder是一个Swin Transformer，有6个标准transformer块，每个块包含一个自注意和一个FNN。</li>
+<li>decoder包含6个块，每个块包含一个自注意力，一个FNN，一个交互注意力。</li>
+</ul>
+</li>
+</ol>
+<p><img src="/../images/CV/1_2.png"></p>
+<h2 id="创新"><a href="#创新" class="headerlink" title="创新"></a>创新</h2><ol>
+<li><p><strong>软标记由概率矢量表示，矢量中的每个值都表示属于编码本的概率。当一个软标记被输入到解码器的输入端或下一个标记预测网络的输入端时，其输入嵌入是由基于概率值的编码本嵌入的加权平均值计算得出的。软标记方法将标记空间视为连续空间，而不是原来的离散空间，从而扩大了 VQ-VAE 的使用范围。</strong></p>
+</li>
+<li><p>提出了一种<strong>掩码增强技术</strong>，用于处理注释中存在损坏、未定义或无效值的视觉任务。深度估计就是此类任务的一个典型例子，其中的遮挡区域没有定义。未定义的区域会给 VQ-VAE 标记化器和去标记化器的训练带来困难，因为它不知道在未定义的区域应该重建什么。为了解决这个问题，我们在训练 VQ-VAE 时随机屏蔽了输入深度图中的几个斑块。与未定义区域不同的是，手动屏蔽的补丁具有地面实况注释，这有助于训练 VQ-VAE 网络，使其能够恢复未定义区域的地面实况。在实验中，我们发现这项技术显著提高了深度估计的准确性。掩码增强技术还可用于其他具有类似未定义或损坏注释的视觉问题，因此增强了我们的统一任务求解器的通用性。</p>
+</li>
+</ol>
+<p><img src="/../images/CV/1_3.png"></p>
+<h3 id="软标记"><a href="#软标记" class="headerlink" title="软标记"></a>软标记</h3><p>在典型的自动回归预测程序中，&#x3D;&#x3D;具有最大预测概率的标记被选为输出，并将其嵌入作为下一步预测的解码器输入。这种方法被称为硬推理。&#x3D;&#x3D;然而，由于通过 VQ-VAE学习的不同标记之间并非完全独立，标记之间的相关性可能会影响标记预测的准确性，从而使硬推理可能无法达到最佳效果。&#x3D;&#x3D;为了充分利用相关性，推理中采用了软标记技术：软标记不是直接使用单个标记的嵌入，而是将不同标记的嵌入按其预测概率加权平均。&#x3D;&#x3D;除了应用于任务求解器以更准确地预测下一个标记外，同样的想法也可用于解标记器以获得更好的重构结果。</p>
+<h3 id="掩码增强"><a href="#掩码增强" class="headerlink" title="掩码增强"></a>掩码增强</h3><p>深度估计数据集中的地面真实深度图通常会有一些未标注深度信息的损坏区域。在传统的深度估计框架中，这些区域会在训练过程中被忽略。我们面临两个挑战：首先，虽然我们在训练 VQ-VAE 时也忽略了这些区域，但重建后的区域仍然不正常（见图 3），进一步影响了任务求解器的训练，使最终结果也有很多伪像；其次，VQ-VAE 预测的标记对应于 322 个补丁，其中可能包含正常像素和损坏像素。因此，忽略标记很难解决这个问题。</p>
+<p><img src="/../images/CV/1_4.png"></p>
+<ul>
+<li>我们在 VQ-VAE 的训练中引入了掩码增强技术来缓解这一难题。具体来说，我们在输入的深度图像中随机屏蔽一些区域，然后使用其原始深度信息作为监督。这样，VQ-VAE 就能以合理的结果完成&#x2F;恢复一些损坏的区域。</li>
+</ul>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Jiaqi Li</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://example.com/2023/10/07/All-in-Tokens-Unifying-Output-Space-of-Visual-Tasks-via-Soft-Token/">http://example.com/2023/10/07/All-in-Tokens-Unifying-Output-Space-of-Visual-Tasks-via-Soft-Token/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/CV/"># CV</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2023/10/07/Dropout/">Dropout</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jiaqi Li | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
