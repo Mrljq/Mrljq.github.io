@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jiaqi Li">
+
+
+
+
+
+<title>MindSpore训练模型 | Hexo</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+    <script>
+        !
+        function() {
+            function n(n, e, t) {
+                return n.getAttribute(e) || t
+            }
+            function e(n) {
+                return document.getElementsByTagName(n)
+            }
+            function t() {
+                var t = e("script"),
+                o = t.length,
+                i = t[o - 1];
+                return {
+                    l: o,
+                    z: n(i, "zIndex", -1), //置于主页面背后
+                    o: n(i, "opacity", .5), //线条透明度
+                    c: n(i, "color", "0,0,0"), //线条颜色
+                    n: n(i, "count", 100) //线条数量
+                }
+            }
+            function o() {
+                a = m.width = window.innerWidth ||
+        document.documentElement.clientWidth || document.body.clientWidth,
+                c = m.height = window.innerHeight ||
+        document.documentElement.clientHeight || document.body.clientHeight
+            }
+            function i() {
+                r.clearRect(0, 0, a, c);
+                var n, e, t, o, m, l;
+                s.forEach(function(i, x) {
+                    for (i.x += i.xa, i.y += i.ya, i.xa *= i.x > a || i.x < 0 ? -1 :
+        1, i.ya *= i.y > c || i.y < 0 ? -1 : 1, r.fillRect(i.x - .5, i.y - .5, 1,
+        1), e = x + 1; e < u.length; e++) n = u[e],
+                    null !== n.x && null !== n.y && (o = i.x - n.x, m = i.y - n.y, l
+        = o * o + m * m, l < n.max && (n === y && l >= n.max / 2 && (i.x -= .03 * o,
+        i.y -= .03 * m), t = (n.max - l) / n.max, r.beginPath(), r.lineWidth = t /
+        2, r.strokeStyle = "rgba(" + d.c + "," + (t + .2) + ")", r.moveTo(i.x, i.y),
+        r.lineTo(n.x, n.y), r.stroke()))
+                }),
+                x(i)
+            }
+            var a, c, u, m = document.createElement("canvas"),
+            d = t(),
+            l = "c_n" + d.l,
+            r = m.getContext("2d"),
+            x = window.requestAnimationFrame || window.webkitRequestAnimationFrame
+        || window.mozRequestAnimationFrame || window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+            function(n) {
+                window.setTimeout(n, 1e3 / 45)
+            },
+            w = Math.random,
+            y = {
+                x: null,
+                y: null,
+                max: 2e4
+            };
+            m.id = l,
+            m.style.cssText = "position:fixed;top:0;left:0;z-index:" + d.z +
+        ";opacity:" + d.o,
+            e("body")[0].appendChild(m),
+            o(),
+            window.onresize = o,
+            window.onmousemove = function(n) {
+                n = n || window.event,
+                y.x = n.clientX,
+                y.y = n.clientY
+            },
+            window.onmouseout = function() {
+                y.x = null,
+                y.y = null
+            };
+            for (var s = [], f = 0; d.n > f; f++) {
+                var h = w() * a,
+                g = w() * c,
+                v = 2 * w() - 1,
+                p = 2 * w() - 1;
+                s.push({
+                    x: h,
+                    y: g,
+                    xa: v,
+                    ya: p,
+                    max: 6e3
+                })
+            }
+            u = s.concat([y]),
+            setTimeout(function() {
+                i()
+            },
+            100)
+        } ();
+        </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jiaqi Li&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jiaqi Li&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">MindSpore训练模型</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jiaqi Li</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">October 8, 2023&nbsp;&nbsp;14:28:07</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/blogs/">blogs</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="MindSpore训练模型"><a href="#MindSpore训练模型" class="headerlink" title="MindSpore训练模型"></a>MindSpore训练模型</h1><p>本文将从如下4个部分进行介绍。</p>
+<ol>
+<li>定义数据集</li>
+<li>定义神经网络</li>
+<li>定义损失函数</li>
+<li>训练</li>
+</ol>
+<h2 id="1-定义数据集"><a href="#1-定义数据集" class="headerlink" title="1. 定义数据集"></a>1. 定义数据集</h2><ul>
+<li><p>mindspore提供了多种使用数据集的方式。</p>
+<ul>
+<li>使用已经封装好的现有数据集（以coco数据集为例）：</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> mindspore.dataset <span class="keyword">as</span> ds</span><br><span class="line">coco_dataset_dir = <span class="string">&quot;/path/to/coco_dataset_directory/images&quot;</span></span><br><span class="line">coco_annotation_file = <span class="string">&quot;/path/to/coco_dataset_directory/annotation_file&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 1) Read COCO data for Detection task</span></span><br><span class="line">dataset = ds.CocoDataset(dataset_dir=coco_dataset_dir,</span><br><span class="line">                         annotation_file=coco_annotation_file,</span><br><span class="line">                         task=<span class="string">&#x27;Detection&#x27;</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>自定义数据集（这个应该是最为重要也是我们正常训练时可能最常用的方式）</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> mindspore.dataset <span class="keyword">as</span> ds</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="comment"># 4) Random accessible dataset as random accessible input.</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyDataset</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, data,label</span>):</span><br><span class="line">        self.x = data</span><br><span class="line">        self.label = label</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__getitem__</span>(<span class="params">self, index</span>):</span><br><span class="line">        <span class="keyword">return</span> self.x[index], self.label[index]</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__len__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">len</span>(self.x)</span><br></pre></td></tr></table></figure>
+
+<p>上述代码完成的是自定义数据集的构建，这里使用的是支持随机存取的数据集。</p>
+<p>下面的代码展示了实例化该类的效果。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">x = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>]</span><br><span class="line">label = [<span class="number">7</span>,<span class="number">10</span>,<span class="number">13</span>,<span class="number">16</span>]</span><br><span class="line">dataset = MyDataset(x,label)</span><br><span class="line"><span class="built_in">print</span>(dataset[<span class="number">2</span>])</span><br><span class="line">(<span class="number">3</span>, <span class="number">13</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>接下来就是重点也就是如何使用batch方式提取数据。（MindSpore与Pytorch不同没有DataLoader）</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 先使用自定义数据集生成函数再使用dataset的自带函数即可</span></span><br><span class="line">dataset = ds.GeneratorDataset(source=dataset, column_names=[<span class="string">&quot;image&quot;</span>, <span class="string">&quot;caption&quot;</span>], shuffle=<span class="literal">True</span>)</span><br><span class="line">dataset = dataset.batch(batch_size=<span class="number">3</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> dataset:</span><br><span class="line">    <span class="built_in">print</span>(i)</span><br><span class="line">[Tensor(shape=[<span class="number">3</span>], dtype=Int64, value= [<span class="number">1</span>, <span class="number">4</span>, <span class="number">3</span>]), Tensor(shape=[<span class="number">3</span>], dtype=Int64, value= [ <span class="number">7</span>, <span class="number">16</span>, <span class="number">13</span>])]</span><br><span class="line">[Tensor(shape=[<span class="number">1</span>], dtype=Int64, value= [<span class="number">2</span>]), Tensor(shape=[<span class="number">1</span>], dtype=Int64, value= [<span class="number">10</span>])]</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码可以发现我们将batch_size设置为3时，它就会从全部数据集中随机抽取3条并合在一起，一轮完成一次遍历也就是一个epoch。batch函数可以选择如下参数舍去不足batch的数据：</p>
+<p><strong>drop_remainder</strong> (bool, 可选) - 当最后一个批处理数据包含的数据条目小于 batch_size 时，是否将该批处理丢弃，不传递给下一个操作。默认值： <code>False</code> ，不丢弃。</p>
+<p><strong>在迭代时可以选择使用迭代器进行：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iterator = dataset.create_tuple_iterator(num_epochs=epochs)<span class="comment"># 这个经实验和直接.batch没啥区别，唯一的区别是设置完epochs后循环epochs次之后会报错</span></span><br></pre></td></tr></table></figure>
+
+<p>num_epochs参数的默认值为-1即可以无限迭代，但如果出现自定义后，一旦迭代次数超过就会报错，因此强烈建议不要修改因为改了除了给自己加一个坑别的什么用也没有（它跟DataLoader完全不一样，这里设置完epochs不会有任何用）</p>
+</li>
+</ul>
+<h2 id="2-定义网络"><a href="#2-定义网络" class="headerlink" title="2. 定义网络"></a>2. 定义网络</h2><p>接下来这个网络实现的其实就是一个一次函数 $ y&#x3D;a*x+b$ ,网络里封装了两个可学习的常数。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> mindspore.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">test</span>(nn.Cell):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">super</span>(test, self).__init__()</span><br><span class="line">        self.w = Parameter(Tensor(<span class="number">6</span>).astype(ms.float32))</span><br><span class="line">        self.b = Parameter(Tensor(<span class="number">6</span>).astype(ms.float32))</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">construct</span>(<span class="params">self, x</span>):</span><br><span class="line">        <span class="keyword">return</span> self.w*x + self.b</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这里的construct和Pytorch里的forward一样。</p>
+<h2 id="3-定义损失函数"><a href="#3-定义损失函数" class="headerlink" title="3. 定义损失函数"></a>3. 定义损失函数</h2><p>本节将分为两个部分进行：</p>
+<ol>
+<li>对于正常使用来说最普遍的还是直接调用已经封装好的损失函数。</li>
+<li>如果有特殊需求需要自定义损失函数即可按照如下方式：</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 定义自定义损失函数</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CustomLoss</span>(nn.loss.LossBase):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">super</span>(CustomLoss, self).__init__()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">construct</span>(<span class="params">self, output, label</span>):</span><br><span class="line">        <span class="comment"># 自定义损失计算逻辑</span></span><br><span class="line">        loss = ms.ops.Square((output-label))  <span class="comment"># 自定义损失计算</span></span><br><span class="line">        <span class="keyword">return</span> loss</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-训练"><a href="#4-训练" class="headerlink" title="4. 训练"></a>4. 训练</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 实例化前向网络</span></span><br><span class="line">t = test()</span><br><span class="line"><span class="comment"># 设定损失函数并连接前向网络与损失函数</span></span><br><span class="line">loss = CustomLoss()</span><br><span class="line">net_with_criterion = nn.WithLossCell(t, loss)</span><br><span class="line"><span class="comment"># 设定优化器</span></span><br><span class="line">opt = nn.Adam(t.trainable_params(), learning_rate=<span class="number">0.001</span>)</span><br><span class="line"><span class="comment"># 定义训练网络</span></span><br><span class="line">train_net = nn.TrainOneStepCell(net_with_criterion, opt)</span><br><span class="line"><span class="comment"># 设置网络为训练模式</span></span><br><span class="line">train_net.set_train()</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10000</span>):</span><br><span class="line">    <span class="keyword">for</span> i1 <span class="keyword">in</span> iterator:</span><br><span class="line">        res = train_net(i1[<span class="number">0</span>],i1[<span class="number">1</span>])</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(loss(t(<span class="number">1</span>),<span class="number">7</span>))</span><br><span class="line"><span class="number">0.0</span></span><br></pre></td></tr></table></figure>
+
+<p>主要知道两点：</p>
+<ol>
+<li>MindSpore训练不需要像Pytorch训练一样梯度清零，梯度更新</li>
+<li>使用下面的几个代码</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">net_with_criterion = nn.WithLossCell(t, loss)</span><br><span class="line">train_net = nn.TrainOneStepCell(net_with_criterion, opt)</span><br><span class="line">train_net.set_train()</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Jiaqi Li</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://example.com/2023/10/08/MindSpore%E8%AE%AD%E7%BB%83%E6%A8%A1%E5%9E%8B/">http://example.com/2023/10/08/MindSpore%E8%AE%AD%E7%BB%83%E6%A8%A1%E5%9E%8B/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/blogs/"># blogs</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2023/10/08/%E4%B8%8A%E9%87%87%E6%A0%B7-UpSampling-%E4%B8%8E%E4%B8%8B%E9%87%87%E6%A0%B7-DownSampling/">上采样(UpSampling)与下采样(DownSampling)</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jiaqi Li | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
