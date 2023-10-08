@@ -13,7 +13,7 @@
 
 
 
-<title>All in Tokens Unifying Output Space of Visual Tasks via Soft Token | Hexo</title>
+<title>上采样(UpSampling)与下采样(DownSampling) | Hexo</title>
 
 
 
@@ -289,7 +289,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">All in Tokens Unifying Output Space of Visual Tasks via Soft Token</h1>
+            <h1 class="post-title">上采样(UpSampling)与下采样(DownSampling)</h1>
             
                 <div class="post-meta">
                     
@@ -298,14 +298,14 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">October 7, 2023&nbsp;&nbsp;18:47:09</a>
+                        Date: <a href="#">October 8, 2023&nbsp;&nbsp;8:56:56</a>
                         </span>
                     
                     
                         <span class="post-category">
                     Category:
                             
-                                <a href="/categories/CV/">CV</a>
+                                <a href="/categories/DeepLearning/">DeepLearning</a>
                             
                         </span>
                     
@@ -314,44 +314,64 @@
         </header>
 
         <div class="post-content">
-            <h1 id="Visual-Tasks-via-Soft-Token"><a href="#Visual-Tasks-via-Soft-Token" class="headerlink" title="Visual Tasks via Soft Token"></a>Visual Tasks via Soft Token</h1><h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h2><ul>
-<li><p>关于通用计算机视觉模型的现有相关研究大多集中于统一架构和预训练。少数研究旨在为多种视觉任务开发一种模型，但它们通常只适用于有限的任务。在本文中，我们的目标是为各种视觉任务提供真正通用的求解器。为此，我们首先注意到一个被忽视和未充分探索的关键障碍：语言任务的输入和输出由相同形式的语言标记表示，而不同计算机视觉任务的输出形式则更加多样化。例如，物体检测的输出是一组坐标和标签；语义分割的输出是一个离散标签图；深度估计的输出是一个带有浮点数值的图像；而流量估计的输出则是一个向量场。</p>
-</li>
-<li><p>本文通过一个通用标记化器将各种视觉任务的输出空间统一编码为一组标记，从而解决了这一障碍。</p>
-</li>
-</ul>
-<h2 id="模型结构"><a href="#模型结构" class="headerlink" title="模型结构"></a>模型结构</h2><p>框架由三部分组成：</p>
+            <h1 id="上采样-UpSampling-与下采样-DownSampling"><a href="#上采样-UpSampling-与下采样-DownSampling" class="headerlink" title="上采样(UpSampling)与下采样(DownSampling)"></a>上采样(UpSampling)与下采样(DownSampling)</h1><p> <strong>缩小图像</strong>（称为下采样或降采样）的主要目的有两个：</p>
 <ol>
-<li>tokenizer（标记化器）</li>
-<li>detokenizer （解标记化器）</li>
-<li>task solver （任务求解器）</li>
+<li><p>使得图像符合显示区域的大小；</p>
+</li>
+<li><p>生成对应图像的缩略图。</p>
+</li>
+</ol>
+<p><strong>放大图像</strong>（或称为上采样或图像插值）的主要目的是：放大原图像,从而可以显示在更高分辨率的显示设备上。</p>
+<p>上采样和下采样都是一种抽象描述，其具体实现有很多种方式：</p>
+<h2 id="下采样："><a href="#下采样：" class="headerlink" title="下采样："></a>下采样：</h2><ol>
+<li>用stride为2的卷积层实现：卷积过程导致的图像变小是为了提取特征。下采样的过程是一个信息损失的过程，而池化层是不可学习的，用stride为2的可学习卷积层来代替pooling可以得到更好的效果，当然同时也增加了一定的计算量。</li>
+<li>用stride为2的池化层实现：池化下采样是为了降低特征的维度。如Max-pooling和Average-pooling，目前通常使用Max-pooling，因为他计算简单而且能够更好的保留纹理特征。</li>
+</ol>
+<p>&#x3D;&#x3D;下采样就是卷积或者池化过程。&#x3D;&#x3D;</p>
+<p><img src="/../images/DeepLearning_Blogs/1_4.png"></p>
+<h3 id="使用矩阵计算卷积"><a href="#使用矩阵计算卷积" class="headerlink" title="使用矩阵计算卷积"></a>使用矩阵计算卷积</h3><p>还是上面那个具体的例子，将输入的矩阵 ( 4×4 )展开变成一个16维的列向量，得到</p>
+<p><img src="/../images/DeepLearning_Blogs/1_7.png"></p>
+<p>输出的图像展开为4维的列向量</p>
+<p><img src="/../images/DeepLearning_Blogs/1_8.png"></p>
+<p>将卷积核展开，变成 4×16 的稀疏矩阵，其形式为<strong>Toeplitz 矩阵</strong>，4是对应输出的维数</p>
+<p>（Toeplitz 矩阵，即每一行中的元素都与上一行的对应位置平移一个单位的元素相同）</p>
+<p><img src="/../images/DeepLearning_Blogs/1_9.png"></p>
+<p>卷积运算则 <strong>Y&#x3D;CX</strong></p>
+<p>上面的结果得到的 <strong>Y</strong>是一个 4维的列向量，再将其reshape成 2×2 ，则得到输出的图像。</p>
+<p>通过矩阵乘法，我们则可以得到反卷积 <strong>X&#x3D;C^T^Y</strong></p>
+<h2 id="上采样："><a href="#上采样：" class="headerlink" title="上采样："></a>上采样：</h2><p>上采样有3种常见的方法：双线性插值(bilinear)，反卷积(Transposed Convolution)，反池化(Unpooling)</p>
+<ol>
+<li>插值：最近邻插值、双线性插值、双三次插值，效果和计算量逐个上升；虽然插值式上采样已没人用，但是下采样过程（数据准备从HRGT到LR）最常用的还是双三次。<br>基于插值的上采样方法只能通过图像的本身内容提高图像的分辨率，并没有带来更多信息，相反还有噪声放大、计算复杂度增加、结果模糊等副作用。</li>
+<li>转置卷积又或是说反卷积(Transpose Conv)，通过对输入feature map间隔填充0，再进行标准的卷积计算，可以使得输出feature map的尺寸比输入更大；相比上池化，<strong>使用反卷积进行图像的“上采样”是可以被学习的</strong>（会用到卷积操作，其参数是可学习的）。</li>
 </ol>
 <ul>
-<li>tokenizer和detokenizer由VQ-VAE实例化，任务求解器由auto-regressive encoderdecoder model(自回归编码器解码器模型)实例化。</li>
-<li>在训练过程中，任务注释首先由标记化器映射为离散标记，并用作训练任务求解器的监督。在推理过程中，任务求解器预测的标记由解码器解码为任务输出。</li>
+<li>Up-Pooling - Max Unpooling &amp;&amp; Avg Unpooling –Max Unpooling，在对称的max pooling位置记录最大值的索引位置，然后在unpooling阶段时将对应的值放置到原先最大值位置，其余位置补0；</li>
 </ul>
-<p><img src="/../images/CV/1_1.png"></p>
-<h3 id="模型内部结构"><a href="#模型内部结构" class="headerlink" title="模型内部结构"></a>模型内部结构</h3><ol>
-<li>Task-solver：<ul>
-<li>encoder是一个Swin Transformer，有6个标准transformer块，每个块包含一个自注意和一个FNN。</li>
-<li>decoder包含6个块，每个块包含一个自注意力，一个FNN，一个交互注意力。</li>
-</ul>
-</li>
-</ol>
-<p><img src="/../images/CV/1_2.png"></p>
-<h2 id="创新"><a href="#创新" class="headerlink" title="创新"></a>创新</h2><ol>
-<li><p><strong>软标记由概率矢量表示，矢量中的每个值都表示属于编码本的概率。当一个软标记被输入到解码器的输入端或下一个标记预测网络的输入端时，其输入嵌入是由基于概率值的编码本嵌入的加权平均值计算得出的。软标记方法将标记空间视为连续空间，而不是原来的离散空间，从而扩大了 VQ-VAE 的使用范围。</strong></p>
-</li>
-<li><p>提出了一种<strong>掩码增强技术</strong>，用于处理注释中存在损坏、未定义或无效值的视觉任务。深度估计就是此类任务的一个典型例子，其中的遮挡区域没有定义。未定义的区域会给 VQ-VAE 标记化器和去标记化器的训练带来困难，因为它不知道在未定义的区域应该重建什么。为了解决这个问题，我们在训练 VQ-VAE 时随机屏蔽了输入深度图中的几个斑块。与未定义区域不同的是，手动屏蔽的补丁具有地面实况注释，这有助于训练 VQ-VAE 网络，使其能够恢复未定义区域的地面实况。在实验中，我们发现这项技术显著提高了深度估计的准确性。掩码增强技术还可用于其他具有类似未定义或损坏注释的视觉问题，因此增强了我们的统一任务求解器的通用性。</p>
-</li>
-</ol>
-<p><img src="/../images/CV/1_3.png"></p>
-<h3 id="软标记"><a href="#软标记" class="headerlink" title="软标记"></a>软标记</h3><p>在典型的自动回归预测程序中，&#x3D;&#x3D;具有最大预测概率的标记被选为输出，并将其嵌入作为下一步预测的解码器输入。这种方法被称为硬推理。&#x3D;&#x3D;然而，由于通过 VQ-VAE学习的不同标记之间并非完全独立，标记之间的相关性可能会影响标记预测的准确性，从而使硬推理可能无法达到最佳效果。&#x3D;&#x3D;为了充分利用相关性，推理中采用了软标记技术：软标记不是直接使用单个标记的嵌入，而是将不同标记的嵌入按其预测概率加权平均。&#x3D;&#x3D;除了应用于任务求解器以更准确地预测下一个标记外，同样的想法也可用于解标记器以获得更好的重构结果。</p>
-<h3 id="掩码增强"><a href="#掩码增强" class="headerlink" title="掩码增强"></a>掩码增强</h3><p>深度估计数据集中的地面真实深度图通常会有一些未标注深度信息的损坏区域。在传统的深度估计框架中，这些区域会在训练过程中被忽略。我们面临两个挑战：首先，虽然我们在训练 VQ-VAE 时也忽略了这些区域，但重建后的区域仍然不正常（见图 3），进一步影响了任务求解器的训练，使最终结果也有很多伪像；其次，VQ-VAE 预测的标记对应于 322 个补丁，其中可能包含正常像素和损坏像素。因此，忽略标记很难解决这个问题。</p>
-<p><img src="/../images/CV/1_4.png"></p>
+<p><img src="/../images/DeepLearning_Blogs/1_2.png"></p>
 <ul>
-<li>我们在 VQ-VAE 的训练中引入了掩码增强技术来缓解这一难题。具体来说，我们在输入的深度图像中随机屏蔽一些区域，然后使用其原始深度信息作为监督。这样，VQ-VAE 就能以合理的结果完成&#x2F;恢复一些损坏的区域。</li>
+<li>PixelShuffle（像素重组）</li>
 </ul>
+<p><img src="/../images/DeepLearning_Blogs/1_3.png"></p>
+<ul>
+<li><p>反卷积</p>
+<ul>
+<li><p>由于卷积核一般比原始图像小，所以卷积之后的图像尺寸往往会变小。有时候我们需要将卷积后的图像还原成原始图像的尺寸，即实现图像从小分辨率到大分辨率的映射，这种操作就叫做<strong>上采样（Upsampling）</strong>。而反卷积正是一种上采样方法。</p>
+<p><strong>反卷积，又称为转置卷积（</strong>Transposed Convolution,<strong>）</strong>，它是一种特殊的卷积，先padding来扩大图像尺寸，紧接着跟正向卷积一样，旋转卷积核180度，再进行卷积计算。看上去就像，已知正向卷积的输出图像，卷积核，得到正向卷积中的原始图像（并非真的得到原始图像，像素点是不一样的，但是尺寸是一致的）。</p>
+<p>它看上去像是正向卷积的逆运算，但其实并不是。因为反卷积<strong>只能还原原始图像的尺寸</strong>，<strong>但是并不能真的恢复原始图像内容，</strong>即每个元素值其实是不一样的。</p>
+<p>卷积过程中：</p>
+<p>o 表示输出， i 表示输入， k :表示kernel的大小， p：表示padding, s : 表达strides</p>
+<p>反卷积过程中：</p>
+<p>o′ 表示输出， i′ 表示输入， k′ :表示kernel的大小， p′：表示padding, s′ : 表达strides</p>
+<p>卷积后的 o 则反卷积的 i′ , 一般卷积核是不会变的， k&#x3D;k′ ，需要注意的是，卷积与反卷积的padding很可能是不一样。</p>
+<p><strong>2.1 Striding</strong></p>
+<p>反卷积的Striding跟卷积有点不一样，它在输入的每个元素之间插入 �′−1 个值为0的元素</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="/../images/DeepLearning_Blogs/1_5.png"></p>
+<p>如果我们将反卷积看成是一种特殊的卷积，它其实是根据反卷积中指定的步长strides, 修改了输入 i′, 根据strding 进行补0操作，得到 I<del>s</del> , 其大小变为 <img src="/../images/DeepLearning_Blogs/1_6.png"> , 然后对 I<del>s</del> 进行s&#x3D;1的卷积。例如，对应上面的三个子图， s′&#x3D;1 对应的 i<del>s</del>′&#x3D;3 , s′&#x3D;2 对应的 i<del>s</del>′&#x3D;5 ， s′&#x3D;3 对应的 i<del>s</del>′&#x3D;7 。</p>
+<p><img src="/../images/DeepLearning_Blogs/1_1.png"></p>
 
         </div>
 
@@ -366,7 +386,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2023/10/07/All-in-Tokens-Unifying-Output-Space-of-Visual-Tasks-via-Soft-Token/">http://example.com/2023/10/07/All-in-Tokens-Unifying-Output-Space-of-Visual-Tasks-via-Soft-Token/</a></span>
+                        <span><a href="http://example.com/2023/10/08/%E4%B8%8A%E9%87%87%E6%A0%B7-UpSampling-%E4%B8%8E%E4%B8%8B%E9%87%87%E6%A0%B7-DownSampling/">http://example.com/2023/10/08/%E4%B8%8A%E9%87%87%E6%A0%B7-UpSampling-%E4%B8%8E%E4%B8%8B%E9%87%87%E6%A0%B7-DownSampling/</a></span>
                     </p>
                 
                 
@@ -390,7 +410,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/CV/"># CV</a>
+                        <a href="/tags/DeepLearning/"># DeepLearning</a>
                     
                         
                 </span>
@@ -403,10 +423,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2023/10/08/%E4%BF%9D%E8%AF%81%E8%BF%9E%E6%8E%A5%E4%B8%8Agithub/">保证连接上github</a>
             
-            
-            <a class="next" rel="next" href="/2023/10/07/Dropout/">Dropout</a>
+            <a class="next" rel="next" href="/2023/10/08/%E4%BF%9D%E8%AF%81%E8%BF%9E%E6%8E%A5%E4%B8%8Agithub/">保证连接上github</a>
             
         </section>
 

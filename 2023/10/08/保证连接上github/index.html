@@ -13,7 +13,7 @@
 
 
 
-<title>Category | Hexo</title>
+<title>保证连接上github | Hexo</title>
 
 
 
@@ -217,155 +217,170 @@
     }
 </script>
             <div class="main">
-                
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
 
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
 
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
 
-    <div class="container">
-        <div class="post-wrap categories">
-            <h2 class="post-title">-&nbsp;Categories&nbsp;-</h2>
-            <div class="categories-card">
-                
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">保证连接上github</h1>
+            
+                <div class="post-meta">
                     
-                    <div class="card-item">
-                        <div class="categories">
-                            <a href="/categories/Multimodal/">
-                                <h3>
-                                    <i class="iconfont icon-category" style="padding-right:3px"></i>
-                                    Multimodal
-                                </h3>
-                            </a>
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2023/10/06/ALBEF/">ALBEF</a>
-                                    </article>
-                                
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2023/10/06/Blip/">Blip</a>
-                                    </article>
-                                
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2023/10/06/VLMo/">VLMo</a>
-                                    </article>
-                                
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2023/10/06/ViLT/">ViLT</a>
-                                    </article>
-                                
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2023/10/06/TART/">TART</a>
-                                    </article>
-                                
-                            
-                            
-                        </div>
-                    </div>
-                
+                        Author: <a itemprop="author" rel="author" href="/">Jiaqi Li</a>
                     
-                    <div class="card-item">
-                        <div class="categories">
-                            <a href="/categories/blogs/">
-                                <h3>
-                                    <i class="iconfont icon-category" style="padding-right:3px"></i>
-                                    blogs
-                                </h3>
-                            </a>
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2023/10/06/hexo%E7%BB%93%E5%90%88Github%E6%90%AD%E5%BB%BA%E8%87%AA%E5%B7%B1%E7%9A%84%E5%8D%9A%E5%AE%A2/">hexo结合Github搭建自己的博客</a>
-                                    </article>
-                                
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2023/10/08/%E4%BF%9D%E8%AF%81%E8%BF%9E%E6%8E%A5%E4%B8%8Agithub/">保证连接上github</a>
-                                    </article>
-                                
-                            
-                            
-                        </div>
-                    </div>
-                
+
                     
-                    <div class="card-item">
-                        <div class="categories">
-                            <a href="/categories/DeepLearning/">
-                                <h3>
-                                    <i class="iconfont icon-category" style="padding-right:3px"></i>
-                                    DeepLearning
-                                </h3>
-                            </a>
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2023/10/07/Dropout/">Dropout</a>
-                                    </article>
-                                
-                            
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2023/10/08/%E4%B8%8A%E9%87%87%E6%A0%B7-UpSampling-%E4%B8%8E%E4%B8%8B%E9%87%87%E6%A0%B7-DownSampling/">上采样(UpSampling)与下采样(DownSampling)</a>
-                                    </article>
-                                
-                            
-                            
-                        </div>
-                    </div>
-                
+                        <span class="post-time">
+                        Date: <a href="#">October 8, 2023&nbsp;&nbsp;8:48:21</a>
+                        </span>
                     
-                    <div class="card-item">
-                        <div class="categories">
-                            <a href="/categories/CV/">
-                                <h3>
-                                    <i class="iconfont icon-category" style="padding-right:3px"></i>
-                                    CV
-                                </h3>
-                            </a>
+                    
+                        <span class="post-category">
+                    Category:
                             
-                                
-                                
-                                    <article class="archive-item">
-                                        <a class="archive-item-link"
-                                           href="/2023/10/07/All-in-Tokens-Unifying-Output-Space-of-Visual-Tasks-via-Soft-Token/">All in Tokens Unifying Output Space of Visual Tasks via Soft Token</a>
-                                    </article>
-                                
+                                <a href="/categories/blogs/">blogs</a>
                             
-                            
-                        </div>
-                    </div>
-                
-            </div>
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="1-在git-bash中执行如下命令"><a href="#1-在git-bash中执行如下命令" class="headerlink" title="1. 在git bash中执行如下命令"></a>1. 在git bash中执行如下命令</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global http.proxy http://127.0.0.1:1080</span><br><span class="line">git config --global https.proxy http://127.0.0.1:1080</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global --<span class="built_in">unset</span> http.proxy </span><br><span class="line">git config --global --<span class="built_in">unset</span> https.proxy </span><br></pre></td></tr></table></figure>
+
+<h2 id="2-更改使用的vpn的端口"><a href="#2-更改使用的vpn的端口" class="headerlink" title="2. 更改使用的vpn的端口"></a>2. 更改使用的vpn的端口</h2><p><img src="/../images/blogs/1_1.png"></p>
+<p>完成上述操作后即可安然在Git Bash中畅联Github啦。</p>
 
         </div>
-    </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Jiaqi Li</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://example.com/2023/10/08/%E4%BF%9D%E8%AF%81%E8%BF%9E%E6%8E%A5%E4%B8%8Agithub/">http://example.com/2023/10/08/%E4%BF%9D%E8%AF%81%E8%BF%9E%E6%8E%A5%E4%B8%8Agithub/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/blogs/"># blogs</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/10/08/%E4%B8%8A%E9%87%87%E6%A0%B7-UpSampling-%E4%B8%8E%E4%B8%8B%E9%87%87%E6%A0%B7-DownSampling/">上采样(UpSampling)与下采样(DownSampling)</a>
+            
+            
+            <a class="next" rel="next" href="/2023/10/07/All-in-Tokens-Unifying-Output-Space-of-Visual-Tasks-via-Soft-Token/">All in Tokens Unifying Output Space of Visual Tasks via Soft Token</a>
+            
+        </section>
+
+
+    </article>
+</div>
 
             </div>
             <footer id="footer" class="footer">
