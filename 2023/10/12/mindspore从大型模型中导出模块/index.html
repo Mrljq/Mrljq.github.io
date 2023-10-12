@@ -13,7 +13,7 @@
 
 
 
-<title>ViT | Hexo</title>
+<title>MindSpore从大型模型中导出模块以及权重处理 | Hexo</title>
 
 
 
@@ -326,7 +326,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">ViT</h1>
+            <h1 class="post-title">MindSpore从大型模型中导出模块以及权重处理</h1>
             
                 <div class="post-meta">
                     
@@ -335,14 +335,14 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">October 9, 2023&nbsp;&nbsp;13:20:40</a>
+                        Date: <a href="#">October 12, 2023&nbsp;&nbsp;14:16:47</a>
                         </span>
                     
                     
                         <span class="post-category">
                     Category:
                             
-                                <a href="/categories/CV/">CV</a>
+                                <a href="/categories/blogs/">blogs</a>
                             
                         </span>
                     
@@ -351,61 +351,42 @@
         </header>
 
         <div class="post-content">
-            <h1 id="ViT"><a href="#ViT" class="headerlink" title="ViT"></a>ViT</h1><h2 id="整体思路"><a href="#整体思路" class="headerlink" title="整体思路"></a>整体思路</h2><ul>
-<li>将图片分成多个patch(16*16)</li>
-<li>将每个patch进行投影作为类似NLP领域中的token</li>
-<li>再将这些‘token’传入标准transformer网络中。</li>
-</ul>
-<p>在中小型数据集上训练出来的效果不佳，但是当训练集的规模增大时收获了极好的结果。</p>
-<h3 id="Related-work"><a href="#Related-work" class="headerlink" title="Related work"></a>Related work</h3><ol>
-<li>最原始的想法是将图片的每个像素都关注其他的每个像素。但这样做的成本是像素点数目的二次方，显然不适用于现实输入尺寸。<ul>
-<li>对于自注意力机制，假设有n个像素点。每个像素点都会对n个像素进行注意力机制。</li>
-</ul>
-</li>
-</ol>
-<p>$$<br>\sum_{i&#x3D;1}^n1*n&#x3D;n^2<br>$$</p>
-<ol start="2">
-<li>只在查询像素的局部邻域内引入自注意力机制而不是全局</li>
-<li>使用2*2的网格去分割图像，但是这样做的后果是仅适用于小分辨率图像。</li>
-<li>将CNN与各种形式的自注意力机制结合</li>
-</ol>
-<h2 id="模型结构"><a href="#模型结构" class="headerlink" title="模型结构"></a>模型结构</h2><p><img src="/../images/CV/2_2.png"></p>
-<p>我们将图像分割成固定大小的片段，对每个片段进行线性嵌入，添加位置嵌入，然后将得到的向量序列输入标准变换器编码器。为了进行分类，我们采用标准方法，<strong>在序列中添加额外的可学习 “分类标记”。</strong></p>
-<p><img src="C:\Githubpage\myblog\source\images\CV\2_3.png"></p>
-<h2 id="模型输入"><a href="#模型输入" class="headerlink" title="模型输入"></a>模型输入</h2><p>给定输入图像 $x\in R^{H<em>W</em>C}$ 将其处理为$x_p \in R^{N*(P^2C)}$ </p>
-<ul>
-<li><p>(P, P) ：是每个图像补丁的分辨率</p>
-</li>
-<li><p>N：$(H<em>W</em>C)&#x2F;(P^2C)&#x3D;HW&#x2F;P^2$  ，就是生成的patch数，也是transformer的有效输入序列长度</p>
-</li>
-<li><p>(H, W) ：是原始图像的分辨率</p>
-</li>
-<li><p>C：通道数</p>
-</li>
-</ul>
+            <h1 id="MindSpore从大型模型中导出模块以及权重处理"><a href="#MindSpore从大型模型中导出模块以及权重处理" class="headerlink" title="MindSpore从大型模型中导出模块以及权重处理"></a>MindSpore从大型模型中导出模块以及权重处理</h1><h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h2><p>在学习Mindformers上的大模型时我们总会出现一些需求：</p>
 <ol>
-<li><p>transformer的隐藏层向量大小D，因此我们使用可训练的线性投影将patch进行flatten并映射到D维（公式1）。我们将该投影的输出称为补丁嵌入。</p>
-</li>
-<li><p>与<strong>BERT 的 [class] 标记类似</strong>，我们在嵌入补丁序列前面添加一个可学习的嵌入($z^0_0&#x3D;x_{class}$ ) ，其 Transformer 编码器 ($z^0_L$) 输出处的状态用作图像表示 y（公式4）。在预训练和微调期间，分类头都附加到 z0 L。分类头在预训练时由具有一个隐藏层的 MLP 实现，在微调时由单个线性层实现。</p>
-</li>
-<li><p>位置嵌入$E_{pos}$被添加到补丁嵌入中以保留位置信息。我们使用标准的可学习 1D 位置嵌入。</p>
-</li>
+<li>我们可能只需要其中的部分模块。</li>
+<li>我们不想要原始封装方式中的那么多冗余的函数之类。</li>
+<li>我们自己构建大模型但一些模块我们并不想改变，或者说我们想要将多个大模型中的模块进行结合。</li>
 </ol>
-<h3 id="混合结构"><a href="#混合结构" class="headerlink" title="混合结构"></a>混合结构</h3><p>作为原始图像补丁的替代方案，<strong>输入序列可以由 CNN 的特征图形成</strong>。在这种混合模型中，补丁嵌入投影 E（公式 1）应用于从 CNN 特征图中提取的补丁。作为一种特例，补丁的空间尺寸可以是 1x1，<strong>这意味着输入序列可以通过简单地平铺特征图的空间维度并投影到变换器维度来获得</strong>。分类输入嵌入和位置嵌入如上所述。</p>
-<h3 id="公式"><a href="#公式" class="headerlink" title="公式"></a>公式</h3><p><img src="/../images/CV/2_1.png"></p>
-<p>公式2的MSA是multiheaded self-attention。</p>
-<p>LN是Layernorm</p>
-<p>MLP 包含两个具有 GELU 非线性的层。</p>
-<h2 id="微调"><a href="#微调" class="headerlink" title="微调"></a>微调</h2><p>在大型数据集上对 ViT 进行预训练，然后根据（较小的）下游任务进行微调。</p>
-<p>在微调时移除预训练的预测头，并附加一个零初始化的 D × K 前馈层，其中 K 是下游类别的数量。与预训练相比，在更高分辨率下进行微调通常是有益的。当输入更高分辨率的图像时，我们会保持补丁大小不变，这样就会增加有效序列长度。视觉转换器可以处理任意长度的序列（受内存限制），<strong>但是，预训练的位置嵌入可能不再有意义。因此，我们根据预训练位置嵌入在原始图像中的位置，对其进行二维插值</strong>。需要注意的是，只有在调整分辨率和提取补丁时，才会手动向视觉转换器注入有关图像二维结构的归纳偏差。</p>
-<p>使用 Adam 训练包括 ResNets 在内的所有模型，β1 &#x3D; 0.9，β2 &#x3D; 0.999，批量大小为 4096，并应用 0.1 的高权重衰减，(Adam 对 ResNets 的效果略好于 SGD)。我们使用线性学习率预热和衰减，</p>
-<p>为了进行微调，我们对所有模型都使用了带动量的 SGD，批量大小为 512，。对于表 2 中的 ImageNet 结果，我们使用了更高的分辨率进行微调：对于表 2 中的 ImageNet 结果，我们使用了更高的分辨率进行微调：ViT-L&#x2F;16 为 512 分辨率，ViT-H&#x2F;14 为 518 分辨率，同时还使用了 Polyak &amp; Juditsky（1992 年）的平均值，系数为 0.9999。</p>
-<h2 id="测验"><a href="#测验" class="headerlink" title="测验"></a>测验</h2><p><img src="C:\Githubpage\myblog\source\images\CV\2_4.png"></p>
-<p>右图：用于测试ViT的图像信息整合能力（注意力权重计算图像空间中信息整合的<strong>平均距离</strong>。这种“注意力距离”<strong>类似于 CNN 中的感受野大小</strong>）。可以发现即使是第0层的attention也有head注意到了大部分图像，其他的head在低层的注意力距离始终较小（局部注意），随着层深度增加注意力距离也在不断增加。</p>
-<p>中间：模型学会在位置嵌入的相似性中对图像内的距离进行编码，距离较近的斑块往往具有更相似的位置嵌入。此外，还出现了行列结构；同一行&#x2F;列中的补丁具有相似的嵌入。<strong>（用于研究位置编码）</strong></p>
-<p>这个可能是如下的理解：</p>
-<p>假如一张图片被分为4个patch，<br>$$<br>\begin{bmatrix}<br>X_1 &amp; X_2  \<br>X_3 &amp; X_4   \<br>\end{bmatrix}<br>$$<br><strong>每个patch进行拉直之类的操作，那么每一行就是一个$R^{2<em>n}$的矩阵，每一列也同理，因此对于上图每一个小格就变成了一个$R^{2</em>2}$的矩阵，（1，1）代表X<del>1</del>与自己，(1,2)代表X<del>1</del>与X<del>3</del>的相似度，而出现暗淡的(2,2)其实就是X<del>2</del>与X<del>3</del>的相似度。</strong></p>
-<p>左图：展示了对于投影层的主成分分析，可以看到有一些纹理和颜色的特征。ViT-L&#x2F;32 的 RGB 值的初始线性嵌入的滤波器。</p>
+<p>那么我们就需要进行模型权重提取。</p>
+<h2 id="MindSpore对权重的操作"><a href="#MindSpore对权重的操作" class="headerlink" title="MindSpore对权重的操作"></a>MindSpore对权重的操作</h2><h3 id="查看哪些参数是可训练"><a href="#查看哪些参数是可训练" class="headerlink" title="查看哪些参数是可训练"></a>查看哪些参数是可训练</h3><p>执行如下代码即可：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Transformer <span class="comment">#假设有一个Transformer包</span></span><br><span class="line">model = Transformer() <span class="comment">#将网络实例化</span></span><br><span class="line"><span class="built_in">print</span>(model.trainable_params()) <span class="comment"># trainable_params()即可返回该网络哪些参数是可训练也就是求梯度的</span></span><br><span class="line"><span class="comment"># 打印结果如下所示（一部分）</span></span><br><span class="line">Parameter (name=visual.visual.class_embedding, shape=(<span class="number">768</span>,), dtype=Float32, requires_grad=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+
+<p>根据上述打印结果我们可以发现每个可训练权重由如下几个部分组成：</p>
+<ol>
+<li>name</li>
+<li>shape</li>
+<li>dtype</li>
+<li>requires_grad</li>
+</ol>
+<p>因此我们可以通过如下方式</p>
+<h3 id="将权重冻结"><a href="#将权重冻结" class="headerlink" title="将权重冻结"></a>将权重冻结</h3><ol>
+<li>冻结某些参数，例如第一层卷积层的权重</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> param <span class="keyword">in</span> net.trainable_params():</span><br><span class="line">    <span class="keyword">if</span> param.name == <span class="string">&quot;conv1.weight&quot;</span>:</span><br><span class="line">        param.requires_grad = <span class="literal">False</span></span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>冻结所有参数，例如第一层卷积层的权重</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> param <span class="keyword">in</span> net.trainable_params():</span><br><span class="line">    param.requires_grad = <span class="literal">False</span></span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> mindspore.train.serialization <span class="keyword">import</span> save_checkpoint</span><br><span class="line">save_checkpoint(visual_t, <span class="string">&quot;clip_visual.ckpt&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> mindspore.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="keyword">from</span> mindspore <span class="keyword">import</span> load_checkpoint, load_param_into_net</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义一个与已保存模型相同结构的模型</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">YourModel</span>(nn.Cell):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">super</span>(YourModel, self).__init__()</span><br><span class="line">        <span class="comment"># 定义你的模型结构，确保结构与已保存的模型相同</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">construct</span>(<span class="params">self, x</span>):</span><br><span class="line">        <span class="comment"># 构建你的模型结构</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建一个与已保存模型相同结构的YourModel实例</span></span><br><span class="line">model = YourModel()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载已保存的模型参数</span></span><br><span class="line">param_dict = load_checkpoint(<span class="string">&quot;your_model.ckpt&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将参数加载到你的模型中</span></span><br><span class="line">load_param_into_net(model, param_dict)</span><br></pre></td></tr></table></figure>
+
 
         </div>
 
@@ -420,7 +401,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2023/10/09/ViT/">http://example.com/2023/10/09/ViT/</a></span>
+                        <span><a href="http://example.com/2023/10/12/mindspore%E4%BB%8E%E5%A4%A7%E5%9E%8B%E6%A8%A1%E5%9E%8B%E4%B8%AD%E5%AF%BC%E5%87%BA%E6%A8%A1%E5%9D%97/">http://example.com/2023/10/12/mindspore%E4%BB%8E%E5%A4%A7%E5%9E%8B%E6%A8%A1%E5%9E%8B%E4%B8%AD%E5%AF%BC%E5%87%BA%E6%A8%A1%E5%9D%97/</a></span>
                     </p>
                 
                 
@@ -444,7 +425,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/CV/"># CV</a>
+                        <a href="/tags/blogs/"># blogs</a>
                     
                         
                 </span>
@@ -457,10 +438,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2023/10/10/MindSpore%E5%AF%B9%E6%A8%A1%E5%9E%8B%E6%9D%83%E9%87%8D%E6%8F%90%E5%8F%96%E4%B8%8E%E6%9F%A5%E7%9C%8B/">MindSpore对模型权重提取与查看</a>
             
-            
-            <a class="next" rel="next" href="/2023/10/08/MindSpore%E8%AE%AD%E7%BB%83%E6%A8%A1%E5%9E%8B/">MindSpore训练模型</a>
+            <a class="next" rel="next" href="/2023/10/10/MindSpore%E5%AF%B9%E6%A8%A1%E5%9E%8B%E6%9D%83%E9%87%8D%E6%8F%90%E5%8F%96%E4%B8%8E%E6%9F%A5%E7%9C%8B/">MindSpore对模型权重提取与查看</a>
             
         </section>
 
