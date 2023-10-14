@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jiaqi Li">
+
+
+
+
+
+<title>Tmux | Hexo</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+    <script>
+        !
+        function() {
+            function n(n, e, t) {
+                return n.getAttribute(e) || t
+            }
+            function e(n) {
+                return document.getElementsByTagName(n)
+            }
+            function t() {
+                var t = e("script"),
+                o = t.length,
+                i = t[o - 1];
+                return {
+                    l: o,
+                    z: n(i, "zIndex", -1), //置于主页面背后
+                    o: n(i, "opacity", .5), //线条透明度
+                    c: n(i, "color", "0,0,0"), //线条颜色
+                    n: n(i, "count", 100) //线条数量
+                }
+            }
+            function o() {
+                a = m.width = window.innerWidth ||
+        document.documentElement.clientWidth || document.body.clientWidth,
+                c = m.height = window.innerHeight ||
+        document.documentElement.clientHeight || document.body.clientHeight
+            }
+            function i() {
+                r.clearRect(0, 0, a, c);
+                var n, e, t, o, m, l;
+                s.forEach(function(i, x) {
+                    for (i.x += i.xa, i.y += i.ya, i.xa *= i.x > a || i.x < 0 ? -1 :
+        1, i.ya *= i.y > c || i.y < 0 ? -1 : 1, r.fillRect(i.x - .5, i.y - .5, 1,
+        1), e = x + 1; e < u.length; e++) n = u[e],
+                    null !== n.x && null !== n.y && (o = i.x - n.x, m = i.y - n.y, l
+        = o * o + m * m, l < n.max && (n === y && l >= n.max / 2 && (i.x -= .03 * o,
+        i.y -= .03 * m), t = (n.max - l) / n.max, r.beginPath(), r.lineWidth = t /
+        2, r.strokeStyle = "rgba(" + d.c + "," + (t + .2) + ")", r.moveTo(i.x, i.y),
+        r.lineTo(n.x, n.y), r.stroke()))
+                }),
+                x(i)
+            }
+            var a, c, u, m = document.createElement("canvas"),
+            d = t(),
+            l = "c_n" + d.l,
+            r = m.getContext("2d"),
+            x = window.requestAnimationFrame || window.webkitRequestAnimationFrame
+        || window.mozRequestAnimationFrame || window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+            function(n) {
+                window.setTimeout(n, 1e3 / 45)
+            },
+            w = Math.random,
+            y = {
+                x: null,
+                y: null,
+                max: 2e4
+            };
+            m.id = l,
+            m.style.cssText = "position:fixed;top:0;left:0;z-index:" + d.z +
+        ";opacity:" + d.o,
+            e("body")[0].appendChild(m),
+            o(),
+            window.onresize = o,
+            window.onmousemove = function(n) {
+                n = n || window.event,
+                y.x = n.clientX,
+                y.y = n.clientY
+            },
+            window.onmouseout = function() {
+                y.x = null,
+                y.y = null
+            };
+            for (var s = [], f = 0; d.n > f; f++) {
+                var h = w() * a,
+                g = w() * c,
+                v = 2 * w() - 1,
+                p = 2 * w() - 1;
+                s.push({
+                    x: h,
+                    y: g,
+                    xa: v,
+                    ya: p,
+                    max: 6e3
+                })
+            }
+            u = s.concat([y]),
+            setTimeout(function() {
+                i()
+            },
+            100)
+        } ();
+        </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jiaqi Li&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jiaqi Li&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Tmux</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jiaqi Li</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">October 14, 2023&nbsp;&nbsp;10:22:58</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/blogs/">blogs</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="Tmux"><a href="#Tmux" class="headerlink" title="Tmux"></a>Tmux</h1><h2 id="一-introduction"><a href="#一-introduction" class="headerlink" title="一. introduction"></a>一. introduction</h2><p>命令行的典型使用方式是，打开一个终端窗口（terminal window，以下简称”窗口”），在里面输入命令。<strong>用户与计算机的这种临时的交互，称为一次”会话”（session）</strong>。</p>
+<p>会话的一个重要特点是，窗口与其中启动的进程是连在一起的。<strong>打开窗口，会话开始；关闭窗口，会话结束，会话内部的进程也会随之终止，不管有没有运行完。</strong></p>
+<p>一个典型的例子就是，SSH远程连接计算机，打开一个远程窗口执行命令。这时，网络突然断线，再次登录的时候，是找不回上一次执行的命令的。因为上一次 SSH 会话已经终止了，里面的进程也随之消失了。</p>
+<p>为了解决这个问题，会话与窗口可以”解绑”：窗口关闭时，会话并不终止，而是继续运行，等到以后需要的时候，再让会话”绑定”其他窗口。</p>
+<h2 id="二-作用"><a href="#二-作用" class="headerlink" title="二. 作用"></a>二. 作用</h2><p><strong>Tmux 就是会话与窗口的”解绑”工具，将它们彻底分离。</strong></p>
+<blockquote>
+<p>（1）它允许在单个窗口中，同时访问多个会话。这对于同时运行多个命令行程序很有用。</p>
+<p>（2） 它可以让新窗口”接入”已经存在的会话。</p>
+<p>（3）它允许每个会话有多个连接窗口，因此可以多人实时共享会话。</p>
+<p>（4）它还支持窗口任意的垂直和水平拆分。</p>
+</blockquote>
+<h2 id="三-使用方式"><a href="#三-使用方式" class="headerlink" title="三.使用方式"></a>三.使用方式</h2><ol>
+<li><strong>安装：</strong></li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Ubuntu 或 Debian</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt-get install tmux</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">CentOS 或 Fedora</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo yum install tmux</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Mac</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">brew install tmux</span></span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><strong>启动与退出</strong></li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux <span class="comment"># 启动一个窗口</span></span></span><br></pre></td></tr></table></figure>
+
+<p>上面命令会启动 Tmux 窗口，底部有一个状态栏。状态栏的左侧是窗口信息（编号和名称），右侧是系统信息。</p>
+<p><img src="C:\Githubpage\myblog\source\images\blogs\2_1.png"></p>
+<p>按下<code>Ctrl+d</code>或者显式输入<code>exit</code>命令，就可以退出 Tmux 窗口。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">exit</span></span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><strong>前缀键</strong></li>
+</ol>
+<p>Tmux 窗口有大量的快捷键。所有快捷键都要通过前缀键唤起。默认的前缀键是<code>Ctrl+b</code>，即先按下<code>Ctrl+b</code>，快捷键才会生效。</p>
+<p>举例来说，帮助命令的快捷键是<code>Ctrl+b ?</code>。它的用法是，在 Tmux 窗口中，先按下<code>Ctrl+b</code>，再按下<code>?</code>，就会显示帮助信息。</p>
+<p>然后，按下 ESC 键或<code>q</code>键，就可以退出帮助。</p>
+<h2 id="四-会话管理"><a href="#四-会话管理" class="headerlink" title="四. 会话管理"></a>四. 会话管理</h2><ol>
+<li><strong>新建会话</strong></li>
+</ol>
+<p>第一个启动的 Tmux 窗口，编号是<code>0</code>，第二个窗口的编号是<code>1</code>，以此类推。这些窗口对应的会话，就是 0 号会话、1 号会话。</p>
+<p>使用编号区分会话，不太直观，更好的方法是为会话起名。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux new -s &lt;session-name&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>上面命令新建一个指定名称的会话。</p>
+<ol start="2">
+<li><strong>分离会话</strong></li>
+</ol>
+<p>在 Tmux 窗口中，按下<strong>Ctrl+b d</strong>或者输入<strong>tmux detach</strong>命令，就会将当前会话与窗口分离。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux detach</span></span><br></pre></td></tr></table></figure>
+
+<p>上面命令执行后，就会退出当前 Tmux 窗口，但是会话和里面的进程仍然在后台运行。</p>
+<p><code>tmux ls</code>命令可以查看当前所有的 Tmux 会话。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux <span class="built_in">ls</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">or</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux list-session</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><strong>接入会话</strong></li>
+</ol>
+<p>tmux attach命令用于重新接入某个已存在的会话。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">使用会话编号</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux attach -t 0</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">使用会话名称</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux attach -t &lt;session-name&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><strong>杀死会话</strong></li>
+</ol>
+<p><code>tmux kill-session</code>命令用于杀死某个会话。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">使用会话编号</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux kill-session -t 0</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">使用会话名称</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux kill-session -t &lt;session-name&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li><strong>切换会话</strong></li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">使用会话编号</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux switch -t 0</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">使用会话名称</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux switch -t &lt;session-name&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li><strong>重命名会话</strong></li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux rename-session -t 0 &lt;new-name&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li><strong>会话快捷键</strong></li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Ctrl+b d：分离当前会话。</span><br><span class="line">Ctrl+b s：列出所有会话。</span><br><span class="line">Ctrl+b $：重命名当前会话。</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Jiaqi Li</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://example.com/2023/10/14/Tmux/">http://example.com/2023/10/14/Tmux/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/blogs/"># blogs</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2023/10/12/mindspore%E4%BB%8E%E5%A4%A7%E5%9E%8B%E6%A8%A1%E5%9E%8B%E4%B8%AD%E5%AF%BC%E5%87%BA%E6%A8%A1%E5%9D%97/">MindSpore从大型模型中导出模块以及权重处理</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jiaqi Li | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

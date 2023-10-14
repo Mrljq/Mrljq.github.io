@@ -358,7 +358,7 @@
 <li>定义损失函数</li>
 <li>训练</li>
 </ol>
-<h2 id="1-定义数据集"><a href="#1-定义数据集" class="headerlink" title="1. 定义数据集"></a>1. 定义数据集</h2><ul>
+<h2 id="一-定义数据集"><a href="#一-定义数据集" class="headerlink" title="一. 定义数据集"></a>一. 定义数据集</h2><ul>
 <li><p>mindspore提供了多种使用数据集的方式。</p>
 <ul>
 <li>使用已经封装好的现有数据集（以coco数据集为例）：</li>
@@ -389,7 +389,7 @@
 <p>num_epochs参数的默认值为-1即可以无限迭代，但如果出现自定义后，一旦迭代次数超过就会报错，因此强烈建议不要修改因为改了除了给自己加一个坑别的什么用也没有（它跟DataLoader完全不一样，这里设置完epochs不会有任何用）</p>
 </li>
 </ul>
-<h2 id="2-定义网络"><a href="#2-定义网络" class="headerlink" title="2. 定义网络"></a>2. 定义网络</h2><p>接下来这个网络实现的其实就是一个一次函数 $ y&#x3D;a*x+b$ ,网络里封装了两个可学习的常数。</p>
+<h2 id="二-定义网络"><a href="#二-定义网络" class="headerlink" title="二. 定义网络"></a>二. 定义网络</h2><p>接下来这个网络实现的其实就是一个一次函数 $ y&#x3D;a*x+b$ ,网络里封装了两个可学习的常数。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> mindspore.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">test</span>(nn.Cell):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">super</span>(test, self).__init__()</span><br><span class="line">        self.w = Parameter(Tensor(<span class="number">6</span>).astype(ms.float32))</span><br><span class="line">        self.b = Parameter(Tensor(<span class="number">6</span>).astype(ms.float32))</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">construct</span>(<span class="params">self, x</span>):</span><br><span class="line">        <span class="keyword">return</span> self.w*x + self.b</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>这里的construct和Pytorch里的forward一样。</p>
@@ -407,6 +407,11 @@
 
 <p>根据源码我们可以发现这个封装其实就是将loss函数和原始的骨干网络结合成一个网络。</p>
 <p>并且这个网络的输入只接受两个，一个是传入骨干网络的data，一个是传入loss函数的label。</p>
+<p>如果你的网络特殊或者说想要更灵活可以使用如下两个方式进行：</p>
+<ol>
+<li>将多输入或者多输出封装成tuple形式。</li>
+<li>舍弃这一个封装，直接在自己网络里封装上loss函数。</li>
+</ol>
 <ul>
 <li>TrainOneStepCell封装：</li>
 </ul>
