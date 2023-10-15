@@ -355,7 +355,7 @@
 <p>预训练视觉模型可提供高质量的视觉呈现。预训练语言模型，尤其是大型语言模型（LLMs），具有强大的语言生成和零点转移能力。为了降低计算成本和应对灾难性遗忘问题，<strong>单模态预训练模型在预训练期间保持冻结。</strong></p>
 <p>面临的问题：</p>
 <p>LLM在单模态预训练时没有看到视觉信息，因此冻结LLM再训练就变得极具挑战性。（很难将文本和图像信息对齐），为此文章提出了Q-Former结构。</p>
-<h2 id="模型架构"><a href="#模型架构" class="headerlink" title="模型架构"></a>模型架构</h2><p><img src="C:\Githubpage\myblog\source\images\Multimodal\6_1.png"></p>
+<h2 id="模型架构"><a href="#模型架构" class="headerlink" title="模型架构"></a>模型架构</h2><p><img src="/../images/Multimodal/6_1.png"></p>
 <ol>
 <li><strong>Q-Former</strong>：一种轻量级的转换器（整体模型的可训练模块），采用一组可学习的查询向量从冻结的图像编码器中提取视觉特征。</li>
 <li>Image Encoder：<ul>
@@ -370,7 +370,7 @@
 <li>视觉-语言表征学习，强制 Q-Former 学习与文本最相关的视觉表征。</li>
 <li>在第二个预训练阶段，我们通过将 Q-Former 的输出连接到冻结的 LLM 来执行视觉到语言的生成学习，并对 Q-Former 进行训练，使其输出的视觉表征能够被 LLM 解释。</li>
 </ul>
-<h3 id="Q-Former"><a href="#Q-Former" class="headerlink" title="Q-Former"></a>Q-Former</h3><p><img src="C:\Githubpage\myblog\source\images\Multimodal\6_2.png"></p>
+<h3 id="Q-Former"><a href="#Q-Former" class="headerlink" title="Q-Former"></a>Q-Former</h3><p><img src="/../images/Multimodal/6_2.png"></p>
 <p>由包含两个共享自注意层的transformer子模块构成：</p>
 <ol>
 <li>图像transformer与冻结的图像编码器交互用于提取视觉特征。</li>
@@ -387,7 +387,7 @@
 <li><p>ITM</p>
 </li>
 </ul>
-<h3 id="二阶段"><a href="#二阶段" class="headerlink" title="二阶段"></a>二阶段</h3><p><img src="C:\Githubpage\myblog\source\images\Multimodal\6_3.png"></p>
+<h3 id="二阶段"><a href="#二阶段" class="headerlink" title="二阶段"></a>二阶段</h3><p><img src="/../images/Multimodal/6_3.png"></p>
 <p>在生成预训练阶段，将 QFormer连接到冻结 LLM，以获取 LLM 的生成语言能力。<strong>使用全连接（FC）层将输出查询嵌入式 Z 线性投影到与 LLM 文本嵌入式相同的维度</strong>。然后，投射的查询嵌入会被添加到输入的文本嵌入中。它们起到软视觉提示的作用，使 LLM 以 Q-Former 提取的视觉表征为条件。由于 Q-Former 已经过预先训练，可以提取与语言相关的视觉表征，<strong>因此它可以有效地发挥信息瓶颈的作用，向 LLM 输送最有用的信息，同时去除无关的视觉信息。这就减轻了 LLM 学习视觉语言对齐的负担，从而缓解了灾难性遗忘问题。</strong></p>
 <p>在此阶段中对两种LLM进行实验：</p>
 <ol>
@@ -409,17 +409,17 @@
 <li>Image Captioning</li>
 </ol>
 <h3 id="VQA"><a href="#VQA" class="headerlink" title="VQA"></a>VQA</h3><p>给定注释过的 VQA 数据后，我们对 Q-Former 和图像编码器的参数进行微调，同时冻结 LLM。我们<strong>使用open-ended answer generation loss(开放式答案生成损失)进行微调</strong>，LLM 接收 Q-Former 的输出和问题作为输入，并被要求生成答案。为了提取与问题更相关的图像特征，我们还将问题作为 Q-Former 的条件。具体来说，问题标记被作为 Q-Former 的输入，并通过自我注意层与查询进行交互，从而引导 Q-Former 的交叉注意层关注信息量更大的图像区域。</p>
-<p><img src="C:\Githubpage\myblog\source\images\Multimodal\6_4.png"></p>
+<p><img src="/../images/Multimodal/6_4.png"></p>
 <p>BLIP-2 在各种<strong>zero-shot</strong>视觉语言任务上的结果概览。与之前最先进的模型相比。BLIP-2 在视觉语言预训练过程中所需的可训练参数数量最少，但却实现了最高的zero-shot性能。</p>
-<p><img src="C:\Githubpage\myblog\source\images\Multimodal\6_5.png"></p>
+<p><img src="/../images/Multimodal/6_5.png"></p>
 <p>​                                                              (与最先进的<strong>zero-shot</strong>视觉问题解答方法进行比较。)</p>
 <p>我们对零镜头视觉问题解答任务进行了定量评估。对于 OPT 模型，我们使用 “Question: {} Answer:”。对于 FlanT5 模型，我们使用 “Question: {} Short answer:”的提示。在生成过程中，我们使用波束搜索，波束宽度为 5。我们还将长度惩罚设置为-1，以鼓励更符合人类注释的较短答案。</p>
 <p><strong>通过上面的实验可以得到上面总结的结论：BLIP-2 是一种通用的视觉语言预训练方法，可以有效地利用视觉和自然语言社区的快速发展。以下几个事实支持这一观点：(1) 对于 OPT 和 FlanT5，ViT-g 均优于 ViT-L。(2) 在同一 LLM 系列中，较大的模型优于较小的模型。(3) 在 VQA 上，经过指令调整的 LLM FlanT5 优于未经监督训练的 OPT。</strong></p>
 <h3 id="Image-Captioning"><a href="#Image-Captioning" class="headerlink" title="Image Captioning"></a>Image Captioning</h3><p>我们将提示语 “一张照片 “作为 LLM 的初始输入，并<strong>利用language modeling loss(语言建模损失)训练模型生成标题。</strong>在微调过程中，我们将 LLM 冻结，并与图像编码器一起更新 Q-Former 的参数。我们使用 ViT-g 和各种 LLM 进行实验。详细的超参数见附录。我们在 COCO 上进行微调，并在 COCO 测试集和零点转移到 NoCaps（Agrawal 等人，2019 年）验证集上进行评估。</p>
-<p><img src="C:\Githubpage\myblog\source\images\Multimodal\6_6.png"></p>
+<p><img src="/../images/Multimodal/6_6.png"></p>
 <p>(在 NoCaps 和 COCO 上与最先进的图像标题制作方法进行比较。所有方法都在微调过程中优化了交叉熵损失。C：CIDEr，S：SPICE，B@4：BLEU@4。)</p>
 <h3 id="Image-Text-Retrieval"><a href="#Image-Text-Retrieval" class="headerlink" title="Image-Text Retrieval"></a>Image-Text Retrieval</h3><p>不使用 LLM，直接对第一阶段预训练模型进行微调。具体来说，我们在 COCO 上使用与预训练相同的目标（即 ITC、ITM 和 ITG）<strong>对图像编码器和 Q-Former 进行微调。</strong>然后，我们在 COCO 和 Flickr30K数据集上对模型的图像到文本检索和文本到图像检索进行评估。在推理过程中，首先根据图像文本特征相似度选择 k &#x3D; 128 个候选对象，然后根据成对的 ITM 分数重新排序。我们使用 ViT-L 和 ViT-g 作为图像编码器进行实验。</p>
-<p><img src="C:\Githubpage\myblog\source\images\Multimodal\6_7.png"></p>
+<p><img src="/../images/Multimodal/6_7.png"></p>
 <p>​                      (与最先进的图像-文本检索方法进行比较，在 COCO 上进行了微调，并将零镜头传输到 Flickr30K。)</p>
 
         </div>
