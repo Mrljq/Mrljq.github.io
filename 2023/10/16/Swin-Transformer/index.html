@@ -13,7 +13,7 @@
 
 
 
-<title>Tmux | Hexo</title>
+<title>Swin Transformer | Hexo</title>
 
 
 
@@ -326,7 +326,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Tmux</h1>
+            <h1 class="post-title">Swin Transformer</h1>
             
                 <div class="post-meta">
                     
@@ -335,143 +335,90 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">October 14, 2023&nbsp;&nbsp;10:22:58</a>
+                        Date: <a href="#">October 16, 2023&nbsp;&nbsp;8:57:23</a>
                         </span>
                     
-                    
-                        <span class="post-category">
-                    Category:
-                            
-                                <a href="/categories/blogs/">blogs</a>
-                            
-                        </span>
                     
                 </div>
             
         </header>
 
         <div class="post-content">
-            <h1 id="Tmux"><a href="#Tmux" class="headerlink" title="Tmux"></a>Tmux</h1><h2 id="一-introduction"><a href="#一-introduction" class="headerlink" title="一. introduction"></a>一. introduction</h2><p>命令行的典型使用方式是，打开一个终端窗口（terminal window，以下简称”窗口”），在里面输入命令。<strong>用户与计算机的这种临时的交互，称为一次”会话”（session）</strong>。</p>
-<p>会话的一个重要特点是，窗口与其中启动的进程是连在一起的。<strong>打开窗口，会话开始；关闭窗口，会话结束，会话内部的进程也会随之终止，不管有没有运行完。</strong></p>
-<p>一个典型的例子就是，SSH远程连接计算机，打开一个远程窗口执行命令。这时，网络突然断线，再次登录的时候，是找不回上一次执行的命令的。因为上一次 SSH 会话已经终止了，里面的进程也随之消失了。</p>
-<p>为了解决这个问题，会话与窗口可以”解绑”：窗口关闭时，会话并不终止，而是继续运行，等到以后需要的时候，再让会话”绑定”其他窗口。</p>
-<h2 id="二-作用"><a href="#二-作用" class="headerlink" title="二. 作用"></a>二. 作用</h2><p><strong>Tmux 就是会话与窗口的”解绑”工具，将它们彻底分离。</strong></p>
-<blockquote>
-<p>（1）它允许在单个窗口中，同时访问多个会话。这对于同时运行多个命令行程序很有用。</p>
-<p>（2） 它可以让新窗口”接入”已经存在的会话。</p>
-<p>（3）它允许每个会话有多个连接窗口，因此可以多人实时共享会话。</p>
-<p>（4）它还支持窗口任意的垂直和水平拆分。</p>
-</blockquote>
-<h2 id="三-使用方式"><a href="#三-使用方式" class="headerlink" title="三.使用方式"></a>三.使用方式</h2><ol>
-<li><strong>安装：</strong></li>
+            <h2 id="Swin-Transformer"><a href="#Swin-Transformer" class="headerlink" title="Swin Transformer"></a>Swin Transformer</h2><h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h2><p>本文目标就是寻求扩展 Transformer 的适用性，使其可以作为计算机视觉的通用骨干，就像它在 NLP 中的作用以及 CNN 在视觉中的作用一样。</p>
+<h3 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h3><p>将Transformer在语言领域的高性能转移到视觉领域的重大挑战可以通过两种模式之间的差异来解释。</p>
+<ol>
+<li><strong>规模。</strong>与作为语言 Transformer 中处理的基本元素的单词标记不同，视觉元素在规模上可能存在很大差异，这一问题在对象检测等任务中受到关注。在现有的基于 Transformer 的模型中，令牌都是固定规模的，这种属性不适合这些视觉应用。</li>
+<li><strong>图像中像素的分辨率比文本段落中的单词要高得多</strong>。存在许多视觉任务，例如语义分割，需要在像素级进行密集预测，这对于高分辨率图像上的 Transformer 来说是很棘手的，因为其自注意力的计算复杂度与图像大小成二次方。</li>
 </ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Ubuntu 或 Debian</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt-get install tmux</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">CentOS 或 Fedora</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo yum install tmux</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Mac</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">brew install tmux</span></span><br></pre></td></tr></table></figure>
-
+<p>为了克服这些问题，本文提出了一个通用的 Transformer 主干，称为 Swin Transformer，它构建分层特征图，并且具有与图像大小线性的计算复杂度。如图 1(a) 所示，Swin Transformer 通过从小尺寸补丁（灰色轮廓）开始并逐渐合并更深 Transformer 层中的相邻补丁来构建分层表示。借助这些<strong>分层特征图</strong>，Swin Transformer 模型可以方便地利用先进技术进行密集预测，<strong>线性计算复杂度是通过在分割图像的非重叠窗口（以红色框出）内本地计算自注意力来实现的</strong>。<strong>每个窗口中的补丁数量是固定的，因此复杂度与图像大小成线性关系。</strong>这些优点使 Swin Transformer 适合作为各种视觉任务的通用骨干网，与之前基于 Transformer 的架构形成鲜明对比，后者生成单一分辨率的特征图并具有二次复杂度。</p>
+<h3 id="解决方式"><a href="#解决方式" class="headerlink" title="解决方式"></a>解决方式</h3><p><img src="C:\Githubpage\myblog\source\images\CV\3_1.png"></p>
+<p>​                                                                                                         图1</p>
+<p>所提出的 Swin Transformer 通过合并更深层中的图像块（以灰色显示）来构建分层特征图，并且由于仅在每个局部窗口（以红色显示）内计算自注意力，因此<strong>具有输入图像大小的线性计算复杂性</strong>。因此，它可以作为图像分类和密集识别任务的通用主干。 (b) 相比之下，之前的视觉 Transformers 产生单个低分辨率的特征图，并且由于全局自注意力的计算，输入图像大小的计算复杂度为二次方</p>
+<h2 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h2><h3 id="移位窗口的实现形式"><a href="#移位窗口的实现形式" class="headerlink" title="移位窗口的实现形式"></a>移位窗口的实现形式</h3><p><img src="C:\Githubpage\myblog\source\images\CV\3_2.png"></p>
+<p><strong>在 l 层（左）中，采用常规窗口划分方案</strong>，并在每个窗口内计算自注意力。<strong>在下一层 l + 1（右）中，窗口分区发生移动，产生新的窗口。新窗口中的自注意力计算跨越了 l 层中先前窗口的边界，提供了它们之间的连接</strong>。</p>
+<p>首先通过补丁分割模块（如 ViT）将输入 RGB 图像分割成不重叠的补丁。每个补丁都被视为一个“令牌”，其特征被设置为原始像素 RGB 值的串联。在我们的实现中，我们使用 <strong>4 × 4</strong> 的块大小，因此每个块的特征维度为 4 × 4 × 3 &#x3D; 48。线性嵌入层应用于此原始值特征，<strong>将其投影到任意维度（记为C)。</strong></p>
+<ol>
+<li><p><strong>阶段1：</strong></p>
+<p>在这些补丁标记上应用几个经过修改的自注意计算变换器块（Swin 变换器块）。变换器块保持标记的数量（$\frac{H}{4}<em>\frac{W}{4}$）（原因是我们第一层的patch是4</em>4大小），并进行线性嵌入。</p>
+</li>
+<li><p><strong>阶段2：</strong></p>
+<p>为了产生分层表示，随着网络的深入，会通过补丁合并层来减少标记的数量。第一个补丁合并层将每组 2 × 2 相邻补丁的特征串联起来，并在 <strong>4C 维串联特征上应用线性层</strong>。（每个patch原先是$4<em>4$大小经过拉直和线性投影变成$1</em>C$的大小，而这一层经过结合4个patch形成$4<em>C$的维度（拉直））<br>$$<br>\begin{bmatrix}<br>a &amp; b \<br>c &amp; d \<br>\end{bmatrix}<br>$$<br>a，b，c，d分别代表相邻的2</em>2的patch。由于经过flatten和投影，他们中每一个其实是$a,b,c,d\in R^{1×C}$ 的矩阵。</p>
+<p>将他们合并形成 $R^{4×C}$ 再将其拉直就变成了4*C的维度串。</p>
+<p>这就将标记数减少了 2 × 2 &#x3D; 4 的倍数（分辨率降低了 2 倍），输出维度设置为 2C。随后应用 Swin 变换器块进行特征变换，分辨率保持为 $\frac{H}{4}*\frac{W}{4}$。这第一块补丁合并和特征变换被称为 “阶段 2”。</p>
+<p>下图中阶段1到阶段2之所以会变成$\frac{H}{8}*\frac{W}{8}$ 因为一次取4个相邻的patch相较于原先就是横纵各少了两倍。</p>
+</li>
+</ol>
+<p><img src="C:\Githubpage\myblog\source\images\CV\3_3.png"></p>
+<p>该过程重复两次，即“阶段 3”和“阶段 4”，输出分辨率分别为 $\frac{H}{16}*\frac{W}{16}$和 $\frac{H}{32}*\frac{W}{32}$。这些阶段共同产生层次表示，具有与典型卷积网络相同的特征图分辨率。因此，所提出的架构可以方便地替换现有方法中用于各种视觉任务的主干网络。</p>
+<h3 id="Swin-Transformer-block"><a href="#Swin-Transformer-block" class="headerlink" title="Swin Transformer block"></a>Swin Transformer block</h3><p><img src="C:\Githubpage\myblog\source\images\CV\3_4.png"></p>
+<p>Swin Transformer 模块 Swin Transformer 是通过将 Transformer 模块中的标准多头自注意力（MSA）模块替换为基于移位窗口的模块而构建的，其他层保持不变。Swin Transformer 模块由基于移位窗口的 MSA 模块组成，后跟中间带有 <strong>GELU 非线性的 2 层 MLP</strong>。在<strong>每个 MSA 模块和每个 MLP 之前应用 LayerNorm (LN) 层</strong>，并在<strong>每个模块之后应用残差连接</strong>。</p>
+<ol>
+<li><strong>计算复杂度对比</strong></li>
+</ol>
+<p><img src="C:\Githubpage\myblog\source\images\CV\3_5.png"></p>
+<p>假设每个窗口包含 M × M 个补丁，则全局 MSA 模块和基于 h × w 补丁图像的窗口的计算复杂度为上图所示。</p>
+<p>推导过程：</p>
+<ul>
+<li><p>MSA：一个自注意力模块其实就是4个投影和中间的2个内积。</p>
+<ul>
+<li><p>投影：</p>
+<p>假设每个补丁大小为 r*r，那么将其拉直后整个图片变成  $R^{(h×w)×(r×r)}$ 经过前置投影变成 $R^{(h×w)×C}$</p>
+<p>将该矩阵传入MSA模块后，投影复杂度应为如下表示：<br>$$<br>R^{(h×w)×C} →  R^{(h×w)×C}输入经过一个R^{C×C}的矩阵<br>$$<br>复杂度就是如下表示<br>$$<br>\sum^4_{i&#x3D;1}h×w×C×C<br>$$</p>
+</li>
+<li><p>内积：</p>
+</li>
+</ul>
+<p>$R^{(h×w)×C}$与$R^{(h×w)×C}$内积的复杂度如下<br>$$<br>\sum^{2}_{i&#x3D;1}h×w×C×h×w<br>$$</p>
+</li>
+<li><p>W-MSA：</p>
+<ul>
+<li>投影复杂度与MSA一致</li>
+<li>内积</li>
+</ul>
+<p>图片被分为$\frac{h×w}{M×M}$个窗口，每个窗口展开是$R^{(M×M)×C}$  的矩阵那么复杂度计算为下式<br>$$<br>\sum^{\frac{h×w}{M×M}}<em>{i&#x3D;1} \sum</em>{i1&#x3D;1}^2 M×M×C×M×M<br>$$</p>
+</li>
+</ul>
 <ol start="2">
-<li><strong>启动与退出</strong></li>
+<li><strong>移动划分方式</strong></li>
 </ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux <span class="comment"># 启动一个窗口</span></span></span><br></pre></td></tr></table></figure>
-
-<p>上面命令会启动 Tmux 窗口，底部有一个状态栏。状态栏的左侧是窗口信息（编号和名称），右侧是系统信息。</p>
-<p><img src="C:\Githubpage\myblog\source\images\blogs\2_1.png"></p>
-<p>按下<code>Ctrl+d</code>或者显式输入<code>exit</code>命令，就可以退出 Tmux 窗口。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">exit</span></span></span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li><strong>前缀键</strong></li>
+<p>第一个模块使用从左上角像素开始的常规窗口划分策略，将 8 × 8 特征图均匀划分为大小为 4 × 4 (M &#x3D; 4) 的 2 × 2 窗口。然后，下一个模块采用与前一层的窗口配置不同的窗口配置，通过将窗口从规则分区的窗口中移动（$\frac{M}{2}$，$ \frac{M}{2}$）个像素。(可以理解为上移再右移)</p>
+<p><img src="C:\Githubpage\myblog\source\images\CV\3_2.png"></p>
+<p>使用移位窗口分区方法，连续的 Swin Transformer 块计算如下</p>
+<p>其中 $z^{l’}$ 和 zl 分别表示块 l 的 (S)WMSA 模块和 MLP 模块的输出特征, W-MSA 和 SW-MSA 分别表示使用常规和移位窗口分区配置的基于窗口的多头自注意力。</p>
+<p><img src="C:\Githubpage\myblog\source\images\CV\3_6.png"></p>
+<ul>
+<li><p>移位配置的高效批量计算移位窗口分区的一个问题是，它将导致更多的窗口，从移位配置中的 <img src="C:\Githubpage\myblog\source\images\CV\3_8.png">到 </p>
+<p><img src="C:\Githubpage\myblog\source\images\CV\3_9.png"> <img src="C:\Githubpage\myblog\source\images\CV\3_10.png">，并且一些窗口将小于 M × M 。一个简单的解决方案是将较小的窗口填充到 M × M 的大小，并在计算注意力时屏蔽掉填充的值。当常规分区中的窗口数量较少时，例如2 × 2，这种朴素解决方案增加的计算量是相当可观的（2 × 2 → 3 × 3，增加了 2.25 倍）。在这里，我们提出了一种更有效的批量计算方法，通过向左上方向循环移位，如图 4 所示。经过这种移位，批处理窗口可能由多个在特征图中不相邻的子窗口组成，因此采用屏蔽机制将自注意力计算限制在每个子窗口内。通过循环移位，批处理窗口的数量保持与常规窗口划分相同，因此也是高效的。该方法的低延迟如表所示<img src="C:\Githubpage\myblog\source\images\CV\3_7.png"></p>
+</li>
+</ul>
+<h2 id="训练"><a href="#训练" class="headerlink" title="训练"></a>训练</h2><h3 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h3><ol>
+<li>优化器: 使用 AdamW优化器进行 300 个周期，使用余弦衰减学习率调度器和 20 个周期的线性预热。使用的批量大小为 1024，初始学习率为 0.001，权重衰减为 0.05。</li>
 </ol>
-<p>Tmux 窗口有大量的快捷键。所有快捷键都要通过前缀键唤起。默认的前缀键是<code>Ctrl+b</code>，即先按下<code>Ctrl+b</code>，快捷键才会生效。</p>
-<p>举例来说，帮助命令的快捷键是<code>Ctrl+b ?</code>。它的用法是，在 Tmux 窗口中，先按下<code>Ctrl+b</code>，再按下<code>?</code>，就会显示帮助信息。</p>
-<p>然后，按下 ESC 键或<code>q</code>键，就可以退出帮助。</p>
-<h2 id="四-会话管理"><a href="#四-会话管理" class="headerlink" title="四. 会话管理"></a>四. 会话管理</h2><ol>
-<li><strong>新建会话</strong></li>
-</ol>
-<p>第一个启动的 Tmux 窗口，编号是<code>0</code>，第二个窗口的编号是<code>1</code>，以此类推。这些窗口对应的会话，就是 0 号会话、1 号会话。</p>
-<p>使用编号区分会话，不太直观，更好的方法是为会话起名。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux new -s &lt;session-name&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>上面命令新建一个指定名称的会话。</p>
-<ol start="2">
-<li><strong>分离会话</strong></li>
-</ol>
-<p>在 Tmux 窗口中，按下<strong>Ctrl+b d</strong>或者输入<strong>tmux detach</strong>命令，就会将当前会话与窗口分离。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux detach</span></span><br></pre></td></tr></table></figure>
-
-<p>上面命令执行后，就会退出当前 Tmux 窗口，但是会话和里面的进程仍然在后台运行。</p>
-<p><code>tmux ls</code>命令可以查看当前所有的 Tmux 会话。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux <span class="built_in">ls</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">or</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux list-session</span></span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li><strong>接入会话</strong></li>
-</ol>
-<p>tmux attach命令用于重新接入某个已存在的会话。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">使用会话编号</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux attach -t 0</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">使用会话名称</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux attach -t &lt;session-name&gt;</span></span><br></pre></td></tr></table></figure>
-
-<ol start="4">
-<li><strong>杀死会话</strong></li>
-</ol>
-<p><code>tmux kill-session</code>命令用于杀死某个会话。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">使用会话编号</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux kill-session -t 0</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">使用会话名称</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux kill-session -t &lt;session-name&gt;</span></span><br></pre></td></tr></table></figure>
-
-<ol start="5">
-<li><strong>切换会话</strong></li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">使用会话编号</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux switch -t 0</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">使用会话名称</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux switch -t &lt;session-name&gt;</span></span><br></pre></td></tr></table></figure>
-
-<ol start="6">
-<li><strong>重命名会话</strong></li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tmux rename-session -t 0 &lt;new-name&gt;</span></span><br></pre></td></tr></table></figure>
-
-<ol start="7">
-<li><strong>会话快捷键</strong></li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Ctrl+b d：分离当前会话。</span><br><span class="line">Ctrl+b s：列出所有会话。</span><br><span class="line">Ctrl+b $：重命名当前会话。</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<p>训练中包含了[57]的大多数增强和正则化策略，除了重复增强[28]和EMA[41]，它们不会提高性能。请注意，这与[57]相反，其中重复增强对于稳定 ViT 训练至关重要。</p>
+<p>[57]Hugo Touvron, Matthieu Cord, Matthijs Douze, Francisco Massa, Alexandre Sablayrolles, and Herv ́ e J ́ egou. Training data-efficient image transformers &amp; distillation through attention. arXiv preprint arXiv:2012.12877, 2020.</p>
+<p>[28] Elad Hoffer, Tal Ben-Nun, Itay Hubara, Niv Giladi, Torsten Hoefler, and Daniel Soudry. Augment your batch: Improving generalization through instance repetition. In Proceedings of the IEEE&#x2F;CVF Conference on Computer Vision and Pattern Recognition, pages 8129–8138, 2020. 6</p>
+<p>[41] Boris T Polyak and Anatoli B Juditsky. Acceleration of stochastic approximation by averaging. SIAM journal on control and optimization, 30(4):838–855, 1992.</p>
+<h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><p><img src="C:\Githubpage\myblog\source\images\CV\3_11.png"></p>
 
         </div>
 
@@ -486,7 +433,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2023/10/14/Tmux/">http://example.com/2023/10/14/Tmux/</a></span>
+                        <span><a href="http://example.com/2023/10/16/Swin-Transformer/">http://example.com/2023/10/16/Swin-Transformer/</a></span>
                     </p>
                 
                 
@@ -509,10 +456,6 @@
                 <span>Tag(s):</span>
                 <span class="tag">
                     
-                    
-                        <a href="/tags/blogs/"># blogs</a>
-                    
-                        
                 </span>
             </div>
             <div>
@@ -523,10 +466,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2023/10/16/Swin-Transformer/">Swin Transformer</a>
             
-            
-            <a class="next" rel="next" href="/2023/10/12/mindspore%E4%BB%8E%E5%A4%A7%E5%9E%8B%E6%A8%A1%E5%9E%8B%E4%B8%AD%E5%AF%BC%E5%87%BA%E6%A8%A1%E5%9D%97/">MindSpore从大型模型中导出模块以及权重处理</a>
+            <a class="next" rel="next" href="/2023/10/14/Tmux/">Tmux</a>
             
         </section>
 
