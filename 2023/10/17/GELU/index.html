@@ -13,7 +13,7 @@
 
 
 
-<title>Swin Transformer | Hexo</title>
+<title>GELU | Hexo</title>
 
 
 
@@ -326,7 +326,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Swin Transformer</h1>
+            <h1 class="post-title">GELU</h1>
             
                 <div class="post-meta">
                     
@@ -335,14 +335,14 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">October 16, 2023&nbsp;&nbsp;8:57:23</a>
+                        Date: <a href="#">October 17, 2023&nbsp;&nbsp;10:43:16</a>
                         </span>
                     
                     
                         <span class="post-category">
                     Category:
                             
-                                <a href="/categories/CV/">CV</a>
+                                <a href="/categories/DeepLearning/">DeepLearning</a>
                             
                         </span>
                     
@@ -351,81 +351,20 @@
         </header>
 
         <div class="post-content">
-            <h2 id="Swin-Transformer"><a href="#Swin-Transformer" class="headerlink" title="Swin Transformer"></a>Swin Transformer</h2><h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h2><p>本文目标就是寻求扩展 Transformer 的适用性，使其可以作为计算机视觉的通用骨干，就像它在 NLP 中的作用以及 CNN 在视觉中的作用一样。</p>
-<h3 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h3><p>将Transformer在语言领域的高性能转移到视觉领域的重大挑战可以通过两种模式之间的差异来解释。</p>
-<ol>
-<li><strong>规模。</strong>与作为语言 Transformer 中处理的基本元素的单词标记不同，视觉元素在规模上可能存在很大差异，这一问题在对象检测等任务中受到关注。在现有的基于 Transformer 的模型中，令牌都是固定规模的，这种属性不适合这些视觉应用。</li>
-<li><strong>图像中像素的分辨率比文本段落中的单词要高得多</strong>。存在许多视觉任务，例如语义分割，需要在像素级进行密集预测，这对于高分辨率图像上的 Transformer 来说是很棘手的，因为其自注意力的计算复杂度与图像大小成二次方。</li>
-</ol>
-<p>为了克服这些问题，本文提出了一个通用的 Transformer 主干，称为 Swin Transformer，它构建分层特征图，并且具有与图像大小线性的计算复杂度。如图 1(a) 所示，Swin Transformer 通过从小尺寸补丁（灰色轮廓）开始并逐渐合并更深 Transformer 层中的相邻补丁来构建分层表示。借助这些<strong>分层特征图</strong>，Swin Transformer 模型可以方便地利用先进技术进行密集预测，<strong>线性计算复杂度是通过在分割图像的非重叠窗口（以红色框出）内本地计算自注意力来实现的</strong>。<strong>每个窗口中的补丁数量是固定的，因此复杂度与图像大小成线性关系。</strong>这些优点使 Swin Transformer 适合作为各种视觉任务的通用骨干网，与之前基于 Transformer 的架构形成鲜明对比，后者生成单一分辨率的特征图并具有二次复杂度。</p>
-<h3 id="解决方式"><a href="#解决方式" class="headerlink" title="解决方式"></a>解决方式</h3><p><img src="/../images/CV/3_1.png"></p>
-<p>​                                                                                                         图1</p>
-<p>所提出的 Swin Transformer 通过合并更深层中的图像块（以灰色显示）来构建分层特征图，并且由于仅在每个局部窗口（以红色显示）内计算自注意力，因此<strong>具有输入图像大小的线性计算复杂性</strong>。因此，它可以作为图像分类和密集识别任务的通用主干。 (b) 相比之下，之前的视觉 Transformers 产生单个低分辨率的特征图，并且由于全局自注意力的计算，输入图像大小的计算复杂度为二次方</p>
-<h2 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h2><h3 id="移位窗口的实现形式"><a href="#移位窗口的实现形式" class="headerlink" title="移位窗口的实现形式"></a>移位窗口的实现形式</h3><p><img src="/../images/CV/3_2.png"></p>
-<p><strong>在 l 层（左）中，采用常规窗口划分方案</strong>，并在每个窗口内计算自注意力。<strong>在下一层 l + 1（右）中，窗口分区发生移动，产生新的窗口。新窗口中的自注意力计算跨越了 l 层中先前窗口的边界，提供了它们之间的连接</strong>。</p>
-<p>首先通过补丁分割模块（如 ViT）将输入 RGB 图像分割成不重叠的补丁。每个补丁都被视为一个“令牌”，其特征被设置为原始像素 RGB 值的串联。在我们的实现中，我们使用 <strong>4 × 4</strong> 的块大小，因此每个块的特征维度为 4 × 4 × 3 &#x3D; 48。线性嵌入层应用于此原始值特征，<strong>将其投影到任意维度（记为C)。</strong></p>
-<ol>
-<li><p><strong>阶段1：</strong></p>
-<p>在这些补丁标记上应用几个经过修改的自注意计算变换器块（Swin 变换器块）。变换器块保持标记的数量（$\frac{H}{4}<em>\frac{W}{4}$）（原因是我们第一层的patch是4</em>4大小），并进行线性嵌入。</p>
-</li>
-<li><p><strong>阶段2：</strong></p>
-<p>为了产生分层表示，随着网络的深入，会通过补丁合并层来减少标记的数量。第一个补丁合并层将每组 2 × 2 相邻补丁的特征串联起来，并在 <strong>4C 维串联特征上应用线性层</strong>。（每个patch原先是$4<em>4$大小经过拉直和线性投影变成$1</em>C$的大小，而这一层经过结合4个patch形成$4<em>C$的维度（拉直））<br>$$<br>\begin{bmatrix}<br>a &amp; b \<br>c &amp; d \<br>\end{bmatrix}<br>$$<br>a，b，c，d分别代表相邻的2</em>2的patch。由于经过flatten和投影，他们中每一个其实是$a,b,c,d\in R^{1×C}$ 的矩阵。</p>
-<p>将他们合并形成 $R^{4×C}$ 再将其拉直就变成了4*C的维度串。</p>
-<p>这就将标记数减少了 2 × 2 &#x3D; 4 的倍数（分辨率降低了 2 倍），输出维度设置为 2C。随后应用 Swin 变换器块进行特征变换，分辨率保持为 $\frac{H}{4}*\frac{W}{4}$。这第一块补丁合并和特征变换被称为 “阶段 2”。</p>
-<p>下图中阶段1到阶段2之所以会变成$\frac{H}{8}*\frac{W}{8}$ 因为一次取4个相邻的patch相较于原先就是横纵各少了两倍。</p>
-</li>
-</ol>
-<p><img src="C:\Githubpage\myblog\source\images\CV\3_3.png"></p>
-<p>该过程重复两次，即“阶段 3”和“阶段 4”，输出分辨率分别为 $\frac{H}{16}*\frac{W}{16}$和 $\frac{H}{32}*\frac{W}{32}$。这些阶段共同产生层次表示，具有与典型卷积网络相同的特征图分辨率。因此，所提出的架构可以方便地替换现有方法中用于各种视觉任务的主干网络。</p>
-<h3 id="Swin-Transformer-block"><a href="#Swin-Transformer-block" class="headerlink" title="Swin Transformer block"></a>Swin Transformer block</h3><p><img src="/../images/CV/3_4.png"></p>
-<p>Swin Transformer 模块 Swin Transformer 是通过将 Transformer 模块中的标准多头自注意力（MSA）模块替换为基于移位窗口的模块而构建的，其他层保持不变。Swin Transformer 模块由基于移位窗口的 MSA 模块组成，后跟中间带有 <strong>GELU 非线性的 2 层 MLP</strong>。在<strong>每个 MSA 模块和每个 MLP 之前应用 LayerNorm (LN) 层</strong>，并在<strong>每个模块之后应用残差连接</strong>。</p>
-<ol>
-<li><strong>计算复杂度对比</strong></li>
-</ol>
-<p><img src="/../images/CV/3_5.png"></p>
-<p>假设每个窗口包含 M × M 个补丁，则全局 MSA 模块和基于 h × w 补丁图像的窗口的计算复杂度为上图所示。</p>
-<p>推导过程：</p>
-<ul>
-<li><p>MSA：一个自注意力模块其实就是4个投影和中间的2个内积。</p>
-<ul>
-<li><p>投影：</p>
-<p>假设每个补丁大小为 r*r，那么将其拉直后整个图片变成  $R^{(h×w)×(r×r)}$ 经过前置投影变成 $R^{(h×w)×C}$</p>
-<p>将该矩阵传入MSA模块后，投影复杂度应为如下表示：<br>$$<br>R^{(h×w)×C} →  R^{(h×w)×C}输入经过一个R^{C×C}的矩阵<br>$$<br>复杂度就是如下表示<br>$$<br>\sum^4_{i&#x3D;1}h×w×C×C<br>$$</p>
-</li>
-<li><p>内积：</p>
-</li>
-</ul>
-<p>$R^{(h×w)×C}$与$R^{(h×w)×C}$内积的复杂度如下<br>$$<br>\sum^{2}_{i&#x3D;1}h×w×C×h×w<br>$$</p>
-</li>
-<li><p>W-MSA：</p>
-<ul>
-<li>投影复杂度与MSA一致</li>
-<li>内积</li>
-</ul>
-<p>图片被分为$\frac{h×w}{M×M}$个窗口，每个窗口展开是$R^{(M×M)×C}$  的矩阵那么复杂度计算为下式<br>$$<br>\sum^{\frac{h×w}{M×M}}<em>{i&#x3D;1} \sum</em>{i1&#x3D;1}^2 M×M×C×M×M<br>$$</p>
-</li>
-</ul>
-<ol start="2">
-<li><strong>移动划分方式</strong></li>
-</ol>
-<p>第一个模块使用从左上角像素开始的常规窗口划分策略，将 8 × 8 特征图均匀划分为大小为 4 × 4 (M &#x3D; 4) 的 2 × 2 窗口。然后，下一个模块采用与前一层的窗口配置不同的窗口配置，通过将窗口从规则分区的窗口中移动（$\frac{M}{2}$，$ \frac{M}{2}$）个像素。(可以理解为上移再右移)</p>
-<p><img src="/../images/CV/3_2.png"></p>
-<p>使用移位窗口分区方法，连续的 Swin Transformer 块计算如下</p>
-<p>其中 $z^{l’}$ 和 zl 分别表示块 l 的 (S)WMSA 模块和 MLP 模块的输出特征, W-MSA 和 SW-MSA 分别表示使用常规和移位窗口分区配置的基于窗口的多头自注意力。</p>
-<p><img src="/../images/CV/3_6.png"></p>
-<ul>
-<li><p>移位配置的高效批量计算移位窗口分区的一个问题是，它将导致更多的窗口，从移位配置中的 <img src="/../images/CV/3_8.png">到 </p>
-<p><img src="C:\Githubpage\myblog\source\images\CV\3_9.png"> <img src="/../images/CV/3_10.png">，并且一些窗口将小于 M × M 。一个简单的解决方案是将较小的窗口填充到 M × M 的大小，并在计算注意力时屏蔽掉填充的值。当常规分区中的窗口数量较少时，例如2 × 2，这种朴素解决方案增加的计算量是相当可观的（2 × 2 → 3 × 3，增加了 2.25 倍）。在这里，我们提出了一种更有效的批量计算方法，通过向左上方向循环移位，如图 4 所示。经过这种移位，批处理窗口可能由多个在特征图中不相邻的子窗口组成，因此采用屏蔽机制将自注意力计算限制在每个子窗口内。通过循环移位，批处理窗口的数量保持与常规窗口划分相同，因此也是高效的。该方法的低延迟如表所示<img src="/../images/CV/3_7.png"></p>
-</li>
-</ul>
-<h2 id="训练"><a href="#训练" class="headerlink" title="训练"></a>训练</h2><h3 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h3><ol>
-<li>优化器: 使用 AdamW优化器进行 300 个周期，使用余弦衰减学习率调度器和 20 个周期的线性预热。使用的批量大小为 1024，初始学习率为 0.001，权重衰减为 0.05。</li>
-</ol>
-<p>训练中包含了[57]的大多数增强和正则化策略，除了重复增强[28]和EMA[41]，它们不会提高性能。请注意，这与[57]相反，其中重复增强对于稳定 ViT 训练至关重要。</p>
-<p>[57]Hugo Touvron, Matthieu Cord, Matthijs Douze, Francisco Massa, Alexandre Sablayrolles, and Herv ́ e J ́ egou. Training data-efficient image transformers &amp; distillation through attention. arXiv preprint arXiv:2012.12877, 2020.</p>
-<p>[28] Elad Hoffer, Tal Ben-Nun, Itay Hubara, Niv Giladi, Torsten Hoefler, and Daniel Soudry. Augment your batch: Improving generalization through instance repetition. In Proceedings of the IEEE&#x2F;CVF Conference on Computer Vision and Pattern Recognition, pages 8129–8138, 2020. 6</p>
-<p>[41] Boris T Polyak and Anatoli B Juditsky. Acceleration of stochastic approximation by averaging. SIAM journal on control and optimization, 30(4):838–855, 1992.</p>
-<h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><p><img src="/../images/CV/3_11.png"></p>
+            <h1 id="GELU"><a href="#GELU" class="headerlink" title="GELU"></a>GELU</h1><p>研究者表明，收到dropout、ReLU等机制的影响，它们都希望将不重要的激活信息规整为0，我们可以理解为，对于输入的值，我们根据它的情况乘上1或者0，更数学一点的描述是，对于每一个输入x，其服从标准的正太分布 N(0,1) ,它会乘上一个伯努利分布 $Bernoulli(\phi(x))$ 其中，$\phi(x)&#x3D;P(X&lt;x)$  。</p>
+<p>随着x的降低，它被归零的概率会升高，对于ReLU来说，这个界限就是0，输入少于零就会被归为0，这一类激活函数，不仅保留了概率性，同时也保留了对输入的依赖性。</p>
+<p>GELU ：高斯误差线性单元激活函数，在最近的Transformer模型（谷歌的BERT和OpenAI的GPT-2）中得到了应用,GELU的论文来自2016年，但是最近才引起关注，这种激活函数的形式为：<br>$$<br>xP(X&lt;x)&#x3D;x\phi(x)<br>$$<br>其中$\phi(x)$ 是高斯正态分布的累积分布：<br>$$<br>xP(X&lt;x) &#x3D; x \int^x_{-\infty}\frac{e^{-\frac{(x-\mu)^2}{2\sigma^2}}}{\sigma \sqrt{2\pi}} dX<br>$$<br>其约等于：<br>$$<br>GELU(X)&#x3D;0.5x(1+tanh(\sqrt{2&#x2F;\pi}(x+0.044715x^3)))<br>$$</p>
+<h2 id="正态分布"><a href="#正态分布" class="headerlink" title="正态分布"></a>正态分布</h2><p>首先展示一下正态分布的函数：<br>$$<br>f(x) &#x3D; \frac{1}{\sigma \sqrt{2\pi}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}<br>$$<br>下面画一下N(0,1)的图像：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">from</span> scipy.stats <span class="keyword">import</span> norm</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">plot_normal</span>(<span class="params">mu, sigma</span>):</span><br><span class="line">    x = np.linspace(mu - <span class="number">3</span>*sigma, mu + <span class="number">3</span>*sigma, <span class="number">100</span>)  <span class="comment"># 生成一系列x值</span></span><br><span class="line">    y = norm.pdf(x, mu, sigma)  <span class="comment"># 计算对应x值的正态分布概率密度函数值</span></span><br><span class="line"></span><br><span class="line">    plt.plot(x, y)  <span class="comment"># 绘制正态分布曲线</span></span><br><span class="line">    plt.xlabel(<span class="string">&#x27;x&#x27;</span>)</span><br><span class="line">    plt.ylabel(<span class="string">&#x27;Probability Density&#x27;</span>)</span><br><span class="line">    plt.title(<span class="string">&#x27;Normal Distribution (mu=&#123;&#125;, sigma=&#123;&#125;)&#x27;</span>.<span class="built_in">format</span>(mu, sigma))</span><br><span class="line">    plt.grid(<span class="literal">True</span>)</span><br><span class="line">    plt.show()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置正态分布的均值和标准差</span></span><br><span class="line">mu = <span class="number">0</span></span><br><span class="line">sigma = <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 绘制正态分布的PDF图</span></span><br><span class="line">plot_normal(mu, sigma)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../images/blogs/3_1.png"></p>
+<h2 id="GELU图像"><a href="#GELU图像" class="headerlink" title="GELU图像"></a>GELU图像</h2><p>GELU函数图像：</p>
+<p><img src="/../images/blogs/3_3.png"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">gelu</span>(<span class="params">x</span>):</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0.5</span> * x * (<span class="number">1</span> + np.tanh(np.sqrt(<span class="number">2</span>/np.pi) * (x + <span class="number">0.044715</span> * x**<span class="number">3</span>)))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成x的取值范围</span></span><br><span class="line">x = np.linspace(-<span class="number">3</span>, <span class="number">3</span>, <span class="number">100</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算对应的y值</span></span><br><span class="line">y = gelu(x)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 绘制函数图像</span></span><br><span class="line">plt.plot(x, y)</span><br><span class="line">plt.xlabel(<span class="string">&#x27;x&#x27;</span>)</span><br><span class="line">plt.ylabel(<span class="string">&#x27;GELU(x)&#x27;</span>)</span><br><span class="line">plt.title(<span class="string">&#x27;GELU Function&#x27;</span>)</span><br><span class="line">plt.grid(<span class="literal">True</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p>GELU函数导数图像：</p>
+<p><img src="/../images/blogs/3_2.png"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">gelu_1</span>(<span class="params">x</span>):</span><br><span class="line">    <span class="comment">#使用numpy实现</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0.5</span>*x*(<span class="number">1</span> + np.tanh(np.sqrt(<span class="number">2</span>/np.pi)*(x + <span class="number">0.044715</span>*x**<span class="number">3</span>)))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">gelu_dao</span>(<span class="params">inputs</span>):</span><br><span class="line">    <span class="keyword">return</span> ((np.tanh((np.sqrt(<span class="number">2</span>) * (<span class="number">0.044715</span> * inputs ** <span class="number">3</span> + inputs)) / np.sqrt(np.pi)) + ((np.sqrt(<span class="number">2</span>) * inputs * (</span><br><span class="line">                <span class="number">0.134145</span> * inputs ** <span class="number">2</span> + <span class="number">1</span>) * ((<span class="number">1</span> / np.cosh(</span><br><span class="line">        (np.sqrt(<span class="number">2</span>) * (<span class="number">0.044715</span> * inputs ** <span class="number">3</span> + inputs)) / np.sqrt(np.pi))) ** <span class="number">2</span>)) / np.sqrt(np.pi) + <span class="number">1</span>))) / <span class="number">2</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">plot_gelu</span>():</span><br><span class="line">    x1=np.arange(-<span class="number">8</span>,<span class="number">8</span>,<span class="number">0.1</span>)</span><br><span class="line">    y1=gelu_1(x1)</span><br><span class="line">    <span class="comment">#plt.plot(x1,y1)</span></span><br><span class="line">    y2=gelu_dao(x1)</span><br><span class="line">    </span><br><span class="line">    plt.plot(x1,y2)</span><br><span class="line">    plt.show()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    plot_gelu()</span><br></pre></td></tr></table></figure>
 
         </div>
 
@@ -440,7 +379,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2023/10/16/Swin-Transformer/">http://example.com/2023/10/16/Swin-Transformer/</a></span>
+                        <span><a href="http://example.com/2023/10/17/GELU/">http://example.com/2023/10/17/GELU/</a></span>
                     </p>
                 
                 
@@ -464,7 +403,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/CV/"># CV</a>
+                        <a href="/tags/DeepLearning/"># DeepLearning</a>
                     
                         
                 </span>
@@ -477,10 +416,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2023/10/17/GELU/">GELU</a>
             
-            
-            <a class="next" rel="next" href="/2023/10/14/Tmux/">Tmux</a>
+            <a class="next" rel="next" href="/2023/10/16/Swin-Transformer/">Swin Transformer</a>
             
         </section>
 
