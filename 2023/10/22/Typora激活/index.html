@@ -13,7 +13,7 @@
 
 
 
-<title>数学拉丁字符 | Hexo</title>
+<title>Typora激活 | Hexo</title>
 
 
 
@@ -257,11 +257,76 @@
                 <div class="container">
     
     
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
 
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">数学拉丁字符</h1>
+            <h1 class="post-title">Typora激活</h1>
             
                 <div class="post-meta">
                     
@@ -270,7 +335,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">October 22, 2023&nbsp;&nbsp;17:26:39</a>
+                        Date: <a href="#">October 22, 2023&nbsp;&nbsp;17:34:18</a>
                         </span>
                     
                     
@@ -286,9 +351,14 @@
         </header>
 
         <div class="post-content">
-            <p><strong>1、 Α α alpha a:lf 阿尔法 角度；系数</strong><br><strong>2 、Β β beta bet 贝塔 磁通系数；角度；系数</strong><br>3、 Γ γ gamma ga:m 伽马 电导系数（小写）<br><strong>4、 Δ δ delta delt 德尔塔 变动；密度；屈光度</strong></p>
-<p>5、 Ε ε epsilon epsilon 伊普西龙 对数之基数</p>
-<p>6、 Ζ ζ zeta zat 截塔 系数；方位角；阻抗；相对粘度；原子序数<br>7、 Η η eta eit 艾塔 磁滞系数；效率（小写）<br><strong>8、 Θ θ thet θit 西塔 温度；相位角</strong><br>9、 Ι ι iot aiot 约塔 微小，一点儿<br>10、 Κ κ kappa kap 卡帕 介质常数<br><strong>11、 ∧ λ lambda lambd 兰布达波长（小写）；体积</strong><br>12、 Μ μ mu mju 缪 磁导系数；微（千分之一）；放大因数（小写）<br>13、 Ν ν nu nju 纽 磁阻系数<br>14、 Ξ ξ xi ksi 克西<br>15、 Ο ο omicron omikron 奥密克戎<br>16、 ∏ π pi pai 派 圆周率&#x3D;圆周÷直径&#x3D;3.1416<br>17、 Ρ ρ rho rou 肉 电阻系数（小写）<br><strong>18、 ∑ σ sigma sigma 西格马 总和（大写），表面密度；跨导（小写）</strong><br><strong>19、 Τ τ tau tau 套 时间常数</strong><br>20、 Υ υ upsilon jupsilon 宇普西龙 位移<br>21、 Φ φ phi fai 佛爱 磁通；角<br>22、Χ χ chi phai 西<br>23、 Ψ ψ psi psai 普西 角速；介质电通量（静电力线）；角<br>24、 Ω ω omega o&#96;miga 欧米伽 欧姆（大写）；角速（小写）；角</p>
+            <h2 id="1-打开Typora安装文件夹中的resources文件夹"><a href="#1-打开Typora安装文件夹中的resources文件夹" class="headerlink" title="1. 打开Typora安装文件夹中的resources文件夹"></a>1. 打开Typora安装文件夹中的resources文件夹</h2><h2 id="2-进入page-dist文件夹"><a href="#2-进入page-dist文件夹" class="headerlink" title="2. 进入page-dist文件夹"></a>2. 进入page-dist文件夹</h2><h2 id="3-进入static文件夹"><a href="#3-进入static文件夹" class="headerlink" title="3. 进入static文件夹"></a>3. 进入static文件夹</h2><h2 id="4-打开js文件夹"><a href="#4-打开js文件夹" class="headerlink" title="4. 打开js文件夹"></a>4. 打开js文件夹</h2><h2 id="5-在js文件夹目录下找到第一个LicenseIndex的js文件并打开"><a href="#5-在js文件夹目录下找到第一个LicenseIndex的js文件并打开" class="headerlink" title="5. 在js文件夹目录下找到第一个LicenseIndex的js文件并打开"></a>5. 在js文件夹目录下找到第一个LicenseIndex的js文件并打开</h2><p><img src="/../images/blogs/4_1.png"></p>
+<ul>
+<li>打开后使用ctrl+f搜索has关键词，找到如下位置。</li>
+</ul>
+<p><img src="/../images/blogs/4_2.png"></p>
+<ul>
+<li>将上图中第二个’true’位置的单词替换为‘true’(这是改完的图片，原始图像这里不是true)</li>
+</ul>
 
         </div>
 
@@ -303,7 +373,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2023/10/22/%E6%95%B0%E5%AD%A6%E6%8B%89%E4%B8%81%E5%AD%97%E7%AC%A6/">http://example.com/2023/10/22/%E6%95%B0%E5%AD%A6%E6%8B%89%E4%B8%81%E5%AD%97%E7%AC%A6/</a></span>
+                        <span><a href="http://example.com/2023/10/22/Typora%E6%BF%80%E6%B4%BB/">http://example.com/2023/10/22/Typora%E6%BF%80%E6%B4%BB/</a></span>
                     </p>
                 
                 
@@ -340,10 +410,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2023/10/22/Typora%E6%BF%80%E6%B4%BB/">Typora激活</a>
             
-            
-            <a class="next" rel="next" href="/2023/10/22/%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%8C%82%E6%A2%AF%E5%AD%90/">服务器挂梯子</a>
+            <a class="next" rel="next" href="/2023/10/22/%E6%95%B0%E5%AD%A6%E6%8B%89%E4%B8%81%E5%AD%97%E7%AC%A6/">数学拉丁字符</a>
             
         </section>
 
