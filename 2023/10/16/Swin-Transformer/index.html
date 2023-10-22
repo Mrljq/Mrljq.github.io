@@ -375,7 +375,7 @@
 <p>下图中阶段1到阶段2之所以会变成$\frac{H}{8}*\frac{W}{8}$ 因为一次取4个相邻的patch相较于原先就是横纵各少了两倍。</p>
 </li>
 </ol>
-<p><img src="C:\Githubpage\myblog\source\images\CV\3_3.png"></p>
+<p><img src="/../images/CV/3_3.png"></p>
 <p>该过程重复两次，即“阶段 3”和“阶段 4”，输出分辨率分别为 $\frac{H}{16}*\frac{W}{16}$和 $\frac{H}{32}*\frac{W}{32}$。这些阶段共同产生层次表示，具有与典型卷积网络相同的特征图分辨率。因此，所提出的架构可以方便地替换现有方法中用于各种视觉任务的主干网络。</p>
 <h3 id="Swin-Transformer-block"><a href="#Swin-Transformer-block" class="headerlink" title="Swin Transformer block"></a>Swin Transformer block</h3><p><img src="/../images/CV/3_4.png"></p>
 <p>Swin Transformer 模块 Swin Transformer 是通过将 Transformer 模块中的标准多头自注意力（MSA）模块替换为基于移位窗口的模块而构建的，其他层保持不变。Swin Transformer 模块由基于移位窗口的 MSA 模块组成，后跟中间带有 <strong>GELU 非线性的 2 层 MLP</strong>。在<strong>每个 MSA 模块和每个 MLP 之前应用 LayerNorm (LN) 层</strong>，并在<strong>每个模块之后应用残差连接</strong>。</p>

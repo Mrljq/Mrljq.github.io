@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jiaqi Li">
+
+
+
+
+
+<title>Swin Transformer V2 | Hexo</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+    <script>
+        !
+        function() {
+            function n(n, e, t) {
+                return n.getAttribute(e) || t
+            }
+            function e(n) {
+                return document.getElementsByTagName(n)
+            }
+            function t() {
+                var t = e("script"),
+                o = t.length,
+                i = t[o - 1];
+                return {
+                    l: o,
+                    z: n(i, "zIndex", -1), //置于主页面背后
+                    o: n(i, "opacity", .5), //线条透明度
+                    c: n(i, "color", "0,0,0"), //线条颜色
+                    n: n(i, "count", 100) //线条数量
+                }
+            }
+            function o() {
+                a = m.width = window.innerWidth ||
+        document.documentElement.clientWidth || document.body.clientWidth,
+                c = m.height = window.innerHeight ||
+        document.documentElement.clientHeight || document.body.clientHeight
+            }
+            function i() {
+                r.clearRect(0, 0, a, c);
+                var n, e, t, o, m, l;
+                s.forEach(function(i, x) {
+                    for (i.x += i.xa, i.y += i.ya, i.xa *= i.x > a || i.x < 0 ? -1 :
+        1, i.ya *= i.y > c || i.y < 0 ? -1 : 1, r.fillRect(i.x - .5, i.y - .5, 1,
+        1), e = x + 1; e < u.length; e++) n = u[e],
+                    null !== n.x && null !== n.y && (o = i.x - n.x, m = i.y - n.y, l
+        = o * o + m * m, l < n.max && (n === y && l >= n.max / 2 && (i.x -= .03 * o,
+        i.y -= .03 * m), t = (n.max - l) / n.max, r.beginPath(), r.lineWidth = t /
+        2, r.strokeStyle = "rgba(" + d.c + "," + (t + .2) + ")", r.moveTo(i.x, i.y),
+        r.lineTo(n.x, n.y), r.stroke()))
+                }),
+                x(i)
+            }
+            var a, c, u, m = document.createElement("canvas"),
+            d = t(),
+            l = "c_n" + d.l,
+            r = m.getContext("2d"),
+            x = window.requestAnimationFrame || window.webkitRequestAnimationFrame
+        || window.mozRequestAnimationFrame || window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+            function(n) {
+                window.setTimeout(n, 1e3 / 45)
+            },
+            w = Math.random,
+            y = {
+                x: null,
+                y: null,
+                max: 2e4
+            };
+            m.id = l,
+            m.style.cssText = "position:fixed;top:0;left:0;z-index:" + d.z +
+        ";opacity:" + d.o,
+            e("body")[0].appendChild(m),
+            o(),
+            window.onresize = o,
+            window.onmousemove = function(n) {
+                n = n || window.event,
+                y.x = n.clientX,
+                y.y = n.clientY
+            },
+            window.onmouseout = function() {
+                y.x = null,
+                y.y = null
+            };
+            for (var s = [], f = 0; d.n > f; f++) {
+                var h = w() * a,
+                g = w() * c,
+                v = 2 * w() - 1,
+                p = 2 * w() - 1;
+                s.push({
+                    x: h,
+                    y: g,
+                    xa: v,
+                    ya: p,
+                    max: 6e3
+                })
+            }
+            u = s.concat([y]),
+            setTimeout(function() {
+                i()
+            },
+            100)
+        } ();
+        </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jiaqi Li&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jiaqi Li&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Swin Transformer V2</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jiaqi Li</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">October 20, 2023&nbsp;&nbsp;19:22:09</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/CV/">CV</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="Swin-Transformer-V2"><a href="#Swin-Transformer-V2" class="headerlink" title="Swin Transformer V2"></a>Swin Transformer V2</h1><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p><strong>该论文目的是解决如下问题：</strong></p>
+<ol>
+<li>训练时的不稳定性。</li>
+<li>如何有效将低像素预训练的模型迁移到更高的像素上。</li>
+</ol>
+<p><strong>提出的解决方式：</strong></p>
+<ul>
+<li>残差后归一化技术。</li>
+<li>缩放余弦注意力方法可提高大视觉模型的稳定性。</li>
+<li>对数间隔连续位置偏差技术。</li>
+</ul>
+<p><strong>Study on bias terms：</strong> 在 NLP 中，<em><strong>相对位置偏置法</strong></em>被证明是有益的，而不是原始 Transformer 中使用的绝对位置嵌入法。在计算机视觉中，相对位置偏置法更常用，这可能是因为视觉信号的空间关系在视觉建模中起着更重要的作用。常见的做法是直接学习偏置值作为模型权重。也有一些作品特别研究了如何设置和学习偏置项。</p>
+<p><img src="/../images/CV/4_1.png"></p>
+<p>​                                                                       Figure 1：Swin Transformer V1与V2结构对比</p>
+<h2 id="模型"><a href="#模型" class="headerlink" title="模型"></a>模型</h2><h3 id="Relative-position-bias"><a href="#Relative-position-bias" class="headerlink" title="Relative position bias"></a>Relative position bias</h3><p>$$<br>Attention(Q,K,V)&#x3D;SoftMax(QK^T&#x2F; \sqrt{d} + B )V<br>$$</p>
+<ul>
+<li><p>$B\in{R}^{M^2×M^2}$</p>
+</li>
+<li><p>$M^2$是一个window中patch的数量。</p>
+</li>
+<li><p>$Q,K,V\in{R^{M^2×d}}$ 是query，key和value。</p>
+</li>
+<li><p>d是隐藏层维度</p>
+</li>
+</ul>
+<p>在 Swin Transformer 中，沿每个轴的相对位置在 [−M + 1, M − 1] 范围内</p>
+<p>相对位置偏差被参数化为偏差矩阵$\hat B∈R(2M−1)×(2M−1) $ B中元素取自$\hat B$ </p>
+<p>源码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#torch.arange默认的步长为1</span></span><br><span class="line">relative_coords_h = torch.arange(-(self.window_size[<span class="number">0</span>] - <span class="number">1</span>), self.window_size[<span class="number">0</span>], dtype=torch.float32)</span><br><span class="line">relative_coords_w = torch.arange(-(self.window_size[<span class="number">1</span>] - <span class="number">1</span>), self.window_size[<span class="number">1</span>], dtype=torch.float32)</span><br><span class="line">relative_coords_table = torch.stack(</span><br><span class="line">     torch.meshgrid([relative_coords_h,</span><br><span class="line">                    relative_coords_w])).permute(<span class="number">1</span>, <span class="number">2</span>, <span class="number">0</span>).contiguous().unsqueeze(<span class="number">0</span>)  <span class="comment"># 1,2*Wh-1,2*Ww-1,2</span></span><br></pre></td></tr></table></figure>
+
+<p>经这个函数形成如下格式的4维矩阵<br>$$<br>R^{1×(2<em>Wh-1)×(2</em>Ww-1)×2}<br>$$<br>解析：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line">relative_coords_h = torch.arange(-(<span class="number">5</span> - <span class="number">1</span>), <span class="number">5</span>, dtype=torch.float32)</span><br><span class="line">relative_coords_w = torch.arange(-(<span class="number">4</span> - <span class="number">1</span>), <span class="number">4</span>, dtype=torch.float32)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(relative_coords_h)</span><br><span class="line"><span class="built_in">print</span>(relative_coords_w)</span><br><span class="line">tensor([-<span class="number">4.</span>, -<span class="number">3.</span>, -<span class="number">2.</span>, -<span class="number">1.</span>,  <span class="number">0.</span>,  <span class="number">1.</span>,  <span class="number">2.</span>,  <span class="number">3.</span>,  <span class="number">4.</span>])</span><br><span class="line">tensor([-<span class="number">3.</span>, -<span class="number">2.</span>, -<span class="number">1.</span>,  <span class="number">0.</span>,  <span class="number">1.</span>,  <span class="number">2.</span>,  <span class="number">3.</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># torch.meshgrid()函数创建两个张量的网格坐标。relative_coords_h和relative_coords_w分别是两个一维张量，表示高度方向和宽度方向的相对坐标。这个函数返回两个张量，分别表示高度方向和宽度方向上的网格坐标。</span></span><br><span class="line">t = torch.meshgrid([relative_coords_h,relative_coords_w])</span><br><span class="line"></span><br><span class="line">(tensor([[-<span class="number">4.</span>, -<span class="number">4.</span>, -<span class="number">4.</span>, -<span class="number">4.</span>, -<span class="number">4.</span>, -<span class="number">4.</span>, -<span class="number">4.</span>],</span><br><span class="line">         [-<span class="number">3.</span>, -<span class="number">3.</span>, -<span class="number">3.</span>, -<span class="number">3.</span>, -<span class="number">3.</span>, -<span class="number">3.</span>, -<span class="number">3.</span>],</span><br><span class="line">         [-<span class="number">2.</span>, -<span class="number">2.</span>, -<span class="number">2.</span>, -<span class="number">2.</span>, -<span class="number">2.</span>, -<span class="number">2.</span>, -<span class="number">2.</span>],</span><br><span class="line">         [-<span class="number">1.</span>, -<span class="number">1.</span>, -<span class="number">1.</span>, -<span class="number">1.</span>, -<span class="number">1.</span>, -<span class="number">1.</span>, -<span class="number">1.</span>],</span><br><span class="line">         [ <span class="number">0.</span>,  <span class="number">0.</span>,  <span class="number">0.</span>,  <span class="number">0.</span>,  <span class="number">0.</span>,  <span class="number">0.</span>,  <span class="number">0.</span>],</span><br><span class="line">         [ <span class="number">1.</span>,  <span class="number">1.</span>,  <span class="number">1.</span>,  <span class="number">1.</span>,  <span class="number">1.</span>,  <span class="number">1.</span>,  <span class="number">1.</span>],</span><br><span class="line">         [ <span class="number">2.</span>,  <span class="number">2.</span>,  <span class="number">2.</span>,  <span class="number">2.</span>,  <span class="number">2.</span>,  <span class="number">2.</span>,  <span class="number">2.</span>],</span><br><span class="line">         [ <span class="number">3.</span>,  <span class="number">3.</span>,  <span class="number">3.</span>,  <span class="number">3.</span>,  <span class="number">3.</span>,  <span class="number">3.</span>,  <span class="number">3.</span>],</span><br><span class="line">         [ <span class="number">4.</span>,  <span class="number">4.</span>,  <span class="number">4.</span>,  <span class="number">4.</span>,  <span class="number">4.</span>,  <span class="number">4.</span>,  <span class="number">4.</span>]]),</span><br><span class="line"> tensor([[-<span class="number">3.</span>, -<span class="number">2.</span>, -<span class="number">1.</span>,  <span class="number">0.</span>,  <span class="number">1.</span>,  <span class="number">2.</span>,  <span class="number">3.</span>],</span><br><span class="line">         [-<span class="number">3.</span>, -<span class="number">2.</span>, -<span class="number">1.</span>,  <span class="number">0.</span>,  <span class="number">1.</span>,  <span class="number">2.</span>,  <span class="number">3.</span>],</span><br><span class="line">         [-<span class="number">3.</span>, -<span class="number">2.</span>, -<span class="number">1.</span>,  <span class="number">0.</span>,  <span class="number">1.</span>,  <span class="number">2.</span>,  <span class="number">3.</span>],</span><br><span class="line">         [-<span class="number">3.</span>, -<span class="number">2.</span>, -<span class="number">1.</span>,  <span class="number">0.</span>,  <span class="number">1.</span>,  <span class="number">2.</span>,  <span class="number">3.</span>],</span><br><span class="line">         [-<span class="number">3.</span>, -<span class="number">2.</span>, -<span class="number">1.</span>,  <span class="number">0.</span>,  <span class="number">1.</span>,  <span class="number">2.</span>,  <span class="number">3.</span>],</span><br><span class="line">         [-<span class="number">3.</span>, -<span class="number">2.</span>, -<span class="number">1.</span>,  <span class="number">0.</span>,  <span class="number">1.</span>,  <span class="number">2.</span>,  <span class="number">3.</span>],</span><br><span class="line">         [-<span class="number">3.</span>, -<span class="number">2.</span>, -<span class="number">1.</span>,  <span class="number">0.</span>,  <span class="number">1.</span>,  <span class="number">2.</span>,  <span class="number">3.</span>],</span><br><span class="line">         [-<span class="number">3.</span>, -<span class="number">2.</span>, -<span class="number">1.</span>,  <span class="number">0.</span>,  <span class="number">1.</span>,  <span class="number">2.</span>,  <span class="number">3.</span>],</span><br><span class="line">         [-<span class="number">3.</span>, -<span class="number">2.</span>, -<span class="number">1.</span>,  <span class="number">0.</span>,  <span class="number">1.</span>,  <span class="number">2.</span>,  <span class="number">3.</span>]]))</span><br><span class="line"><span class="comment"># torch.stack的作用就是将上面的两个二维矩阵合并成一个三维矩阵</span></span><br><span class="line">t = torch.stack(t)</span><br><span class="line">t.shape</span><br><span class="line">torch.Size([<span class="number">2</span>, <span class="number">9</span>, <span class="number">7</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># permute(1,2,0)函数将该三维矩阵进行变形</span></span><br><span class="line">tensor([[[-<span class="number">4.</span>, -<span class="number">3.</span>],</span><br><span class="line">         [-<span class="number">4.</span>, -<span class="number">2.</span>],</span><br><span class="line">         [-<span class="number">4.</span>, -<span class="number">1.</span>],</span><br><span class="line">         [-<span class="number">4.</span>,  <span class="number">0.</span>],</span><br><span class="line">         [-<span class="number">4.</span>,  <span class="number">1.</span>],</span><br><span class="line">         [-<span class="number">4.</span>,  <span class="number">2.</span>],</span><br><span class="line">         [-<span class="number">4.</span>,  <span class="number">3.</span>]],</span><br><span class="line">...</span><br><span class="line">         [ <span class="number">4.</span>, -<span class="number">1.</span>],</span><br><span class="line">         [ <span class="number">4.</span>,  <span class="number">0.</span>],</span><br><span class="line">         [ <span class="number">4.</span>,  <span class="number">1.</span>],</span><br><span class="line">         [ <span class="number">4.</span>,  <span class="number">2.</span>],</span><br><span class="line">         [ <span class="number">4.</span>,  <span class="number">3.</span>]]])</span><br><span class="line"></span><br><span class="line"><span class="comment"># contiguous()：将张量在内存中变为连续存储，确保后续操作的正确性。</span></span><br><span class="line"><span class="comment"># unsqueeze(0)：在第0维度上增加一个维度，将三维张量变为四维张量。这样做是为了与后续操作的张量形状相匹配。</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="Continuous-relative-position-bias"><a href="#Continuous-relative-position-bias" class="headerlink" title="Continuous relative position bias"></a>Continuous relative position bias</h2><p>$$<br>B(\Delta x,\Delta y)&#x3D;G(\Delta x,\Delta y)<br>$$<br>G是一个小型网络，中间使用ReLU激活的两层MLP。</p>
+<p>元网络 G 为任意相对坐标生成偏差值，因此可以自然地转移到具有任意变化窗口大小的微调任务。在推论中，可以预先计算每个相对位置的偏差值并将其存储为模型参数，使得推论与原始参数化偏差方法相同。</p>
+<h3 id="Log-spaced-coordinates"><a href="#Log-spaced-coordinates" class="headerlink" title="Log-spaced coordinates"></a>Log-spaced coordinates</h3><p>通过使用对数间隔坐标，当我们在窗口分辨率上传递相对位置偏差时，所需的外推率将比使用原始线性间隔坐标小得多。对于从预训练的 8 × 8 窗口大小转移到微调的 16 × 16 窗口大小的示例，使用原始原始坐标，输入坐标范围将从 [−7, 7]×[−7，7]至[−15, 15]×[−15, 15]。外推比为原始范围的 8&#x2F;7 &#x3D; 1.14倍。使用对数间隔坐标，输入范围将从 [−2.079, 2.079] × [−2.079, 2.079] 到 [−2.773, 2.773] × [−2.773, 2.773]。</p>
+<p>这篇文章的外推比意思是值的大小差除以原始值：<br>$$<br>8&#x3D;15-7\<br>Extrapolation Ratio &#x3D; 8&#x2F;7  \<br>\Delta &#x3D; 2.773-2.079 &#x3D; 0.684\<br>Extrapolation Ratio &#x3D; \frac{0.684}{2.079} &#x3D; 0.333<br>$$</p>
+<ul>
+<li>源码</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> pretrained_window_size[<span class="number">0</span>] &gt; <span class="number">0</span>:</span><br><span class="line">    relative_coords_table[:, :, :, <span class="number">0</span>] /= (pretrained_window_size[<span class="number">0</span>] - <span class="number">1</span>)</span><br><span class="line">    relative_coords_table[:, :, :, <span class="number">1</span>] /= (pretrained_window_size[<span class="number">1</span>] - <span class="number">1</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    relative_coords_table[:, :, :, <span class="number">0</span>] /= (self.window_size[<span class="number">0</span>] - <span class="number">1</span>)</span><br><span class="line">    relative_coords_table[:, :, :, <span class="number">1</span>] /= (self.window_size[<span class="number">1</span>] - <span class="number">1</span>)</span><br><span class="line">relative_coords_table *= <span class="number">8</span>  <span class="comment"># normalize to -8, 8</span></span><br><span class="line">relative_coords_table = torch.sign(relative_coords_table) * torch.log2(</span><br><span class="line">           torch.<span class="built_in">abs</span>(relative_coords_table) + <span class="number">1.0</span>) / np.log2(<span class="number">8</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>公式</li>
+</ul>
+<p>$$<br>\hat{\Delta x} &#x3D; sign(x)*log(1+|{\Delta x}|),\<br>\hat{\Delta y} &#x3D; sign(y)*log(1+|{\Delta y}|)<br>$$</p>
+<h2 id="Scaled-cosine-attention"><a href="#Scaled-cosine-attention" class="headerlink" title="Scaled cosine attention"></a>Scaled cosine attention</h2><p>原始的自注意力计算，相似的像素对是使用点积来计算query和key向量的。<strong>当这种方法被用到大的视觉模型上时一些块和头的学习注意力图经常由几个像素对主导</strong>，特别是在 res-post-norm 配置中。<br>$$<br>Sim(q_i,k_j)&#x3D;\cos(q_i,k_i)&#x2F;τ +B_{ij}<br>$$<br>​                                                                                                 $\tau$ 是一个可学习参数</p>
+<p><strong>经过查阅源码发现其本质就是在点积前进行归一化保证最后进行点积的向量的长度是单位长度，最后出来的点积结果就是两向量间的角度。</strong></p>
+<ul>
+<li>源码：</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">attn = (F.normalize(q, dim=-<span class="number">1</span>) @ F.normalize(k, dim=-<span class="number">1</span>).transpose(-<span class="number">2</span>, -<span class="number">1</span>))</span><br><span class="line">logit_scale = torch.clamp(self.logit_scale, <span class="built_in">max</span>=torch.log(torch.tensor(<span class="number">1.</span> / <span class="number">0.01</span>))).exp()</span><br><span class="line">attn = attn * logit_scale</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>解析</li>
+</ul>
+<ol>
+<li><code>attn = (F.normalize(q, dim=-1) @ F.normalize(k, dim=-1).transpose(-2, -1))</code><br>这行代码计算了查询（<code>q</code>）和键（<code>k</code>）之间的注意力得分。首先，通过 <code>F.normalize</code> 函数对查询和键进行归一化，使它们具有单位长度。然后，使用矩阵乘法 <code>@</code> 计算查询和键的内积，得到注意力得分矩阵 <code>attn</code>。这个矩阵描述了查询与每个键的相关性或相似度。</li>
+<li><code>logit_scale = torch.clamp(self.logit_scale, max=torch.log(torch.tensor(1. / 0.01))).exp()</code><br>这行代码通过对 <code>self.logit_scale</code> 进行限制和指数化，得到一个用于缩放注意力得分的比例因子。<code>self.logit_scale</code> 可能是一个模型参数，通过对其进行限制，确保缩放因子不会过大。<code>torch.clamp</code> 函数用于限制 <code>self.logit_scale</code> 的最大值为 <code>torch.log(torch.tensor(1. / 0.01))</code>，然后使用 <code>exp()</code> 函数进行指数化。</li>
+<li><code>attn = attn * logit_scale</code><br>这行代码将注意力得分矩阵 <code>attn</code> 与缩放因子 <code>logit_scale</code> 相乘，对注意力得分进行缩放。这个缩放操作可以调整注意力权重的范围和重要性，以适应模型的需要。</li>
+</ol>
+<h2 id="后置归一化"><a href="#后置归一化" class="headerlink" title="后置归一化"></a>后置归一化</h2><p><img src="/../images/CV/4_2.png"></p>
+<ul>
+<li>原先问题</li>
+</ul>
+<p>如上图所示，原先的前置归一化手段会使得每次合并后幅度被积累（因为先进行归一化再进行Attention的，也就是Attention这一步可能会将输出值变得幅度很大（因为有投影）） </p>
+<ul>
+<li>改进后</li>
+</ul>
+<p>在这种方法中，每个残差块的输出在合并回主分支之前被归一化，并且当层更深时主分支的幅度不会累积。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Jiaqi Li</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://example.com/2023/10/20/Swin-Transformer-V2/">http://example.com/2023/10/20/Swin-Transformer-V2/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/CV/"># CV</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/10/22/%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%8C%82%E6%A2%AF%E5%AD%90/">服务器挂梯子</a>
+            
+            
+            <a class="next" rel="next" href="/2023/10/18/%E6%95%B0%E6%8D%AE%E9%9B%86%E5%A4%84%E7%90%86/">数据集处理</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jiaqi Li | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
