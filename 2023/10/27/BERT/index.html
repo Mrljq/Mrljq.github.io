@@ -13,7 +13,7 @@
 
 
 
-<title>Tag | Hexo</title>
+<title>BERT | Hexo</title>
 
 
 
@@ -254,28 +254,186 @@
     }
 </script>
             <div class="main">
-                
-
-    <div class="container">
-        <div class="post-wrap tags">
-            <h2 class="post-title">-&nbsp;Tag Cloud&nbsp;-</h2>
-
-            <div class="tag-cloud-tags">
-                
-                    <a href="/tags/Multimodal/">Multimodal<small>(7)</small></a>
-                
-                    <a href="/tags/blogs/">blogs<small>(11)</small></a>
-                
-                    <a href="/tags/DeepLearning/">DeepLearning<small>(3)</small></a>
-                
-                    <a href="/tags/CV/">CV<small>(4)</small></a>
-                
-                    <a href="/tags/LLM/">LLM<small>(1)</small></a>
-                
-            </div>
-        </div>
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
     </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
 
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">BERT</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jiaqi Li</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">October 27, 2023&nbsp;&nbsp;9:45:22</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/LLM/">LLM</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="BERT"><a href="#BERT" class="headerlink" title="BERT"></a>BERT</h1><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>BERT旨在通过联合调节所有层中的<strong>左右上下文来预训练未标记文本的深度双向表示</strong>。，这样BERT模型就可以只需一个额外的输出层就可进行微调。</p>
+<p>先前手段：</p>
+<ol>
+<li><p>feature-based</p>
+<p>使用特定于任务的架构，其中包括预训练的表示作为附加功能。</p>
+</li>
+<li><p>fine-tuning</p>
+<p>引入最少的特定于任务的参数，并通过简单地微调所有预训练参数来对下游任务进行训练。</p>
+</li>
+</ol>
+<p>针对fine-tuning：其中每个令牌只能关注 Transformer 的自注意力层中的先前令牌。这种限制对于句子级任务来说并不是最优的，并且当将基于微调的方法应用于标记级任务（例如问答）时可能非常有害，因为在这些任务中，从两个方向合并上下文至关重要。</p>
+<p>BERT的解决方法：使用<strong>MLM</strong>进行预训练。</p>
+<h3 id="MLM"><a href="#MLM" class="headerlink" title="MLM"></a>MLM</h3><p>The masked language model随机屏蔽输入中的一些标记，目标是根据上下文预测屏蔽的原始词汇id。</p>
+<h2 id="模型"><a href="#模型" class="headerlink" title="模型"></a>模型</h2><p><img src="/../images/LLM/1_1.png"></p>
+<p>​                     Figure 1:[CLS] 是添加在每个输入示例前面的特殊符号，[SEP] 是特殊的分隔符标记（例如分隔问题&#x2F;答案）。</p>
+<h3 id="Training"><a href="#Training" class="headerlink" title="Training"></a>Training</h3><p>two-steps：</p>
+<ol>
+<li><p>pre-training：</p>
+<p>在预训练期间，模型在不同的预训练任务中使用未标记的数据进行训练。</p>
+</li>
+<li><p>fine-tuning：</p>
+<p>对于微调，BERT 模型首先使用预先训练的参数进行初始化，然后使用来自下游任务的标记数据对所有参数进行微调。每个下游任务都有单独的微调模型，即使它们是使用相同的预训练参数进行初始化的。</p>
+</li>
+</ol>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Jiaqi Li</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://example.com/2023/10/27/BERT/">http://example.com/2023/10/27/BERT/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/LLM/"># LLM</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2023/10/22/Typora%E6%BF%80%E6%B4%BB/">Typora激活</a>
+            
+        </section>
+
+
+    </article>
+</div>
 
             </div>
             <footer id="footer" class="footer">
