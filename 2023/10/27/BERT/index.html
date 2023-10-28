@@ -366,6 +366,9 @@
 <h3 id="MLM"><a href="#MLM" class="headerlink" title="MLM"></a>MLM</h3><p>The masked language model随机屏蔽输入中的一些标记，目标是根据上下文预测屏蔽的原始词汇id。</p>
 <h2 id="模型"><a href="#模型" class="headerlink" title="模型"></a>模型</h2><p><img src="/../images/LLM/1_1.png"></p>
 <p>​                     Figure 1:[CLS] 是添加在每个输入示例前面的特殊符号，[SEP] 是特殊的分隔符标记（例如分隔问题&#x2F;答案）。</p>
+<p>BERT的特点是它的预训练架构和最后的下游架构差距很小。</p>
+<p>将层数（即 Transformer 块）表示为 L，隐藏大小表示为 H，自注意力头的数量表示为 A 我们主要报告两种模型大小的结果：$BERT_{BASE}$（L&#x3D;  12，H&#x3D;768，A&#x3D;12，总参数&#x3D;110M）和$BERT_{LARGE}$（L&#x3D;24，H&#x3D;1024，A&#x3D;16，总参数&#x3D;340M）。</p>
+<p>使用WordPiece embedding，每个句子的第一个token总是一个特殊的分类标记([CLS])。与该标记对应的最终隐藏状态用作分类任务的聚合序列表示。</p>
 <h3 id="Training"><a href="#Training" class="headerlink" title="Training"></a>Training</h3><p>two-steps：</p>
 <ol>
 <li><p>pre-training：</p>
@@ -375,6 +378,45 @@
 <p>对于微调，BERT 模型首先使用预先训练的参数进行初始化，然后使用来自下游任务的标记数据对所有参数进行微调。每个下游任务都有单独的微调模型，即使它们是使用相同的预训练参数进行初始化的。</p>
 </li>
 </ol>
+<h3 id="pre-training"><a href="#pre-training" class="headerlink" title="pre-training"></a>pre-training</h3><p>预训练时使用两个无监督任务：</p>
+<ul>
+<li>Task 1:Masked LM</li>
+</ul>
+<p>loss: cross entropy loss</p>
+<p>训练数据生成器随机选择 15% 的 token 位置进行预测。如果选择第 i 个令牌，我们将第 i 个令牌替换为 </p>
+<p>(1) 80% 的时间为 [MASK] token (2) 10% 的时间为随机token (3) 10%的时间是未更改的第 i 个token。</p>
+<p>然后，Ti 将用于通过交叉熵损失来预测原始令牌。</p>
+<ul>
+<li>Task 2: Next Sentence Prediction</li>
+</ul>
+<p>为了训练理解句子关系的模型，我们预先训练二值化的下一个句子预测任务，该任务可以从任何单语语料库轻松生成。具体来说，当为每个预训练示例选择句子 A 和 B 时，50% 的时间 B 是 A 之后的实际下一个句子（标记为 IsNext），50% 的时间它是来自语料库的随机句子（标记为 IsNext）。作为NotNext）。C 用于下一句预测 (NSP)。</p>
+<p><img src="/../images/LLM/1_2.png"></p>
+<h4 id="Pre-training-data："><a href="#Pre-training-data：" class="headerlink" title="Pre-training data："></a>Pre-training data：</h4><ol>
+<li>BooksCorpus  (800M words), </li>
+<li>English Wikipedia  (2500M words)</li>
+</ol>
+<h3 id="fine-tuning"><a href="#fine-tuning" class="headerlink" title="fine-tuning"></a>fine-tuning</h3><p>对于每个任务，我们只需将特定于任务的输入和输出插入 BERT 中，并端到端地微调所有参数。</p>
+<p>在输入端，预训练中的句子 A 和句子 B 类似于 </p>
+<ol>
+<li><p>释义中的句子对，</p>
+</li>
+<li><p>蕴涵中的假设-前提对，</p>
+</li>
+<li><p>问答中的问题-段落对，以及</p>
+</li>
+<li><p>文本分类或序列标记中的简并文本-∅对。在输出处，令牌表示被馈送到令牌级任务的输出层，例如序列标记或问答，并且 [CLS] 表示被馈送到输出层以进行分类，例如蕴涵或情感分析。</p>
+</li>
+</ol>
+<p><img src="/../images/LLM/1_4.png"></p>
+<h2 id="Input"><a href="#Input" class="headerlink" title="Input"></a>Input</h2><p>句子对被打包成一个序列。我们以两种方式区分句子。首先，我们用一个特殊的标记（[SEP]）将它们分开。其次，我们向每个标记添加一个<strong>学习嵌入</strong>，指示它属于句子 A 还是句子 B。如下图 所示，我们将输入嵌入表示为 E，将特殊 [CLS] 标记的最终隐藏向量表示为 C ∈ $R^H$ ，第 i 个输入标记的最终隐藏向量为 Ti ∈ $R^H$ 。</p>
+<p><img src="/../images/LLM/1_2.png"></p>
+<p>对于给定的标记，其输入表示是通过对相应的标记、段和位置嵌入求和来构造的。</p>
+<p><img src="/../images/LLM/1_3.png"></p>
+<h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><ol>
+<li>GLUE</li>
+</ol>
+<p>为了在 GLUE 上进行微调，我们如第 3 节中所述表示输入序列（对于单个句子或句子对），并使用与第一个输入标记（[CLS]）相对应的最终隐藏向量$ C \in R^H $作为聚合表示。微调过程中引入的唯一新参数是分类层权重 $ W \in R^{K×H}$ ，其中 K 是标签数量。我们用 C 和 W 计算标准分类损，即 log(softmax( $CW^T$ ))。</p>
+<p><img src="C:\Githubpage\myblog\source\images\LLM\1_5.png"></p>
 
         </div>
 
