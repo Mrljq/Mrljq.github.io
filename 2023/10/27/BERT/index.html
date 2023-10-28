@@ -368,7 +368,11 @@
 <p>​                     Figure 1:[CLS] 是添加在每个输入示例前面的特殊符号，[SEP] 是特殊的分隔符标记（例如分隔问题&#x2F;答案）。</p>
 <p>BERT的特点是它的预训练架构和最后的下游架构差距很小。</p>
 <p>将层数（即 Transformer 块）表示为 L，隐藏大小表示为 H，自注意力头的数量表示为 A 我们主要报告两种模型大小的结果：$BERT_{BASE}$（L&#x3D;  12，H&#x3D;768，A&#x3D;12，总参数&#x3D;110M）和$BERT_{LARGE}$（L&#x3D;24，H&#x3D;1024，A&#x3D;16，总参数&#x3D;340M）。</p>
-<p>使用WordPiece embedding，每个句子的第一个token总是一个特殊的分类标记([CLS])。与该标记对应的最终隐藏状态用作分类任务的聚合序列表示。</p>
+<p><strong>使用WordPiece embedding，每个句子的第一个token总是一个特殊的分类标记([CLS])。与该标记对应的最终隐藏状态用作分类任务的聚合序列表示。</strong></p>
+<h3 id="CLS"><a href="#CLS" class="headerlink" title="CLS"></a>CLS</h3><p>一句话理解：<strong>【CLS】就是一个向量，只是不是某一个字的向量，是一个够代表整个文本的的语义特征向量，取出来就可以直接用于分类了。</strong></p>
+<p>主要用于以下两种任务：</p>
+<p>单文本分类任务：对于文本分类任务，BERT模型在文本前插入一个[CLS]符号，并将该符号对应的输出向量作为整篇文本的语义表示，用于文本分类，如下图所示。可以理解为：与文本中已有的其它字&#x2F;词相比，这个无明显语义信息的符号会更“公平”地融合文本中各个字&#x2F;词的语义信息。<br><img src="/../images/LLM/1_6.png"></p>
+<p>语句对分类任务：该任务的实际应用场景包括：问答（判断一个问题与一个答案是否匹配）、语句匹配（两句话是否表达同一个意思）等。对于该任务，BERT模型除了添加[CLS]符号并将对应的输出作为文本的语义表示，还对输入的两句话用一个[SEP]符号作分割，并分别对两句话附加两个不同的文本向量以作区分，如下图所示。<br><img src="/../images/LLM/1_7.png"></p>
 <h3 id="Training"><a href="#Training" class="headerlink" title="Training"></a>Training</h3><p>two-steps：</p>
 <ol>
 <li><p>pre-training：</p>
