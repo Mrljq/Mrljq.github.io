@@ -13,7 +13,7 @@
 
 
 
-<title>Blip-2 | Hexo</title>
+<title>X-LLM | Hexo</title>
 
 
 
@@ -326,7 +326,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Blip-2</h1>
+            <h1 class="post-title">X-LLM</h1>
             
                 <div class="post-meta">
                     
@@ -335,7 +335,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">October 10, 2023&nbsp;&nbsp;16:12:26</a>
+                        Date: <a href="#">October 29, 2023&nbsp;&nbsp;10:29:03</a>
                         </span>
                     
                     
@@ -351,76 +351,52 @@
         </header>
 
         <div class="post-content">
-            <h1 id="Blip-2"><a href="#Blip-2" class="headerlink" title="Blip-2"></a>Blip-2</h1><h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h2><p>视觉语言研究处于视觉和语言的交叉点，因此，我们自然期望视觉语言模型能够从视觉和自然语言界现成的单模态模型中获得收获。</p>
-<p>预训练视觉模型可提供高质量的视觉呈现。预训练语言模型，尤其是大型语言模型（LLMs），具有强大的语言生成和零点转移能力。为了降低计算成本和应对灾难性遗忘问题，<strong>单模态预训练模型在预训练期间保持冻结。</strong></p>
-<p>面临的问题：</p>
-<p>LLM在单模态预训练时没有看到视觉信息，因此冻结LLM再训练就变得极具挑战性。（很难将文本和图像信息对齐），为此文章提出了Q-Former结构。</p>
-<h2 id="模型架构"><a href="#模型架构" class="headerlink" title="模型架构"></a>模型架构</h2><p><img src="/../images/Multimodal/6_1.png"></p>
-<ol>
-<li><strong>Q-Former</strong>：一种轻量级的转换器（整体模型的可训练模块），采用一组可学习的查询向量从冻结的图像编码器中提取视觉特征。</li>
-<li>Image Encoder：<ul>
-<li>来自 CLIP 的 ViT-L&#x2F;14。</li>
-<li>来自 EVA-CLIP 的 ViT-g&#x2F;14。</li>
-</ul>
-</li>
-</ol>
-<p><strong>作者提出BLIP-2的架构具有通用性即通过更强的单模态编码器可以实现更好的效果。</strong></p>
-<h3 id="训练策略"><a href="#训练策略" class="headerlink" title="训练策略"></a>训练策略</h3><p>两阶段训练策略：</p>
+            <h1 id="X-LLM"><a href="#X-LLM" class="headerlink" title="X-LLM"></a>X-LLM</h1><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>GPT-4展现了远超先前的视觉语言模型的多模态能力，但是其模型结构和训练方式依然未知。</p>
+<p>因此本文提出X-LLM来<strong>将多模态数据通过X2L接口转换成外语再将他们传入LLM</strong>（ChatGLM）中。</p>
+<p>X-LLM 使用 X2L 接口将多个冻结的单模态编码器和冻结的 LLM 对齐。</p>
+<p>X2L接口由图像I2L接口、视频V2L接口和语音S2L接口组成，其中“X”表示多模态，“L”表示语言。</p>
 <ul>
-<li>视觉-语言表征学习，强制 Q-Former 学习与文本最相关的视觉表征。</li>
-<li>在第二个预训练阶段，我们通过将 Q-Former 的输出连接到冻结的 LLM 来执行视觉到语言的生成学习，并对 Q-Former 进行训练，使其输出的视觉表征能够被 LLM 解释。</li>
-</ul>
-<h3 id="Q-Former"><a href="#Q-Former" class="headerlink" title="Q-Former"></a>Q-Former</h3><p><img src="/../images/Multimodal/6_2.png"></p>
-<p>由包含两个共享自注意层的transformer子模块构成：</p>
-<ol>
-<li>图像transformer与冻结的图像编码器交互用于提取视觉特征。</li>
-<li>文本transformer，它既可以用作文本编码器，也可以用作文本解码器。我们创建了一组<strong>可学习的查询嵌入，作为图像转换器的输入</strong>。查询通过自关注层相互影响，并通过交叉关注层（每隔一个转换器块插入）与冻结的图像特征相互作用。此外，查询还可以通过相同的自注意层与文本进行交互。根据预训练任务的不同，我们会应用不同的自我注意掩码来控制查询与文本之间的交互。我们使用 BERTbase的预训练权重初始化 QFormer，而<strong>交叉注意层则随机初始化</strong>。Q-Former 总共包含 1.88 亿个参数。<strong>请注意，查询被视为模型参数。</strong></li>
-</ol>
-<p>用 Z 表示输出的查询表示（image transformer的输出）。Z 的大小：32 × 768，（和Q-Former的隐藏层维度相同）这种架构迫使查询提取与文本最相关的视觉信息。</p>
-<p><strong>text transformer其实只是为了一阶段预训练时给图像transformer作为一个监督，其在正常的推理过程中是不使用的。</strong></p>
-<p>&#x3D;&#x3D;Image Encoder选择是Clip或&#x3D;&#x3D;</p>
-<h2 id="训练"><a href="#训练" class="headerlink" title="训练"></a>训练</h2><h3 id="一阶段"><a href="#一阶段" class="headerlink" title="一阶段"></a>一阶段</h3><ul>
-<li><p>ITC：<strong>将图像转换器输出的查询表示法 Z 与文本表示的t对齐</strong>，<strong>Text Transformer的文本嵌入t是 [CLS] 标记的输出嵌入(text encoder会输出[n,32,769]的矩阵作为文本特征，然而真正用于计算的文本特征是 t[0] [0]，而Query嵌入则包含多个输出嵌入（每个查询一个），<em>因此首先计算每个Query输嵌入与文本嵌入之间的相似度，然后选择最高的一个作为图像-文本相似度。</em>为了避免信息泄露，我们采用了单模态自关注掩码，在这种掩码下，查询和文本不能互相看到</strong>。由于使用了冻结图像编码器，与端到端方法相比，我们可以在每个 GPU 上安装更多样本。因此，我们在 BLIP 中使用了批内否定，而不是动量队列。</p>
+<li><p>图像接口和视频接口具有相同的结构，我们采用BLIP-2中的Q-Former将视觉信息转换为外语表示。</p>
 </li>
-<li><p>ITG：<strong>以输入图像为条件生成文本</strong>。由于 Q-Former 的架构不允许冻结图像编码器与文本标记之间直接交互，因此<strong>生成文本所需的信息必须首先由查询提取，然后通过自注意层传递给文本标记</strong>。因此，查询必须提取能捕捉文本所有信息的视觉特征。我们采用<strong>多模态因果自注意掩码</strong>来控制查询与文本之间的交互，这与 UniLM中使用的掩码类似。查询可以相互关注，但不能关注文本标记。每个文本标记可以关注所有查询及其之前的文本标记。我们还将 [CLS] 标记替换为新的 [DEC] 标记，作为第一个文本标记，以表示解码任务。</p>
+<li><p>视频接口将图像接口的参数与图像文本数据重用，但使用视频文本数据进行进一步训练，以使编码的视频特征与 LLM 保持一致。</p>
 </li>
-<li><p>ITM</p>
+<li><p>语音接口利用连续集成触发（CIF）机制和变压器结构将语音表达转换为外语表示。</p>
 </li>
 </ul>
-<h3 id="二阶段"><a href="#二阶段" class="headerlink" title="二阶段"></a>二阶段</h3><p><img src="/../images/Multimodal/6_3.png"></p>
-<p>在生成预训练阶段，将 QFormer连接到冻结 LLM，以获取 LLM 的生成语言能力。<strong>使用全连接（FC）层将输出查询嵌入式 Z 线性投影到与 LLM 文本嵌入式相同的维度</strong>。然后，<strong>投射的查询嵌入会被添加到输入的文本嵌入中</strong>。它们起到软视觉提示的作用，使 LLM 以 Q-Former 提取的视觉表征为条件。由于 Q-Former 已经过预先训练，可以提取与语言相关的视觉表征，<strong>因此它可以有效地发挥信息瓶颈的作用，向 LLM 输送最有用的信息，同时去除无关的视觉信息。这就减轻了 LLM 学习视觉语言对齐的负担，从而缓解了灾难性遗忘问题。</strong></p>
-<p>在此阶段中对两种LLM进行实验：</p>
-<ol>
-<li>基于解码器的LLM：使用LM损失进行训练。</li>
-<li>基于编码器和解码器的LLM：使用前缀语言建模损失进行训练，将文本分成两部分。前缀文本（prefix text）与可视化表示法相连接，作为 LLM 编码器的输入。后缀文本（suffix text）则作为 LLM 解码器的生成目标。</li>
-</ol>
-<h3 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h3><p>包括 COCO、Visual Genome、CC3M、CC12M、SBU以及 LAION400M 数据集中的 1.15 亿张图片。</p>
-<p>使用 BLIP<del>large</del> 标题模型生成 10 个标题，并根据 CLIP ViT-L&#x2F;14 模型生成的图像-文本相似度对合成标题和原始网页标题进行排序。我们保留<strong>每张图片的前两个标题作为训练数据</strong>，并在每个预训练步骤中随机抽取一个。</p>
-<h3 id="训练设置"><a href="#训练设置" class="headerlink" title="训练设置"></a>训练设置</h3><ul>
-<li><strong>优化器</strong></li>
-</ul>
-<p>AdamW：β1 &#x3D; 0.9，β1 &#x3D; 0.98，权重衰减为 0.05。采用余弦学习率衰减，峰值学习率为 1e-4，线性热身为 2k 步。</p>
+<p><img src="/../images/Multimodal/7_1.png"></p>
+<p>​                                                                                             Figure 1</p>
+<h2 id="Model"><a href="#Model" class="headerlink" title="Model"></a>Model</h2><p>对于视觉感知，我们采用ViT-g作为图像编码器和视频编码器。</p>
+<p>对于语音感知，我们使用由卷积层和conformer 结构组成的语音编码器。</p>
+<p>我们设计了一个将多模态信息与LLM对齐的模块，统称为X2L接口，包括图像接口、视频接口和语音接口。</p>
 <ul>
-<li>增强</li>
+<li><p>图像接口和视频接口具有相同的结构，由Q-Formers和Adapter模块组成。</p>
+</li>
+<li><p>语音接口包括C-Former和Adapter模块。 C-Former 可以通过连续集成和激发（CIF）机制将来自语音编码器的帧级语音特征序列压缩为令牌级语音嵌入序列。由于令牌级语音嵌入序列与语音对应的转录的令牌序列严格对齐，因此使用令牌级语音嵌入表示语音可以有效减少将语音合并到 LLM 时的 GPU 内存使用量。</p>
+</li>
 </ul>
-<p>使用大小为 224×224 的图像，并通过随机调整大小的裁剪和水平翻转进行增强。</p>
-<h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><ol>
-<li>VQA</li>
-<li>Image Captioning</li>
+<h3 id="X2L-Interfaces"><a href="#X2L-Interfaces" class="headerlink" title="X2L Interfaces"></a>X2L Interfaces</h3><ul>
+<li>**The Image Interface :**图像接口由Q-Formers和I-Adapter模块组成。 Q-Formers 旨在将图像转换为语言，将从图像编码器获得的图像特征转换为具有 $L_i$ 准语言嵌入的序列。 I-Adapter 模块旨在对齐准语言嵌入的维度和 LLM 的嵌入维度。</li>
+<li><strong>The Video Interface:</strong> 视频接口与图像接口结构相同，同样由Q-Formers和V-Adapter模块组成。我们使用均匀采样并用 T 帧表示每个视频。然后我们将每一帧视为图像。视频接口将每个帧特征转换为具有$L_i$准语言嵌入的序列。然后视频接口连接所有序列以获得最终的准语言嵌入，其长度为$T×L_i$。</li>
+<li><strong>The Speech Interface :</strong>  语音接口由两部分组成，即C-Former和S-Adaptor。 C-Former是CIF模块和12层变压器结构的组合。<ul>
+<li>首先，CIF模块通过变长下采样将来自语音编码器的语音特征序列压缩为与相应转录长度相同的令牌级语音嵌入序列。假设语音编码器对输入语音发出的特征序列的长度为 U ，语音转录的令牌序列的长度为 $L_s$ ，则令牌级语音嵌入序列的长度应为 $L_s$ ( U 通常比  $L_s$ 长几倍）。</li>
+<li>然后，变压器结构为来自 CIF 模块的标记级语音嵌入提供上下文建模。</li>
+<li>最后，使用S-Adaptor将Transformer结构的输出投影到LLM的输入向量空间，进一步缩小语音和语言之间的语义差距。</li>
+</ul>
+</li>
+</ul>
+<h2 id="Training"><a href="#Training" class="headerlink" title="Training"></a>Training</h2><p>包含3个阶段：</p>
+<ol>
+<li><p><strong>转变多模态信息</strong>：训练每个 X2L 接口分别与其各自的单模态编码器对齐，以将多模态信息转换为语言。</p>
+</li>
+<li><p><strong>将X2L表征与LLM对齐</strong>：单模态编码器通过X2L接口独立地与LLM对齐。</p>
+<p>使用BLIP2第二阶段训练的Q-Former来初始化X-LLM中图像接口的Q-Former。为了使 Q-Former 适应中文 LLM，我们使用了一个组合数据集，总计约 1400 万个中文图像文本对进行训练。接下来，我们使用经过训练的图像接口来初始化视频接口（Q-Former 和 V-Adapter），并在翻译后的视频文本数据上训练视频接口。最后，我们使用 ASR 数据训练语音接口，以使语音接口的输出与 LLM 保持一致。应该注意的是，在整个第二个训练阶段，所有编码器和 LLM 都保持冻结状态，仅对接口进行训练。</p>
+</li>
+<li><p><strong>整合多模态</strong>：所有单模态编码器都通过 X2L 接口与 LLM 对齐，以将多模态功能集成到 LLM 中。</p>
+<p>在此阶段，我们使用构建的紧凑但高质量的数据来微调我们的模型。在微调过程中，我们使用以下模板中的预定义提示： </p>
+<p><Image><ImageFeats></Image><Video><VideoFeats></Video><Speech><SpeechFeats> </Speech>Question: <Instruction>\n Answer：</p>
+<p>在这个提示中，<Instruction>代表从我们预定义的指令集中随机抽取的一条指令，包括“详细描述这张图片”、“你能描述一下你在视频中注意到什么吗”、“回答问题”等不同的形式。在基于图像的演讲中”。应该注意的是，我们不会专门针对这个特定的指令提示计算回归损失。因此，X-LLM可以集成多种模态，并根据需要根据各种指令组合生成更自然、更可靠的响应。</p>
+</li>
 </ol>
-<h3 id="VQA"><a href="#VQA" class="headerlink" title="VQA"></a>VQA</h3><p>给定注释过的 VQA 数据后，我们对 Q-Former 和图像编码器的参数进行微调，同时冻结 LLM。我们<strong>使用open-ended answer generation loss(开放式答案生成损失)进行微调</strong>，LLM 接收 Q-Former 的输出和问题作为输入，并被要求生成答案。为了提取与问题更相关的图像特征，我们还将问题作为 Q-Former 的条件。具体来说，问题标记被作为 Q-Former 的输入，并通过自我注意层与查询进行交互，从而引导 Q-Former 的交叉注意层关注信息量更大的图像区域。</p>
-<p><img src="/../images/Multimodal/6_4.png"></p>
-<p>BLIP-2 在各种<strong>zero-shot</strong>视觉语言任务上的结果概览。与之前最先进的模型相比。BLIP-2 在视觉语言预训练过程中所需的可训练参数数量最少，但却实现了最高的zero-shot性能。</p>
-<p><img src="/../images/Multimodal/6_5.png"></p>
-<p>​                                                              (与最先进的<strong>zero-shot</strong>视觉问题解答方法进行比较。)</p>
-<p>我们对零镜头视觉问题解答任务进行了定量评估。对于 OPT 模型，我们使用 “Question: {} Answer:”。对于 FlanT5 模型，我们使用 “Question: {} Short answer:”的提示。在生成过程中，我们使用波束搜索，波束宽度为 5。我们还将长度惩罚设置为-1，以鼓励更符合人类注释的较短答案。</p>
-<p><strong>通过上面的实验可以得到上面总结的结论：BLIP-2 是一种通用的视觉语言预训练方法，可以有效地利用视觉和自然语言社区的快速发展。以下几个事实支持这一观点：(1) 对于 OPT 和 FlanT5，ViT-g 均优于 ViT-L。(2) 在同一 LLM 系列中，较大的模型优于较小的模型。(3) 在 VQA 上，经过指令调整的 LLM FlanT5 优于未经监督训练的 OPT。</strong></p>
-<h3 id="Image-Captioning"><a href="#Image-Captioning" class="headerlink" title="Image Captioning"></a>Image Captioning</h3><p>我们将提示语 “一张照片 “作为 LLM 的初始输入，并<strong>利用language modeling loss(语言建模损失)训练模型生成标题。</strong>在微调过程中，我们将 LLM 冻结，并与图像编码器一起更新 Q-Former 的参数。我们使用 ViT-g 和各种 LLM 进行实验。详细的超参数见附录。我们在 COCO 上进行微调，并在 COCO 测试集和零点转移到 NoCaps（Agrawal 等人，2019 年）验证集上进行评估。</p>
-<p><img src="/../images/Multimodal/6_6.png"></p>
-<p>(在 NoCaps 和 COCO 上与最先进的图像标题制作方法进行比较。所有方法都在微调过程中优化了交叉熵损失。C：CIDEr，S：SPICE，B@4：BLEU@4。)</p>
-<h3 id="Image-Text-Retrieval"><a href="#Image-Text-Retrieval" class="headerlink" title="Image-Text Retrieval"></a>Image-Text Retrieval</h3><p>不使用 LLM，直接对第一阶段预训练模型进行微调。具体来说，我们在 COCO 上使用与预训练相同的目标（即 ITC、ITM 和 ITG）<strong>对图像编码器和 Q-Former 进行微调。</strong>然后，我们在 COCO 和 Flickr30K数据集上对模型的图像到文本检索和文本到图像检索进行评估。在推理过程中，首先根据图像文本特征相似度选择 k &#x3D; 128 个候选对象，然后根据成对的 ITM 分数重新排序。我们使用 ViT-L 和 ViT-g 作为图像编码器进行实验。</p>
-<p><img src="/../images/Multimodal/6_7.png"></p>
-<p>​                      (与最先进的图像-文本检索方法进行比较，在 COCO 上进行了微调，并将零镜头传输到 Flickr30K。)</p>
 
         </div>
 
@@ -435,7 +411,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2023/10/10/Blip-2/">http://example.com/2023/10/10/Blip-2/</a></span>
+                        <span><a href="http://example.com/2023/10/29/X-LLM/">http://example.com/2023/10/29/X-LLM/</a></span>
                     </p>
                 
                 
@@ -472,10 +448,10 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2023/10/12/mindspore%E4%BB%8E%E5%A4%A7%E5%9E%8B%E6%A8%A1%E5%9E%8B%E4%B8%AD%E5%AF%BC%E5%87%BA%E6%A8%A1%E5%9D%97/">MindSpore从大型模型中导出模块以及权重处理</a>
+                <a class="prev" rel="prev" href="/2023/10/30/BLIVA/">BLIVA</a>
             
             
-            <a class="next" rel="next" href="/2023/10/09/ViT/">ViT</a>
+            <a class="next" rel="next" href="/2023/10/27/BERT/">BERT</a>
             
         </section>
 
