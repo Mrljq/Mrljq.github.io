@@ -440,38 +440,13 @@
 
 
 
+<h2 id="指定数据存储"><a href="#指定数据存储" class="headerlink" title="指定数据存储"></a>指定数据存储</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mindspore.set_context(mode=<span class="number">0</span>, device_id=<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
 
 
 
+<h2 id="并行设置"><a href="#并行设置" class="headerlink" title="并行设置"></a>并行设置</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> mindspore <span class="keyword">as</span> ms</span><br><span class="line"><span class="keyword">from</span> mindspore.communication <span class="keyword">import</span> init</span><br><span class="line"></span><br><span class="line">ms.set_context(mode=ms.GRAPH_MODE)</span><br><span class="line">ms.set_auto_parallel_context(parallel_mode=ms.ParallelMode.AUTO_PARALLEL, gradients_mean=<span class="literal">True</span>)</span><br><span class="line">init()</span><br></pre></td></tr></table></figure>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<p><a target="_blank" rel="noopener" href="https://www.mindspore.cn/tutorials/experts/zh-CN/r2.2/parallel/mpirun.html">官方链接</a></p>
 
         </div>
 

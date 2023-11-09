@@ -384,7 +384,7 @@
 </li>
 <li><p>ITG：<strong>以输入图像为条件生成文本</strong>。由于 Q-Former 的架构不允许冻结图像编码器与文本标记之间直接交互，因此<strong>生成文本所需的信息必须首先由查询提取，然后通过自注意层传递给文本标记</strong>。因此，查询必须提取能捕捉文本所有信息的视觉特征。我们采用<strong>多模态因果自注意掩码</strong>来控制查询与文本之间的交互，这与 UniLM中使用的掩码类似。查询可以相互关注，但不能关注文本标记。每个文本标记可以关注所有查询及其之前的文本标记。我们还将 [CLS] 标记替换为新的 [DEC] 标记，作为第一个文本标记，以表示解码任务。</p>
 </li>
-<li><p>ITM</p>
+<li><p>ITM：<strong>ITM</strong>是一个二元分类任务，通过预测图像-文本对是正匹配还是负匹配，学习图像和文本表示之间的细粒度对齐。这里将Image Transformer输出的每个Query嵌入输入到一个二类线性分类器中以获得对应的logit，然后将所有的logit平均，再计算匹配分数。<strong>ITM使用双向自注意掩码，所有Query和Text都可以相互关注。</strong></p>
 </li>
 </ul>
 <h3 id="二阶段"><a href="#二阶段" class="headerlink" title="二阶段"></a>二阶段</h3><p><img src="/../images/Multimodal/6_3.png"></p>
