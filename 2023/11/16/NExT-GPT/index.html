@@ -13,7 +13,7 @@
 
 
 
-<title>Visual Instruction Tuning | Hexo</title>
+<title>NExT-GPT | Hexo</title>
 
 
 
@@ -326,7 +326,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Visual Instruction Tuning</h1>
+            <h1 class="post-title">NExT-GPT</h1>
             
                 <div class="post-meta">
                     
@@ -335,7 +335,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">October 31, 2023&nbsp;&nbsp;12:27:15</a>
+                        Date: <a href="#">November 16, 2023&nbsp;&nbsp;9:16:40</a>
                         </span>
                     
                     
@@ -351,12 +351,38 @@
         </header>
 
         <div class="post-content">
-            <h1 id="Visual-Instruction-Tuning"><a href="#Visual-Instruction-Tuning" class="headerlink" title="Visual Instruction Tuning"></a>Visual Instruction Tuning</h1><h2 id="Instruction"><a href="#Instruction" class="headerlink" title="Instruction"></a>Instruction</h2><p>利用机器生成的instruction-following data对大型语言模型（LLM）进行指令调整，提高了新任务中的零拍能力，但这一想法在多模态领域的探索较少。</p>
-<p>在本文中，提出了 <em>visual instruction-tuning</em>，这是首次尝试将指令调整扩展到多模态空间，为构建通用视觉助手铺平了道路。本文做出了以下贡献：</p>
+            <h1 id="NExT-GPT-Any-to-Any-Multimodal-LLM"><a href="#NExT-GPT-Any-to-Any-Multimodal-LLM" class="headerlink" title="NExT-GPT Any-to-Any Multimodal LLM"></a>NExT-GPT Any-to-Any Multimodal LLM</h1><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><ul>
+<li>问题：目前的多模态大模型面临着只能处理输入端的多模态理解问题，而不能去用多模态生成内容。</li>
+</ul>
+<p>人类感知和与他人交流总是通过多种模态，开发一种any-to-any的能接受和传递任意模态的多模态大模型对于human-level级的AI变得尤其重要。</p>
+<ul>
+<li>本文提出NExT-GPT解决生成端的多模态问题，用多模态适配器连接上LLM和不同的扩散解码器。通过使用现存的已经经过训练的表现良好的编码器和解码器，NExT-GPT可以只用微调只占1%参数的某些投影层。</li>
+</ul>
+<h2 id="model"><a href="#model" class="headerlink" title="model"></a>model</h2><p><img src="/../images/Multimodal/10_1.png"></p>
+<p>目前一种值得注意的方式是使用适配器将其他模态的预训练编码器和文本大模型对齐。但是这样的做法只关注输入端的多模态内容理解缺乏输出文本外的多种模态内容能力。</p>
+<ul>
+<li>我们只考虑对输入投影层和输出投影层进行局部微调，编码侧对齐以 LLM 为中心，解码侧对齐以指令为中心。</li>
+</ul>
+<p>模型包含3种主要层次：</p>
 <ol>
-<li><strong>Multimodal instruction-following data.</strong>  其中一个主要挑战是缺乏视觉语言教学数据。我们提出了一种数据重组观点和管道，利用 ChatGPT&#x2F;GPT-4 <strong>将图像-文本对转换为适当的instruction-following格式。</strong></li>
-<li><strong>大型多模态模型</strong>。我们开发了一个大型多模态模型（LMM），将 CLIP [36] 的开放集视觉编码器与语言解码器 LLaMA 相连接，并在生成的视觉语言教学数据上对它们进行端对端微调。我们的实证研究验证了使用生成数据进行 LMM 指令调整的有效性，并为构建通用指令跟随视觉代理提出了实用建议。利用 GPT-4，我们在ScienceQA 多模态推理数据集上取得了一流的性能。</li>
+<li><p>encoding stage：这里使用跨6种模态的统一高性能编码器ImageBind。</p>
+</li>
+<li><p>LLM understanding and reasoning stage：使用Vicuna，将不同模态的表征作为输入，并对输入进行语义理解和推理。</p>
+<p>输出包括： </p>
+<ul>
+<li>直接的文本响应</li>
+<li>每种模态的信号标记用于指示解码层是否生成多模态内容以及生成什么内容</li>
+</ul>
+</li>
+<li><p>decoding stage：基于变换器的输出投影层接收来自 LLM的带有特定指令的多模态信号，将信号标记表征映射为后续多模态解码器可以理解的表征。</p>
+</li>
 </ol>
+<p><img src="/../images/Multimodal/10_2.png"></p>
+<h3 id="对齐"><a href="#对齐" class="headerlink" title="对齐"></a>对齐</h3><h4 id="输入端"><a href="#输入端" class="headerlink" title="输入端"></a>输入端</h4><p><img src="/../images/Multimodal/10_3.png"></p>
+<p>本文考虑将不同的输入模态特征和文本特征空间对齐，这样表征可以被LLM内核识别。输入多模态-文本对并将LLM生成的标题与标准标题进行比对。</p>
+<h4 id="解码端指令对齐"><a href="#解码端指令对齐" class="headerlink" title="解码端指令对齐"></a>解码端指令对齐</h4><p>每个扩散模型和 LLM 之间执行全面的对齐过程将带来巨大的计算负担。作为替代方案，我们在此探索一种更高效的方法，即解码侧指令跟随对齐，如图 3(b) 所示。具体来说，由于各种模式的扩散模型仅以文本标记输入为条件。在我们的系统中，这种条件与来自 LLM 的模态信号标记有很大差异，这导致扩散模型在准确解释来自 LLM 的指令方面存在差距。因此，我们考虑最小化 LLM 的模态信号标记表示（在每个基于 Transformer 的项目层之后）与扩散模型的条件文本表示之间的距离。由于只使用了文本条件编码器（扩散骨干被冻结），因此学习仅仅基于纯字幕文本，即不需要任何视觉或音频资源。这也确保了训练的高度轻量化。</p>
+<h3 id="Modality-switching-Instruction-Tuning"><a href="#Modality-switching-Instruction-Tuning" class="headerlink" title="Modality-switching Instruction Tuning"></a>Modality-switching Instruction Tuning</h3><p><img src="/../images/Multimodal/10_4.png"></p>
+<p>尽管编码和解码两端都与 LLM 保持一致，但在实现使整个系统能够忠实地遵循和理解用户指令并生成所需的多模态输出这一目标方面仍存在差距。为了解决这个问题，进一步的指令调整（IT）被认为是提高 LLM 的能力和可控性所必需的。IT 涉及使用”（输入，输出）”对整个 MM-LLM 进行额外训练，其中 “输入 “表示用户指令，”输出 “表示符合给定指令的所需模型输出。在技术上，我们利用 LoRA ，使 NExT-GPT 中的一小部分参数在 IT 阶段与两层投影同时更新。 当一个 IT 对话样本输入系统时，LLM 会重建并生成输入的文本内容（并以多模态信号标记表示多模态内容）。优化基于金注释和 LLM 的输出。除了 LLM 调整外，我们还对 NExT-GPT 的解码端进行了微调。我们将输出投影编码的模态信号标记表示与扩散条件编码器编码的黄金多模态字幕表示相一致。因此，综合调整过程更接近与用户进行忠实、有效互动的目标。</p>
 
         </div>
 
@@ -371,7 +397,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2023/10/31/Visual-Instruction-Tuning/">http://example.com/2023/10/31/Visual-Instruction-Tuning/</a></span>
+                        <span><a href="http://example.com/2023/11/16/NExT-GPT/">http://example.com/2023/11/16/NExT-GPT/</a></span>
                     </p>
                 
                 
@@ -408,10 +434,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2023/11/14/Achieving-Cross-Modal-Generalization/">Achieving Cross Modal Generalization</a>
             
-            
-            <a class="next" rel="next" href="/2023/10/30/BLIVA/">BLIVA</a>
+            <a class="next" rel="next" href="/2023/11/14/Achieving-Cross-Modal-Generalization/">Achieving Cross Modal Generalization</a>
             
         </section>
 

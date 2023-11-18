@@ -13,7 +13,7 @@
 
 
 
-<title>Visual Instruction Tuning | Hexo</title>
+<title>Achieving Cross Modal Generalization | Hexo</title>
 
 
 
@@ -326,7 +326,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Visual Instruction Tuning</h1>
+            <h1 class="post-title">Achieving Cross Modal Generalization</h1>
             
                 <div class="post-meta">
                     
@@ -335,7 +335,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">October 31, 2023&nbsp;&nbsp;12:27:15</a>
+                        Date: <a href="#">November 14, 2023&nbsp;&nbsp;13:39:08</a>
                         </span>
                     
                     
@@ -351,12 +351,44 @@
         </header>
 
         <div class="post-content">
-            <h1 id="Visual-Instruction-Tuning"><a href="#Visual-Instruction-Tuning" class="headerlink" title="Visual Instruction Tuning"></a>Visual Instruction Tuning</h1><h2 id="Instruction"><a href="#Instruction" class="headerlink" title="Instruction"></a>Instruction</h2><p>利用机器生成的instruction-following data对大型语言模型（LLM）进行指令调整，提高了新任务中的零拍能力，但这一想法在多模态领域的探索较少。</p>
-<p>在本文中，提出了 <em>visual instruction-tuning</em>，这是首次尝试将指令调整扩展到多模态空间，为构建通用视觉助手铺平了道路。本文做出了以下贡献：</p>
+            <h1 id="Achieving-Cross-Modal-Generalization-with-Multimodal-Unified-Representation"><a href="#Achieving-Cross-Modal-Generalization-with-Multimodal-Unified-Representation" class="headerlink" title="Achieving Cross Modal Generalization with Multimodal Unified Representation"></a>Achieving Cross Modal Generalization with Multimodal Unified Representation</h1><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><ul>
+<li><strong>解决的问题</strong>：在预训练期间从成对的多模态数据中学习统一的离散表示。从而实现在下游任务时模型能实现在其它模态的zero-shot生成能力。</li>
+</ul>
+<p>现有的多模态表征学习方法更侧重于粗粒度的配准，或者依赖于不同模态信息完全配准的假设，然而在现实中这个是不现实的。</p>
+<p>为了解决这个限制本文提出了<strong>Uni-Code</strong>，包括如下两个主要贡献：</p>
 <ol>
-<li><strong>Multimodal instruction-following data.</strong>  其中一个主要挑战是缺乏视觉语言教学数据。我们提出了一种数据重组观点和管道，利用 ChatGPT&#x2F;GPT-4 <strong>将图像-文本对转换为适当的instruction-following格式。</strong></li>
-<li><strong>大型多模态模型</strong>。我们开发了一个大型多模态模型（LMM），将 CLIP [36] 的开放集视觉编码器与语言解码器 LLaMA 相连接，并在生成的视觉语言教学数据上对它们进行端对端微调。我们的实证研究验证了使用生成数据进行 LMM 指令调整的有效性，并为构建通用指令跟随视觉代理提出了实用建议。利用 GPT-4，我们在ScienceQA 多模态推理数据集上取得了一流的性能。</li>
+<li>双跨模态信息分解（DCID）模块</li>
+<li>多模态指数移动平均（MM-EMA）</li>
 </ol>
+<p>尽管近些年多模态领域已经出现许多重大的成就例如多模态问答、基于提示的分割等，然而标注这些任务往往要消耗大量的人力资源，并且给这些模态标注的消耗在不同的模态间也有巨大的不同，导致一部分模态被标注而其他的依然很稀缺。</p>
+<p>因此，在本文中，我们开发了一项新任务–<strong>跨模态泛化（CMG）</strong>，用于研究如何从这些未标记的多模态数据对中学习统一的离散表征。</p>
+<p><strong>我们的目标是在下游任务中，将从标注模式中获得的知识转移到其他未见模式中。</strong></p>
+<p><img src="C:\Githubpage\myblog\source\images\Multimodal\9_1.png"></p>
+<p>Figure 1： 我们提出的 CMG 任务概览，左侧和中间部分的不同颜色代表不同的语义。左侧部分是糟糕的多模态统一表征的示意图，来自不同模态的具有相同语义的特征被映射到不同的潜在代码中，而良好的统一表征（中间部分）则完全不同。右图显示，在下游任务中，模型将直接转移到未见过的模态中。</p>
+<h3 id="目前研究"><a href="#目前研究" class="headerlink" title="目前研究"></a>目前研究</h3><p>人类能自然地利用已经学习到的模态将有相似语义的模态联系在一起。</p>
+<p>受此启发，许多研究都在探索如何将不同的多模态信息整合到统一的语义空间中。</p>
+<p>这些语义空间可分为两类：</p>
+<ol>
+<li>隐性表征 ：<ol>
+<li>多种方法利用模态无关编码器去表示不同的模态</li>
+<li>使用对比学习将不同模态在高纬语义空间中拉近</li>
+</ol>
+</li>
+<li>显性表征<ol>
+<li>使用统一的编码本或原型来表示不同的模态，作为促进不同模态之间稳健对齐的桥梁。</li>
+</ol>
+</li>
+</ol>
+<p>本文的方法：两个关键方面是</p>
+<ol>
+<li>在不同模态中提取具有相同语义的信息，同时减少特定模态细节的影响；</li>
+<li>使用统一的编码本以共享语义表示这些不同的模态。</li>
+</ol>
+<h2 id="Model"><a href="#Model" class="headerlink" title="Model"></a>Model</h2><p><img src="C:\Githubpage\myblog\source\images\Multimodal\9_2.png"></p>
+<p>​                                                                                                     Figure 2</p>
+<h3 id="CMG任务"><a href="#CMG任务" class="headerlink" title="CMG任务"></a>CMG任务</h3><p>给定一组大小为 N 的成对多模态数据 $X &#x3D; {(x_i^A,x_i^B,x_i^C…)}^N_{i&#x3D;1}$  ，其中 A、B、C 等代表不同模态，跨模态泛化（CMG）任务的目的是在预训练阶段将这些不同模态映射到一个统一的离散空间中，使具有相同语义的离散潜在代码在不同模态之间共享。随后，在下游任务中，当只有一种模态（如模式 A）有注释信息时，模型可以根据预训练时获得的共享离散空间，将从 A 模态学到的知识转移到其他模态（如模式 B 和 C），从而实现零误差泛化能力。</p>
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>与以往简单地从成对模态中提取信息然后直接绘制地图的工作不同，我们认为<strong>统一表征的成功在于提取了与模态无关的语义特征</strong>。</p>
+<p>首先，我们引入了 DCID 模块，旨在提取细粒度语义信息，并将其从每种模态中相应的特定模态信息中分离出来。其次，我们通过 VQ-VAE 将提取的语义特征压缩为离散变量，确保压缩后的离散变量通过重构损失仍能包含原始语义信息。</p>
 
         </div>
 
@@ -371,7 +403,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2023/10/31/Visual-Instruction-Tuning/">http://example.com/2023/10/31/Visual-Instruction-Tuning/</a></span>
+                        <span><a href="http://example.com/2023/11/14/Achieving-Cross-Modal-Generalization/">http://example.com/2023/11/14/Achieving-Cross-Modal-Generalization/</a></span>
                     </p>
                 
                 
@@ -408,10 +440,10 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2023/11/14/Achieving-Cross-Modal-Generalization/">Achieving Cross Modal Generalization</a>
+                <a class="prev" rel="prev" href="/2023/11/16/NExT-GPT/">NExT-GPT</a>
             
             
-            <a class="next" rel="next" href="/2023/10/30/BLIVA/">BLIVA</a>
+            <a class="next" rel="next" href="/2023/10/31/Visual-Instruction-Tuning/">Visual Instruction Tuning</a>
             
         </section>
 
