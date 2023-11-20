@@ -357,6 +357,44 @@
 <li><strong>Multimodal instruction-following data.</strong>  其中一个主要挑战是缺乏视觉语言教学数据。我们提出了一种数据重组观点和管道，利用 ChatGPT&#x2F;GPT-4 <strong>将图像-文本对转换为适当的instruction-following格式。</strong></li>
 <li><strong>大型多模态模型</strong>。我们开发了一个大型多模态模型（LMM），将 CLIP [36] 的开放集视觉编码器与语言解码器 LLaMA 相连接，并在生成的视觉语言教学数据上对它们进行端对端微调。我们的实证研究验证了使用生成数据进行 LMM 指令调整的有效性，并为构建通用指令跟随视觉代理提出了实用建议。利用 GPT-4，我们在ScienceQA 多模态推理数据集上取得了一流的性能。</li>
 </ol>
+<h2 id="GPT辅助的instruction-following-data构建"><a href="#GPT辅助的instruction-following-data构建" class="headerlink" title="GPT辅助的instruction-following data构建"></a>GPT辅助的instruction-following data构建</h2><h3 id="1-一种天真的方式去将图像文本对拓展为instruction-following：Xq参见表8"><a href="#1-一种天真的方式去将图像文本对拓展为instruction-following：Xq参见表8" class="headerlink" title="1. 一种天真的方式去将图像文本对拓展为instruction-following：Xq参见表8"></a>1. 一种天真的方式去将图像文本对拓展为instruction-following：<strong>Xq参见表8</strong></h3><p>​	Human : Xq Xv<STOP>\n </p>
+<p>​	Assistant : Xc<STOP>\n.</p>
+<p>​	其中Xq是question，Xv是image，Xc是caption。</p>
+<p>​	但是这种简单的构建方式在instruction和response上都缺乏多样性和深度推理。</p>
+<h3 id="2-为了解决这个问题本文利用纯文本的GPT-4或者ChatGPT作为teacher去创造加入视觉内容的instruction-following数据。"><a href="#2-为了解决这个问题本文利用纯文本的GPT-4或者ChatGPT作为teacher去创造加入视觉内容的instruction-following数据。" class="headerlink" title="2. 为了解决这个问题本文利用纯文本的GPT-4或者ChatGPT作为teacher去创造加入视觉内容的instruction-following数据。"></a>2. 为了解决这个问题本文利用纯文本的GPT-4或者ChatGPT作为teacher去创造加入视觉内容的instruction-following数据。</h3><p>为了将图像编码为视觉特征，以提示纯文本 GPT，我们使用了两类符号表示：</p>
+<ul>
+<li>标题通常从不同角度描述视觉场景</li>
+<li>边框通常定位场景中的物体，每个边框编码物体概念及其空间位置。如表1上部分</li>
+</ul>
+<p><strong>通过将图片用符号化的语言表示就可以将图像特征传递给纯文本的大语言模型中。</strong></p>
+<p><img src="/../images/Multimodal/11_1.png"></p>
+<p><strong>下面这一步是最关键的生成instruction-following data。</strong></p>
+<h3 id="3-通过上述的符号表示法将图像编码为LLM可识别序列，使用coco图像生成3种instruction-following-data：表1下部"><a href="#3-通过上述的符号表示法将图像编码为LLM可识别序列，使用coco图像生成3种instruction-following-data：表1下部" class="headerlink" title="3. 通过上述的符号表示法将图像编码为LLM可识别序列，使用coco图像生成3种instruction-following data：表1下部"></a>3. 通过上述的符号表示法将图像编码为LLM可识别序列，使用coco图像生成3种instruction-following data：表1下部</h3><ul>
+<li><p>Conversation：我们设计了一段对话，对话内容是助理和一个就这张照片提问的人之间的对话。回答者的语气就像助手看到图片并回答问题一样。我们会就图片的视觉内容提出一系列不同的问题，包括物体类型、物体数量、物体动作、物体位置、物体之间的相对位置等。只有有明确答案的问题才会被考虑。如表10所示</p>
+<p><img src="/../images/Multimodal/11_4.png"></p>
+</li>
+<li><p>Detailed description：为了对一幅图像进行丰富而全面的描述，我们创建了一个具有这种意图的问题列表。我们会提示 GPT-4，然后对该列表进行整理，详见附录中的表 9。对于每张图片，我们从列表中随机抽取一个问题，要求 GPT-4 生成详细描述。</p>
+<p><img src="/../images/Multimodal/11_3.png"></p>
+</li>
+<li><p>Complex reasoning：上述两类问题主要针对视觉内容本身，在此基础上我们进一步创建深度推理问题。答案通常需要按照严密的逻辑进行逐步推理。</p>
+</li>
+</ul>
+<h2 id="model"><a href="#model" class="headerlink" title="model"></a>model</h2><p><img src="/../images/Multimodal/11_5.png"></p>
+<p>Language Model 选用LLAMA</p>
+<p>对于输入图像 Xv，我们考虑使用预先训练好的 CLIP 视觉编码器 ViT-L&#x2F;14 ，它能提供视觉特征 $Zv &#x3D; g(Xv)$。我们在实验中考虑了最后一个变换器层之前和之后的网格特征。<strong>用简单的线性层将图像特征连接到词嵌入空间</strong>。具体来说，我们应用可训练的投影矩阵 W 将 Zv 转换为语言嵌入标记 Hq，其维度与语言模型中的单词嵌入空间相同。<br>$$<br>Hv&#x3D;W*Zv, with Zv&#x3D;g(Xv)<br>$$<br>本文使用了最简单的投影层，后续可能会考虑使用Qformer等架构。</p>
+<h2 id="训练"><a href="#训练" class="headerlink" title="训练"></a>训练</h2><p>对于每个image $Xv$ ，本文生成多轮对话数据$(X_q^1,X_a^1,…,X_q^T,X_a^T)$ ，$T$ 是全部的轮次。将所有的answers作为助手的回应。</p>
+<p>$$<br>X_{instruct^t &#x3D; }\left{<br>\begin{aligned}<br>    &amp;\substack{\text{Random choose [$X_1^q,X_v$] or [$X_v,X_q^1$], the first turn t &#x3D; 1} \ } \<br>    &amp;\substack{\text{$X^t_q$, the remaining turns t&gt;1 } \ }<br>\end{aligned}<br>\right.<br>$$<br>这就形成了表 2 所示的多模态指令-跟读序列的统一格式。我们利用 LLM 最初的自动回归训练目标，对预测标记进行指令调整。</p>
+<p><img src="/../images/Multimodal/11_6.png"></p>
+<p>​                                                                         Table2 :用于训练模型的输入序列<br>$$<br>p(Xa|Xv,X{instruct})&#x3D; \prod_{i&#x3D;1}^{L} p_\theta(x_i; Xv,X{instruct},&lt;i,Xa,&lt;i)<br>$$<br>对于长度为 L 的序列，<strong>这里这个L的意思应该是L轮对话的意思，每一个x_i都是对应的一个答案。</strong>其中，θ 是可训练参数，$Xinstruct,&lt;i$ 和 $Xa,&lt;i $分别是当前预测标记 xi 之前所有回合中的指令和答案标记。我们明确添加了 Xv，以强调图像对所有答案都是有基础的这一事实。</p>
+<h3 id="一阶段特征对齐预训练"><a href="#一阶段特征对齐预训练" class="headerlink" title="一阶段特征对齐预训练"></a>一阶段特征对齐预训练</h3><p><img src="/../images/Multimodal/11_2.png"></p>
+<p>为了在概念覆盖率和训练效率之间取得平衡，我们将 CC3M 过滤为 595K 个图像-文本对。使用第 3 节中描述的天真扩展方法将这些对转换为指令跟随数据。每个样本都可视为一次单轮对话。为了构建 (2) 中的输入 Xinstruct，对于图像 Xv，随机抽取表 8 中的问题 Xq，该问题是要求助手简要描述图像的语言指令。<strong>预测答案 Xa 就是原始caption</strong>。在训练过程中，我们冻结视觉编码器和 LLM 权重，<strong>仅使用可训练参数 θ &#x3D; W（投影矩阵）最大化 的可能性</strong>。这样，图像特征 Hv 就能与预先训练的 LLM 词嵌入对齐。这一阶段可以理解为为冻结的 LLM 训练一个兼容的视觉标记器。</p>
+<h3 id="二阶段端到端微调"><a href="#二阶段端到端微调" class="headerlink" title="二阶段端到端微调"></a>二阶段端到端微调</h3><p>我们只冻结视觉编码器的权重，并在 LLaVA 中继续更新投影层和 LLM 的预训练权重；即可训练参数为θ &#x3D; {W, φ}投影层和LLM。我们考虑了两个具体的使用场景：</p>
+<ol>
+<li>多模态聊天机器人。我们通过对第 3 节中收集的 158K 条独特的语言图像指令跟踪数据进行微调，开发了一个聊天机器人。在三种类型的回复中，conversation是多轮回复，而其他两种是单轮回复。它们在训练中统一采样。-</li>
+<li>科学 QA。我们在 ScienceQA 基准上研究了我们的方法，这是第一个大规模多模态科学问题数据集，该数据集为答案注释了详细的讲座和解释。每个问题都有一个自然语言或图像形式的上下文。助手用自然语言提供推理过程，并从多个选项中选出答案。为了进行中的训练，我们将数据组织为单轮对话，问题和上下文为 $Xinstruct$，推理和答案为 Xa。</li>
+</ol>
+<h2 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h2><p><img src="/../images/Multimodal/11_7.png"></p>
+<p> LLaVA 根据问题和视觉输入图像预测答案。 GPT-4 根据问题、真实边界框和标题进行参考预测，标记教师模型的上限。在获得两个模型的响应后，我们将问题、视觉信息（以标题和边界框的格式）以及两个助手生成的响应提供给 GPT-4。 GPT-4 评估助理响应的有用性、相关性、准确性和详细程度，并给出 1 到 10 分的总体评分，其中评分越高表示整体表现越好。</p>
 
         </div>
 
