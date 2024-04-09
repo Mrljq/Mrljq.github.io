@@ -13,7 +13,7 @@
 
 
 
-<title>Blip-fine-tuning | Hexo</title>
+<title>BertAttack | Hexo</title>
 
 
 
@@ -326,7 +326,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Blip-fine-tuning</h1>
+            <h1 class="post-title">BertAttack</h1>
             
                 <div class="post-meta">
                     
@@ -335,14 +335,14 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">March 15, 2024&nbsp;&nbsp;13:04:42</a>
+                        Date: <a href="#">April 7, 2024&nbsp;&nbsp;16:08:35</a>
                         </span>
                     
                     
                         <span class="post-category">
                     Category:
                             
-                                <a href="/categories/fine-tuning/">fine-tuning</a>
+                                <a href="/categories/Attack/">Attack</a>
                             
                         </span>
                     
@@ -351,45 +351,53 @@
         </header>
 
         <div class="post-content">
-            <h1 id="官方微调"><a href="#官方微调" class="headerlink" title="官方微调"></a>官方微调</h1><h2 id="1-image-text-retrival-微调"><a href="#1-image-text-retrival-微调" class="headerlink" title="1. image-text retrival 微调"></a>1. image-text retrival 微调</h2><h3 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h3><figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python -m torch.distributed.run --nproc_per_node=<span class="number">8</span> train_retrieval.py \</span><br><span class="line">--config ./configs/retrieval_coco.yaml \</span><br><span class="line">--output_dir output/retrieval_coco </span><br></pre></td></tr></table></figure>
-
-<h3 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h3><ul>
-<li><p>retrieval_coco.yaml 文件如下</p>
+            <h1 id="BertAttack"><a href="#BertAttack" class="headerlink" title="BertAttack"></a>BertAttack</h1><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><h3 id="原先方法"><a href="#原先方法" class="headerlink" title="原先方法"></a>原先方法</h3><ol>
+<li>原先的攻击方式基于特定的规则，这样就不能同时保证生成的对抗样本语义一致并流畅。</li>
+<li>方法较为复杂</li>
+</ol>
+<h3 id="本方法"><a href="#本方法" class="headerlink" title="本方法"></a>本方法</h3><ol>
+<li>使用Bert作为语言模型去生成对抗样本。高效</li>
+</ol>
+<p><img src="/../images/Attack/1_1.png" alt="image-20240407161127638"></p>
+<h2 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h2><h3 id="首先找到句子中重要性大的单词："><a href="#首先找到句子中重要性大的单词：" class="headerlink" title="首先找到句子中重要性大的单词："></a>首先找到句子中重要性大的单词：</h3><p>$o_y$ 是模型预测概率   $S_{&#x2F;w_i} &#x3D; [w_0,…,w_{i-1},[MASK],w_{i+1},…]$<br>$$<br>I_{wi}&#x3D;o_y(S) - o_y(S_{&#x2F;w_i})<br>$$<br>所以最后值越大的就代表这个单词最易收到攻击，因为将其mask掉后概率很低。</p>
+<h3 id="用语义连贯的单词去替换这些单词"><a href="#用语义连贯的单词去替换这些单词" class="headerlink" title="用语义连贯的单词去替换这些单词:"></a>用语义连贯的单词去替换这些单词:</h3><p>这里并不会将i位置的单词mask掉然后让其预测，因为会产生这样的问题：</p>
 <ul>
-<li>pretrained：改为下载好的权重</li>
-<li>image_root：改为存放数据集图像的文件夹路径，并且该文件夹里要有三个子文件夹：test2014，train2014，val2014.（目的是与annotation文件里对于图像的路径保持一致）</li>
-<li>ann_root: 改为存放json文件的路径，其中包括coco_karpathy_train.json,coco_karpathy_test,coco_karpathy_val.json</li>
-</ul>
-<p>如下图所示，如果需要改变微调的超参可直接在其中修改。</p>
+<li><p>”I like the cat.” 将cat位置mask掉很难生成cat，因为生成”I like the dog.”同样是顺畅的。<strong>（不过按照代码实现的角度确实应该是mask了）</strong></p>
+</li>
+<li><p>计算代价大</p>
 </li>
 </ul>
-<p><img src="/../images/fine-tuning/1-1.png"></p>
+<p>因此将原始句子$S&#x3D;[w_0,w_1,…]$分词成sub-word $H&#x3D;[h_0,h_1,…]$ 将H输入ML model中得到概率P，这里不会直接取最大值而是取前K个值作为<strong>每一个位置</strong>的K个替换词。也就是最后生成一个$P^{\in n×K}$ 的矩阵，其中第i行代表第i个单词的前k位替换词。</p>
+<ol>
+<li><p><strong>参数解析</strong></p>
 <ul>
-<li><p>微调设置</p>
-<ul>
-<li>优化器：AdamW</li>
-<li>学习率使用余弦学习率安排</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">cosine_lr_schedule</span>(<span class="params">optimizer, epoch, max_epoch, init_lr, min_lr</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;Decay the learning rate&quot;&quot;&quot;</span></span><br><span class="line">    lr = (init_lr - min_lr) * <span class="number">0.5</span> * (<span class="number">1.</span> + math.cos(math.pi * epoch / max_epoch)) + min_lr</span><br><span class="line">    <span class="keyword">for</span> param_group <span class="keyword">in</span> optimizer.param_groups:</span><br><span class="line">        param_group[<span class="string">&#x27;lr&#x27;</span>] = lr</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><strong>微调参数量：vision encoder和bert encoder</strong></li>
-</ul>
-</li>
-</ul>
-<h2 id="2-image-text-captioning-微调"><a href="#2-image-text-captioning-微调" class="headerlink" title="2. image-text captioning 微调"></a>2. image-text captioning 微调</h2><figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -m torch.distributed.run --nproc_per_node=<span class="number">8</span> train_caption.py </span><br></pre></td></tr></table></figure>
-
-<h2 id="3-VQA-微调"><a href="#3-VQA-微调" class="headerlink" title="3. VQA 微调"></a>3. VQA 微调</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -m torch.distributed.run --nproc_per_node=16 train_vqa.py </span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>微调设置<ul>
-<li><strong>微调参数：vision encoder和bert decoder</strong></li>
+<li>sub-word：例如一个句子[‘i’,’like’,’dog’],sub-word就是将’dog’这样的单词进行第一次分词，BERT采取的BPE来进行分词，因此结果可能导致一个单词分词后成两个token。针对这种情况本文分开进行处理：<ul>
+<li>single word：将K个候选词进行第一次过滤去除其中的停顿词。（不同任务清理的也不同）替换后进行测试是否攻击成功。</li>
+<li>sub-word：如果一个单词被分成$[h_0,h_1,…,h_t]$ ,那么对应P部分该单词的token候选应该是$R\in t*K$ ，可以得到$K^t$个token组合将其转换成正常单词后计算困惑度得到前K个组合，从而找到合适的子词组合。</li>
 </ul>
 </li>
 </ul>
-<h2 id="4-NLVR2-微调"><a href="#4-NLVR2-微调" class="headerlink" title="4. NLVR2 微调"></a>4. NLVR2 微调</h2><figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -m torch.distributed.run --nproc_per_node=<span class="number">16</span> train_nlvr.py </span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>代码实现</strong></p>
+</li>
+</ol>
+<p>获得可替换词P：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sub_words = [<span class="string">&#x27;[CLS]&#x27;</span>] + sub_words[:max_length - <span class="number">2</span>] + [<span class="string">&#x27;[SEP]&#x27;</span>]</span><br><span class="line">input_ids_ = torch.tensor([tokenizer.convert_tokens_to_ids(sub_words)])</span><br><span class="line"><span class="comment">#这一步就是将sub_words变成[103,1023,..]这样的形式，其实和直接编码结果一样</span></span><br><span class="line">word_predictions = mlm_model(input_ids_.to(<span class="string">&#x27;cuda&#x27;</span>))[<span class="number">0</span>].squeeze()  <span class="comment"># seq-len(sub) vocab</span></span><br><span class="line"><span class="comment">#将句子输入到MLM model里，例如input_ids_ = [10,12,312]有三个token，那么最后生成3*30155的矩阵，就是每个位置预测结果</span></span><br><span class="line">word_pred_scores_all, word_predictions = torch.topk(word_predictions, k, -<span class="number">1</span>)  <span class="comment"># seq-len k</span></span><br><span class="line">word_predictions = word_predictions[<span class="number">1</span>:<span class="built_in">len</span>(sub_words) + <span class="number">1</span>, :]</span><br><span class="line">word_pred_scores_all = word_pred_scores_all[<span class="number">1</span>:<span class="built_in">len</span>(sub_words) + <span class="number">1</span>, :]</span><br></pre></td></tr></table></figure>
 
-<h2 id="执行效果"><a href="#执行效果" class="headerlink" title="执行效果"></a>执行效果</h2><p><img src="/../images/fine-tuning/1_2.png"></p>
+
+
+<h3 id="总览"><a href="#总览" class="headerlink" title="总览"></a>总览</h3><p><img src="/../images/Attack/1_2.png" alt="image-20240407164028760"></p>
+<h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><p><img src="/../images/Attack/1_3.png" alt="image-20240409145849106"></p>
+<ul>
+<li>Perturb：扰动率，越小说明语义一致性越强</li>
+<li>Original Acc 和 Attacked Acc：原始成功率和攻击后成功率，两者对比</li>
+<li>Query Number：黑盒模型查询次数</li>
+<li>Avg Len：句子平均长度，越长理论上需要查询次数越多。</li>
+</ul>
+<p>人工评价：</p>
+<p><img src="/../images/Attack/1_4.png" alt="image-20240409151256944"></p>
+<p>K值选取:</p>
+<p><img src="/../images/Attack/1_5.png" alt="image-20240409151502200"></p>
 
         </div>
 
@@ -404,7 +412,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2024/03/15/Blip-fine-tuning/">http://example.com/2024/03/15/Blip-fine-tuning/</a></span>
+                        <span><a href="http://example.com/2024/04/07/BertAttack/">http://example.com/2024/04/07/BertAttack/</a></span>
                     </p>
                 
                 
@@ -428,7 +436,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/fine-tuning/"># fine-tuning</a>
+                        <a href="/tags/Attack/"># Attack</a>
                     
                         
                 </span>
@@ -441,10 +449,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2024/04/07/BertAttack/">BertAttack</a>
             
-            
-            <a class="next" rel="next" href="/2023/12/20/modelarts-data/">modelarts_data</a>
+            <a class="next" rel="next" href="/2024/03/15/Blip-fine-tuning/">Blip-fine-tuning</a>
             
         </section>
 
