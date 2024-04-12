@@ -351,7 +351,7 @@
         </header>
 
         <div class="post-content">
-            <h1 id="VQAttack"><a href="#VQAttack" class="headerlink" title="VQAttack"></a>VQAttack</h1><p><img src="/../images/attack/2_1.png" alt="image-20240412123135698"></p>
+            <h1 id="VQAttack"><a href="#VQAttack" class="headerlink" title="VQAttack"></a>VQAttack</h1><p><img src="/../images/Attack/2_1.png" alt="image-20240412123135698"></p>
 <h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h2><ol>
 <li>现在多模态模型遵循 预训练-微调范式。在进行VQA任务时，微调的数据在预训练中没有见到过，并且微调的模型结构可能与预训练模型有差异。导致可转移性上有问题。</li>
 <li>单模态攻击比较成熟但是对于连续图像数值和离散文本的多模态攻击并没有充分探究。</li>
@@ -359,13 +359,13 @@
 <h2 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h2><p>使用一个预训练模型去生成图像和文本的对抗样本，在各种微调模型中测试。这里的微调模型是任意的，黑箱的。</p>
 <h3 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h3><p>用$F$ 来代表预训练模型，$S$ 代表下游微调模型，在预训练模型上用干净的$(I,T)$ 图像文本对生成对抗图像文本对$(\hat{I},\hat{T})$</p>
 <p>使得 $S(\hat{I},\hat{T}) \notin Y$ ，由于正确答案不一定是一个所以$Y$是正确答案的集合。</p>
-<p><img src="/../images/attack/2_2.png" alt="image-20240412125539754"></p>
-<h2 id="算法流程"><a href="#算法流程" class="headerlink" title="算法流程"></a>算法流程</h2><p><img src="/../images/attack/2_5.png" alt="image-20240412130805743"></p>
-<h3 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h3><p><img src="/../images/attack/2_3.png" alt="image-20240412125850044"></p>
+<p><img src="/../images/Attack/2_2.png" alt="image-20240412125539754"></p>
+<h2 id="算法流程"><a href="#算法流程" class="headerlink" title="算法流程"></a>算法流程</h2><p><img src="/../images/Attack/2_5.png" alt="image-20240412130805743"></p>
+<h3 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h3><p><img src="/../images/Attack/2_3.png" alt="image-20240412125850044"></p>
 <p>和VlAttack类似，其中$ L_p$ 和$ L_q $分别表示图像编码器和多模态编码器的层数。$D_p$ 和$ D_q$ 分别表示图像编码器和多模态编码器的输入标记数。对于图像编码器，输入标记是图像片段；而多模态编码器则将图像片段和文本词的表示作为输入标记。$f^p_{i,j}$和$f^q_{i,j}$ 是第 i 层第 j 个标记的输出特征表示向量</p>
-<p><img src="/../images/attack/2_4.png" alt="image-20240412130221269"></p>
+<p><img src="/../images/Attack/2_4.png" alt="image-20240412130221269"></p>
 <p>将句子，正确标签和prompt传给chatgpt来生成扰动句子，并将正确标签位置的单词mask掉，N代表正确标签个数，由于正确的标签不一定是一个单词因此生成时，一个token一个token生成，让其概率最小。$z_{m,i,j}$代表第i个标签句子的第j个位置token。</p>
-<p><img src="/../images/attack/2_6.png" alt="image-20240412133759305"></p>
+<p><img src="/../images/Attack/2_6.png" alt="image-20240412133759305"></p>
 <h3 id="算法总结"><a href="#算法总结" class="headerlink" title="算法总结"></a>算法总结</h3><p>对于图像应该是分两步进行梯度优化，第一步直接根据原始图像和扰动图像的</p>
 <ul>
 <li>联合攻击</li>
