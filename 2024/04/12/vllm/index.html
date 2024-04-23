@@ -13,7 +13,7 @@
 
 
 
-<title>VQAttack | Hexo</title>
+<title>A800部署 | Hexo</title>
 
 
 
@@ -326,7 +326,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">VQAttack</h1>
+            <h1 class="post-title">A800部署</h1>
             
                 <div class="post-meta">
                     
@@ -335,14 +335,14 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">April 12, 2024&nbsp;&nbsp;12:30:05</a>
+                        Date: <a href="#">April 12, 2024&nbsp;&nbsp;15:27:35</a>
                         </span>
                     
                     
                         <span class="post-category">
                     Category:
                             
-                                <a href="/categories/Attack/">Attack</a>
+                                <a href="/categories/blogs/">blogs</a>
                             
                         </span>
                     
@@ -351,29 +351,27 @@
         </header>
 
         <div class="post-content">
-            <h1 id="VQAttack"><a href="#VQAttack" class="headerlink" title="VQAttack"></a>VQAttack</h1><p><img src="/../images/Attack/2_1.png" alt="image-20240412123135698"></p>
-<h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h2><ol>
-<li>现在多模态模型遵循 预训练-微调范式。在进行VQA任务时，微调的数据在预训练中没有见到过，并且微调的模型结构可能与预训练模型有差异。导致可转移性上有问题。</li>
-<li>单模态攻击比较成熟但是对于连续图像数值和离散文本的多模态攻击并没有充分探究。</li>
-</ol>
-<h2 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h2><p>使用一个预训练模型去生成图像和文本的对抗样本，在各种微调模型中测试。这里的微调模型是任意的，黑箱的。</p>
-<h3 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h3><p>用$F$ 来代表预训练模型，$S$ 代表下游微调模型，在预训练模型上用干净的$(I,T)$ 图像文本对生成对抗图像文本对$(\hat{I},\hat{T})$</p>
-<p>使得 $S(\hat{I},\hat{T}) \notin Y$ ，由于正确答案不一定是一个所以$Y$是正确答案的集合。</p>
-<p><img src="/../images/Attack/2_2.png" alt="image-20240412125539754"></p>
-<h2 id="算法流程"><a href="#算法流程" class="headerlink" title="算法流程"></a>算法流程</h2><p><img src="/../images/Attack/2_5.png" alt="image-20240412130805743"></p>
-<h3 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h3><p><img src="/../images/Attack/2_3.png" alt="image-20240412125850044"></p>
-<p>和VlAttack类似，其中$ L_p$ 和$ L_q $分别表示图像编码器和多模态编码器的层数。$D_p$ 和$ D_q$ 分别表示图像编码器和多模态编码器的输入标记数。对于图像编码器，输入标记是图像片段；而多模态编码器则将图像片段和文本词的表示作为输入标记。$f^p_{i,j}$和$f^q_{i,j}$ 是第 i 层第 j 个标记的输出特征表示向量</p>
-<p><img src="/../images/Attack/2_4.png" alt="image-20240412130221269"></p>
-<p>将句子，正确标签和prompt传给chatgpt来生成扰动句子，并将正确标签位置的单词mask掉，N代表正确标签个数，由于正确的标签不一定是一个单词因此生成时，一个token一个token生成，让其概率最小。$z_{m,i,j}$代表第i个标签句子的第j个位置token。</p>
-<p><img src="/../images/Attack/2_6.png" alt="image-20240412133759305"></p>
-<h3 id="算法总结"><a href="#算法总结" class="headerlink" title="算法总结"></a>算法总结</h3><p>对于图像应该是分两步进行梯度优化，第一步直接根据原始图像和扰动图像的</p>
-<ul>
-<li>联合攻击</li>
+            <h1 id="bert分类器"><a href="#bert分类器" class="headerlink" title="bert分类器"></a>bert分类器</h1><p>分类器用于将输入的字符串判断是传入训练的llama模型还是数据库。是一个二元分类且 1是数据库，0是llama（1是化工知识，0是日常问答）</p>
+<p><strong>在推理时和训练时传入的x有区别，因为训练过程中Dataloader会按照batch抽取数据且将他们分词结果处理成tensor形式。但是我们正常回答过程中，没有batch，也没有处理成tensor，所以需要改成如下形式（forward改就行）</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="keyword">from</span> transformers <span class="keyword">import</span> AutoModel</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyNetwork</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, args, freeze=<span class="literal">False</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(MyNetwork, self).__init__()</span><br><span class="line">        self.num_classes = args.num_classes<span class="comment">#2</span></span><br><span class="line">        self.bert_dim = args.bert_dim<span class="comment">#768</span></span><br><span class="line"></span><br><span class="line">        self.bert = AutoModel.from_pretrained(args.model_type)</span><br><span class="line">        self.fc = nn.Linear(self.bert_dim, self.num_classes)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> freeze:</span><br><span class="line">            <span class="keyword">for</span> name, param <span class="keyword">in</span> self.bert.named_parameters():</span><br><span class="line">                param.requires_grad = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># self.init_weights()</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        <span class="comment"># print(x)</span></span><br><span class="line">        outputs = self.bert(torch.tensor(x[<span class="string">&#x27;input_ids&#x27;</span>]).unsqueeze(<span class="number">0</span>).cuda(), torch.tensor(x[<span class="string">&#x27;attention_mask&#x27;</span>]).unsqueeze(<span class="number">0</span>).cuda(), torch.tensor(x[<span class="string">&#x27;token_type_ids&#x27;</span>]).unsqueeze(<span class="number">0</span>).cuda())</span><br><span class="line">        out = self.fc(outputs.last_hidden_state[:, <span class="number">0</span>, :])</span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">t</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        self.bert_dim = <span class="number">768</span></span><br><span class="line">        self.num_classes = <span class="number">2</span></span><br><span class="line">        self.model_type = <span class="string">&#x27;/data/lijiaqi/MultimodalAttack/BERT-Attack/model/bert-base-uncased&#x27;</span></span><br><span class="line">        </span><br><span class="line">args = t()</span><br><span class="line">model = MyNetwork(args=args)</span><br><span class="line">model.to(<span class="string">&#x27;cuda&#x27;</span>)</span><br><span class="line"><span class="keyword">from</span> transformers <span class="keyword">import</span> AutoTokenizer</span><br><span class="line">tokenizer = AutoTokenizer.from_pretrained(args.model_type)</span><br><span class="line"><span class="keyword">import</span> torch</span><br><span class="line">t = tokenizer(<span class="string">&#x27;洛阳在哪个国家?&#x27;</span>, truncation=<span class="literal">True</span>, padding=<span class="string">&quot;max_length&quot;</span>, max_length=<span class="number">128</span>)</span><br><span class="line">model(t)</span><br><span class="line"><span class="comment">#tensor([[0.8523, 0.2502]], device=&#x27;cuda:0&#x27;, grad_fn=&lt;AddmmBackward0&gt;)</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="VLLM-使用"><a href="#VLLM-使用" class="headerlink" title="VLLM 使用"></a>VLLM 使用</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> vllm <span class="keyword">import</span> LLM</span><br><span class="line"></span><br><span class="line">llm = LLM(model=<span class="string">&quot;/data/lijiaqi/chem/data/plm/output/20240315_chem_generalandchem_60000_merge&quot;</span>,gpu_memory_utilization=<span class="number">0.4</span>,swap_space=<span class="number">20</span>)  <span class="comment"># swap_space这个参数小的话容易爆。gpu_memory_utilization这个参数大的话容易爆。</span></span><br><span class="line">output = llm.generate([<span class="string">&quot;Hello, my name is&quot;</span>])</span><br><span class="line"><span class="built_in">print</span>(output[<span class="number">0</span>].outputs[<span class="number">0</span>].text)</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="整体"><a href="#整体" class="headerlink" title="整体"></a>整体</h1><ul>
+<li>加载分类器</li>
+<li>将网页的输入传入分类器</li>
 </ul>
-<p>​	联合扰动中，使用NLTK工具包过滤掉所有停滞词得到一个集合{$t_i|i\in W$}，然后用BERT-Attack对这i个标记按照相似性生成前k个候选词。得到一个候选序列$C &#x3D; {c_{i,j}|1\le j \le K}_{i\in W}$</p>
-<p>由于单词在文本编码器中应该是token形式的，因此根据$L^m_c$损失可以得到第i个token的梯度，使用这个梯度和其的单词嵌入$E(t_i)$就可以得到估计更有希望的候选词 $E(\hat{t_i})&#x3D;E(t_i)+\delta L_c^m(t_i)$ ,从$t_i$的候选词中找到与$E(\hat{t_i})$ 余弦相似度最大的单词即可。</p>
-<p>$y_{i,j}&#x3D;\cos(E(\hat{t_i}),E(c_{i,j}))$</p>
-<p>用上述公式对候选词进行排序得到$R(c)$，用最大的词替换句子中的单词，检查其是否满足$\cos(U(\hat T^{\prime}_{m-1}),U(T))&gt;\sigma$ 满足就替换并在$R(c)$中删除这个单词的所有同义词然后移至下一个信息词</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">t = tokenizer(<span class="string">&#x27;给定一张山脉的照片，创作一首有关景色的俳句。&#x27;</span>, truncation=<span class="literal">True</span>, padding=<span class="string">&quot;max_length&quot;</span>, max_length=<span class="number">128</span>,return_tensors=<span class="string">&quot;pt&quot;</span>)<span class="comment">#</span></span><br><span class="line">model(t)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>根据分类</li>
+</ul>
 
         </div>
 
@@ -388,7 +386,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2024/04/12/VQAttack/">http://example.com/2024/04/12/VQAttack/</a></span>
+                        <span><a href="http://example.com/2024/04/12/vllm/">http://example.com/2024/04/12/vllm/</a></span>
                     </p>
                 
                 
@@ -412,7 +410,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/Attack/"># Attack</a>
+                        <a href="/tags/blogs/"># blogs</a>
                     
                         
                 </span>
@@ -425,10 +423,10 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2024/04/12/vllm/">A800部署</a>
+                <a class="prev" rel="prev" href="/2024/04/23/SSP/">SSP.md</a>
             
             
-            <a class="next" rel="next" href="/2024/04/07/BertAttack/">BertAttack</a>
+            <a class="next" rel="next" href="/2024/04/12/VQAttack/">VQAttack</a>
             
         </section>
 

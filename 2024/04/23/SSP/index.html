@@ -13,7 +13,7 @@
 
 
 
-<title>Archives | Hexo</title>
+<title>SSP.md | Hexo</title>
 
 
 
@@ -254,107 +254,172 @@
     }
 </script>
             <div class="main">
-                <div class="post-wrap archive">
+                <div class="container">
     
     
-        
-
-        
-            <h3>2023</h3>
-        
-
-        <article class="archive-item">
-            <a class="archive-item-link" href="/2023/10/30/BLIVA/">BLIVA</a>
-            <span class="archive-item-date">October 30, 2023</span>
-        </article>
-    
-        
-
-        
-
-        <article class="archive-item">
-            <a class="archive-item-link" href="/2023/10/29/X-LLM/">X-LLM</a>
-            <span class="archive-item-date">October 29, 2023</span>
-        </article>
-    
-        
-
-        
-
-        <article class="archive-item">
-            <a class="archive-item-link" href="/2023/10/27/BERT/">BERT</a>
-            <span class="archive-item-date">October 27, 2023</span>
-        </article>
-    
-        
-
-        
-
-        <article class="archive-item">
-            <a class="archive-item-link" href="/2023/10/22/Typora%E6%BF%80%E6%B4%BB/">Typora激活</a>
-            <span class="archive-item-date">October 22, 2023</span>
-        </article>
-    
-        
-
-        
-
-        <article class="archive-item">
-            <a class="archive-item-link" href="/2023/10/22/%E6%95%B0%E5%AD%A6%E6%8B%89%E4%B8%81%E5%AD%97%E7%AC%A6/">数学拉丁字符</a>
-            <span class="archive-item-date">October 22, 2023</span>
-        </article>
-    
-        
-
-        
-
-        <article class="archive-item">
-            <a class="archive-item-link" href="/2023/10/22/%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%8C%82%E6%A2%AF%E5%AD%90/">服务器挂梯子</a>
-            <span class="archive-item-date">October 22, 2023</span>
-        </article>
-    
-        
-
-        
-
-        <article class="archive-item">
-            <a class="archive-item-link" href="/2023/10/20/Swin-Transformer-V2/">Swin Transformer V2</a>
-            <span class="archive-item-date">October 20, 2023</span>
-        </article>
-    
-        
-
-        
-
-        <article class="archive-item">
-            <a class="archive-item-link" href="/2023/10/18/%E6%95%B0%E6%8D%AE%E9%9B%86%E5%A4%84%E7%90%86/">数据集处理</a>
-            <span class="archive-item-date">October 18, 2023</span>
-        </article>
-    
-        
-
-        
-
-        <article class="archive-item">
-            <a class="archive-item-link" href="/2023/10/18/image-text-retrieval/">image text retrieval</a>
-            <span class="archive-item-date">October 18, 2023</span>
-        </article>
-    
-        
-
-        
-
-        <article class="archive-item">
-            <a class="archive-item-link" href="/2023/10/17/clip/">clip</a>
-            <span class="archive-item-date">October 17, 2023</span>
-        </article>
-    
-    
-    <nav class="pagination">
-        <a class="page-number" href="/archives/">1</a><span class="page-number current">2</span><a class="page-number" href="/archives/page/3/">3</a><a class="page-number" href="/archives/page/4/">4</a>
-    </nav>
-
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
 </div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">SSP.md</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jiaqi Li</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">April 23, 2024&nbsp;&nbsp;9:57:47</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/Attack/">Attack</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="A-Self-supervised-Approach-for-Adversarial-Robustness（CVPR-2020）"><a href="#A-Self-supervised-Approach-for-Adversarial-Robustness（CVPR-2020）" class="headerlink" title="A Self-supervised Approach for Adversarial Robustness（CVPR 2020）"></a>A Self-supervised Approach for Adversarial Robustness（CVPR 2020）</h1><p><img src="/..%5Cimages%5Cattack%5C3_1.png" alt="image-20240423095955449"></p>
+<h2 id="攻击部分"><a href="#攻击部分" class="headerlink" title="攻击部分"></a>攻击部分</h2><p><img src="/..%5Cimages%5Cattack%5C3_2.png" alt="image-20240423100023925"></p>
+<ul>
+<li>n是模型的第n层输出特征</li>
+</ul>
+<h2 id="防御部分"><a href="#防御部分" class="headerlink" title="防御部分"></a>防御部分</h2><p><img src="/..%5Cimages%5Cattack%5C3_3.png" alt="image-20240423100035201"></p>
+<ul>
+<li>这里$C_\Phi$输出应该是一个值可能为错误图像的概率，这样随着$P_\theta$将对抗图像优化的越来越像真图，差值减小，loss下降。</li>
+</ul>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Jiaqi Li</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://example.com/2024/04/23/SSP/">http://example.com/2024/04/23/SSP/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Attack/"># Attack</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2024/04/12/vllm/">A800部署</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
             </div>
             <footer id="footer" class="footer">
     <div class="copyright">
