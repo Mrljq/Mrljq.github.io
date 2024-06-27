@@ -13,7 +13,7 @@
 
 
 
-<title>SSP.md | Hexo</title>
+<title>m | Hexo</title>
 
 
 
@@ -326,7 +326,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">SSP.md</h1>
+            <h1 class="post-title">m</h1>
             
                 <div class="post-meta">
                     
@@ -335,7 +335,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">April 23, 2024&nbsp;&nbsp;9:57:47</a>
+                        Date: <a href="#">June 27, 2024&nbsp;&nbsp;22:47:44</a>
                         </span>
                     
                     
@@ -351,15 +351,47 @@
         </header>
 
         <div class="post-content">
-            <h1 id="A-Self-supervised-Approach-for-Adversarial-Robustness（CVPR-2020）"><a href="#A-Self-supervised-Approach-for-Adversarial-Robustness（CVPR-2020）" class="headerlink" title="A Self-supervised Approach for Adversarial Robustness（CVPR 2020）"></a>A Self-supervised Approach for Adversarial Robustness（CVPR 2020）</h1><p><img src="/..%5Cimages%5Cattack%5C3_1.png" alt="image-20240423095955449"></p>
-<h2 id="攻击部分"><a href="#攻击部分" class="headerlink" title="攻击部分"></a>攻击部分</h2><p><img src="/..%5Cimages%5Cattack%5C3_2.png" alt="image-20240423100023925"></p>
+            <h1 id="Mutual-Modality-Adversarial-Attack-with-Semantic-Perturbation"><a href="#Mutual-Modality-Adversarial-Attack-with-Semantic-Perturbation" class="headerlink" title="Mutual-Modality Adversarial Attack with Semantic Perturbation"></a>Mutual-Modality Adversarial Attack with Semantic Perturbation</h1><h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h2><p>当前的DNN网络虽然取得了巨大的成就，但是一点扰动就可能使他们产生错误的分类。目前的方法大多使用白盒方法进行攻击，但是现实情况往往无法获得模型的权重，因此白盒攻击不如黑盒攻击现实。并且目前的技术主要是通过选择一个合适的替代模型，但是替代模型不但不稳定并且与目标网络的差距往往很大。<strong>因此仔细选择一个合适的替代模型就成了一个关键问题。</strong></p>
+<p><img src="/../images/Attack/5_1.png" alt="image-20240625194208398"></p>
+<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><p><img src="/../images/Attack/5_2.png"></p>
+<p>对抗样本$x^{\prime}_i$按照如下公式获取：<br>$$<br>x^{\prime}_i&#x3D;min(x_i+\epsilon,max(\mathcal G(x_i),x_i-\epsilon))<br>$$<br>其中$\epsilon$是最大扰动限制。$\mathcal G(x_i)$代表生成的有边界对抗样本。</p>
+<p>攻击黑盒模型的目标就是最大化如下公式：<br>$$<br>\sum 1 <em>{y^{\prime}\neq y</em>{true}}|y^{\prime} \leftarrow \mathcal{M^p}[\mathcal{G}(x_i)],x_i\in \mathcal{D}^p,\mathcal{M}^p\in \mathcal{M}<br>$$<br>$y_{true}$是输入的正确标签，$\mathcal{M}$是目标模型集合。</p>
+<p><img src="/../images/Attack/5_3.png" alt="image-20240625210741743"></p>
+<p>$E_t$是CLIP的文本编码器$E_i$是CLIP的图像编码器，$X_t&#x3D;{x^0_t,x_t^1,…,x_t^{C-1}}$是为每一类标签c生成的文本嵌入。</p>
+<p><img src="/../images/Attack/5_4.png" alt="image-20240625211301518"></p>
+<p>$\mathcal{P}(.)$是文本输入的提示调整函数。</p>
 <ul>
-<li>n是模型的第n层输出特征</li>
+<li>优化$\mathcal{G}$是通过最小化干净图像和对抗图像的余弦相似度实现。</li>
+<li>优化$\mathcal{P}$是通过调整$\mathcal{P}(x_t)$使其能重新和对抗图像匹配上。</li>
+<li>通过迭代训练获得一个扰动网络$\mathcal{G}$</li>
 </ul>
-<h2 id="防御部分"><a href="#防御部分" class="headerlink" title="防御部分"></a>防御部分</h2><p><img src="/..%5Cimages%5Cattack%5C3_3.png" alt="image-20240423100035201"></p>
+<h3 id="Visual-Attack-with-Semantic-Perturbation"><a href="#Visual-Attack-with-Semantic-Perturbation" class="headerlink" title="Visual Attack with Semantic Perturbation"></a>Visual Attack with Semantic Perturbation</h3><h4 id="一"><a href="#一" class="headerlink" title="一"></a>一</h4><p><img src="/../images/Attack/5_5.png" alt="image-20240625212053259"></p>
+<p>这一步通过最大化CLIP图像编码器所提取出的扰动图像特征和干净特征的相似度来实现，使用MSE损失。</p>
+<h4 id="二"><a href="#二" class="headerlink" title="二"></a>二</h4><p>通过一个给定的prompt和标签来构造文本输入，然后使用CLIP的文本编码器提取表征按照如下公式进行最大化特征</p>
+<p><img src="/../images/Attack/5_6.png" alt="image-20240625215727594"></p>
+<p>先选择出与干净文本输入最不接近的扰动文本，拉近扰动的图像特征和它的距离，$\alpha$用于设定扰动的图像表征和正确答案的距离不能过低也不会过高。</p>
+<h4 id="三"><a href="#三" class="headerlink" title="三"></a>三</h4><p><img src="/../images/Attack/5_7.png" alt="image-20240625221851353"></p>
+<p>分类损失，$H_{CE}(.)$是标准交叉熵损失，Clip(.)是输出的概率</p>
+<h3 id="Textual-Defense-with-Prompt-Updating"><a href="#Textual-Defense-with-Prompt-Updating" class="headerlink" title="Textual Defense with Prompt Updating"></a>Textual Defense with Prompt Updating</h3><p><img src="/../images/Attack/5_8.png" alt="image-20240625223940463"></p>
+<p><img src="/../images/Attack/5_9.png" alt="image-20240625225705746"></p>
 <ul>
-<li>这里$C_\Phi$输出应该是一个值可能为错误图像的概率，这样随着$P_\theta$将对抗图像优化的越来越像真图，差值减小，loss下降。</li>
+<li>$X_l&#x3D;&lt;CLASS(c)&gt;,X_p&#x3D;{v_1,v_2,…,v_m}$。文本输入其实由这两部分组成，即标签和提示模板，在更新时按照如下方式更新：</li>
 </ul>
+<p><img src="/../images/Attack/5_10.png" alt="image-20240625225631640"></p>
+<ul>
+<li>只更新提示模板，通过最大化扰动图像嵌入和这个文本的距离找到最合适的提示模板。（<strong>相当于每一个lable一个句子，然后只优化每个句子后面的模板部分</strong>）由于直接学习每一个文本的最佳标记是不合适的，因此通过计算突出得分，选取合适的单词：</li>
+</ul>
+<p><img src="/../images/Attack/5_11.png" alt="image-20240626170443398"></p>
+<p>（Generating Natural Language Adversarial Examples through Probability Weighted Word Saliency）</p>
+<ul>
+<li>将其中得分超过阈值的token放到一个集合中，从一个候选集合中替换更新集合的单词（这里是使用GPT-2生成候选单词）：</li>
+</ul>
+<p><img src="/../images/Attack/5_12.png" alt="image-20240626173342235"></p>
+<p>这里应该是括号位置错了，目的应该是替换后的句子的正确概率和mask句子的概率之差的最大，因为差的越大说明这个替换越接近，也就是防御了。</p>
+<h2 id="Experience"><a href="#Experience" class="headerlink" title="Experience"></a>Experience</h2><ul>
+<li>消融实验</li>
+</ul>
+<p><img src="/../images/Attack/5_13.png" alt="image-20240626173844932"></p>
 
         </div>
 
@@ -374,7 +406,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2024/04/23/SSP/">http://example.com/2024/04/23/SSP/</a></span>
+                        <span><a href="http://example.com/2024/06/27/Mutual-Modality_Adversarial_Attack_with_Semantic_Perturbation/">http://example.com/2024/06/27/Mutual-Modality_Adversarial_Attack_with_Semantic_Perturbation/</a></span>
                     </p>
                 
                 
@@ -411,10 +443,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2024/06/27/FDA/">FDA</a>
             
-            
-            <a class="next" rel="next" href="/2024/04/12/vllm/">A800部署</a>
+            <a class="next" rel="next" href="/2024/06/27/FDA/">FDA</a>
             
         </section>
 

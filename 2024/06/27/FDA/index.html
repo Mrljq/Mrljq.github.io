@@ -13,7 +13,7 @@
 
 
 
-<title>SSP.md | Hexo</title>
+<title>FDA | Hexo</title>
 
 
 
@@ -326,7 +326,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">SSP.md</h1>
+            <h1 class="post-title">FDA</h1>
             
                 <div class="post-meta">
                     
@@ -335,7 +335,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">April 23, 2024&nbsp;&nbsp;9:57:47</a>
+                        Date: <a href="#">June 27, 2024&nbsp;&nbsp;22:39:21</a>
                         </span>
                     
                     
@@ -351,15 +351,37 @@
         </header>
 
         <div class="post-content">
-            <h1 id="A-Self-supervised-Approach-for-Adversarial-Robustness（CVPR-2020）"><a href="#A-Self-supervised-Approach-for-Adversarial-Robustness（CVPR-2020）" class="headerlink" title="A Self-supervised Approach for Adversarial Robustness（CVPR 2020）"></a>A Self-supervised Approach for Adversarial Robustness（CVPR 2020）</h1><p><img src="/..%5Cimages%5Cattack%5C3_1.png" alt="image-20240423095955449"></p>
-<h2 id="攻击部分"><a href="#攻击部分" class="headerlink" title="攻击部分"></a>攻击部分</h2><p><img src="/..%5Cimages%5Cattack%5C3_2.png" alt="image-20240423100023925"></p>
+            <h1 id="FDA"><a href="#FDA" class="headerlink" title="FDA"></a>FDA</h1><h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h2><p>在攻击Deep Neural Networks（DNN）时，<strong>大多数现存工作的做法是通过优化网络的softmax或者pre-softmax的输出来进行攻击的，但这样做会导致网络每一层所提取到的特征不会被完全打破，而保留一些特征。</strong>如下图（用feature inversion技术可视化）：</p>
+<p><img src="/../images/Attack/4_1.png"></p>
+<p>因此文本提出FDA攻击来解决这一问题。</p>
+<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><p>FDA 会产生扰动，目的是以有原则的方式破坏<strong>网络各层的特征</strong>。这将导致深层特征的破坏，进而降低网络的性能。</p>
+<p>将对抗样本$\tilde{x}$定义为如下形式：<br>$$<br>argmax(f(\tilde{x}))\ne y_{GT} \quad &amp; \quad d(x,\tilde{x})&lt;\epsilon<br>$$<br>其中分类器$f:x\in R^m \rightarrow y \in Y^c$。$x$是$m$维的输入，$y$是$c$维的pre-softmax输出，$y_{GT}$是标准答案。</p>
+<h3 id="全新的评价指标"><a href="#全新的评价指标" class="headerlink" title="全新的评价指标"></a>全新的评价指标</h3><p>只看愚弄率并不能反映攻击的全貌。一方面，PGD-ML 等攻击可能会将标签翻转到语义相似的类别中，另一方面，PGD-LL 等攻击可能会将标签翻转到非常不同的类别中，同时仍保留原始标签的高（相对）概率。因此提出如下两个指标</p>
 <ul>
-<li>n是模型的第n层输出特征</li>
+<li>New Label Old Rank（NLOR）</li>
+<li>Old Label New Rank（OLNR）</li>
 </ul>
-<h2 id="防御部分"><a href="#防御部分" class="headerlink" title="防御部分"></a>防御部分</h2><p><img src="/..%5Cimages%5Cattack%5C3_3.png" alt="image-20240423100035201"></p>
-<ul>
-<li>这里$C_\Phi$输出应该是一个值可能为错误图像的概率，这样随着$P_\theta$将对抗图像优化的越来越像真图，差值减小，loss下降。</li>
-</ul>
+<p>将C-way 分类器输出的c类softmax输出作为每一类的置信度，使用降序将他们进行排序，将攻击前的网络预测视为旧标签，攻击后的网络预测视为新标签。</p>
+<p>在大多数攻击中，旧标签的等级会从 1 变为 “p”。旧标签的新等级 “p “被定义为 OLNR。此外，攻击后，新标签的等级将从 “q “变为 1。“q”被定义为NLOR</p>
+<h3 id="攻击方法"><a href="#攻击方法" class="headerlink" title="攻击方法"></a>攻击方法</h3><p>$$<br>\mathcal{L}(l_i)&#x3D;D({l_i(\tilde{x}<em>{N_j})|N_j \notin S_i})-D({l_i(\tilde{x}</em>{N_j})|N_j \in S_i})<br>$$</p>
+<p>其中，$l_i$代表第$i$层网络,$l_i(\tilde{x})<em>{N_j}$表示 $l_i(\tilde{x})$ 的第 $N_j$ 个值，$S_i$ 表示支持当前预测的激活集，D 是激活集$l(\tilde{x})</em>{N_j}$的单调递增函数。我们将 D 定义为输入$l_i(\tilde{x})$的$l_2$正态。<br>$$<br>S_i&#x3D;{N_j|l_i(x)_{N_j}&gt;C}<br>$$<br>C是一种中心趋势的度量，本文使用$spatial-mean(l_i(x))&#x3D;C(h,w)$（跨通道平均）</p>
+<p><img src="/../images/Attack/4_2.png"></p>
+<p>可以从(d)图看出其实现就是大的值降低，低的值增大。将两个公式结合变为如下形式：</p>
+<p><img src="/../images/Attack/4_3.png"></p>
+<p>最终损失函数定义为如下形式：</p>
+<p><img src="/../images/Attack/4_4.png"></p>
+<h2 id="Experience"><a href="#Experience" class="headerlink" title="Experience"></a>Experience</h2><h3 id="相似度"><a href="#相似度" class="headerlink" title="相似度"></a>相似度</h3><p><img src="/../images/Attack/4_5.png"></p>
+<p>上面展示了在每一层中<strong>对抗图像和原始图像的不相似度</strong>（图名应该写错了）。</p>
+<p><img src="/../images/Attack/4_6.png" alt="image-20240625165322893"></p>
+<p>我们还测量了Normalized Rank Transformation (NRT) distance。NRT 距离表示第 k 个有序统计量 ∀ k 的秩的平均移动。NRT 距离测量法的主要优势在于其对异常值的稳健性。</p>
+<h3 id="愚弄率，NLOR，OLNR"><a href="#愚弄率，NLOR，OLNR" class="headerlink" title="愚弄率，NLOR，OLNR"></a>愚弄率，NLOR，OLNR</h3><p><img src="/../images/Attack/4_7.png"></p>
+<p>测试了提出的方法在各种模型上的表现，下面的是对抗训练过的模型。</p>
+<p><img src="/../images/Attack/4_8.png"></p>
+<p>结合TOP@K准确率的愚弄率，应该就是<strong>1-前K个结果出现正确阶段的比例</strong>因此K值增大愚弄率会下降因为不好骗了。</p>
+<p><img src="/../images/Attack/4_10.png"></p>
+<p>这个是经过Adversarial-logitpairing (alp) based adversarial training的模型</p>
+<p><img src="/../images/Attack/4_11.png"></p>
+<p>上表展示了对字幕生成的攻击效果，右侧是纯白噪声的效果。</p>
 
         </div>
 
@@ -374,7 +396,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2024/04/23/SSP/">http://example.com/2024/04/23/SSP/</a></span>
+                        <span><a href="http://example.com/2024/06/27/FDA/">http://example.com/2024/06/27/FDA/</a></span>
                     </p>
                 
                 
@@ -411,10 +433,10 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2024/06/27/FDA/">FDA</a>
+                <a class="prev" rel="prev" href="/2024/06/27/Mutual-Modality_Adversarial_Attack_with_Semantic_Perturbation/">m</a>
             
             
-            <a class="next" rel="next" href="/2024/04/12/vllm/">A800部署</a>
+            <a class="next" rel="next" href="/2024/04/23/SSP/">SSP.md</a>
             
         </section>
 
