@@ -13,7 +13,7 @@
 
 
 
-<title>m | Hexo</title>
+<title>Hexo</title>
 
 
 
@@ -326,7 +326,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">m</h1>
+            <h1 class="post-title"></h1>
             
                 <div class="post-meta">
                     
@@ -335,63 +335,148 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">June 27, 2024&nbsp;&nbsp;22:47:44</a>
+                        Date: <a href="#">April 12, 2025&nbsp;&nbsp;11:39:08</a>
                         </span>
                     
-                    
-                        <span class="post-category">
-                    Category:
-                            
-                                <a href="/categories/Attack/">Attack</a>
-                            
-                        </span>
                     
                 </div>
             
         </header>
 
         <div class="post-content">
-            <h1 id="Mutual-Modality-Adversarial-Attack-with-Semantic-Perturbation"><a href="#Mutual-Modality-Adversarial-Attack-with-Semantic-Perturbation" class="headerlink" title="Mutual-Modality Adversarial Attack with Semantic Perturbation"></a>Mutual-Modality Adversarial Attack with Semantic Perturbation</h1><h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h2><p>当前的DNN网络虽然取得了巨大的成就，但是一点扰动就可能使他们产生错误的分类。目前的方法大多使用白盒方法进行攻击，但是现实情况往往无法获得模型的权重，因此白盒攻击不如黑盒攻击现实。并且目前的技术主要是通过选择一个合适的替代模型，但是替代模型不但不稳定并且与目标网络的差距往往很大。<strong>因此仔细选择一个合适的替代模型就成了一个关键问题。</strong></p>
-<p><img src="/../images/Attack/5_1.png" alt="image-20240625194208398"></p>
-<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><p><img src="/../images/Attack/5_2.png"></p>
-<p>对抗样本$x^{\prime}_i$按照如下公式获取：<br>$$<br>x^{\prime}_i&#x3D;min(x_i+\epsilon,max(\mathcal G(x_i),x_i-\epsilon))<br>$$<br>其中$\epsilon$是最大扰动限制。$\mathcal G(x_i)$代表生成的有边界对抗样本。</p>
-<p>攻击黑盒模型的目标就是最大化如下公式：<br>$$<br>\sum 1 <em>{y^{\prime}\neq y</em>{true}}|y^{\prime} \leftarrow \mathcal{M^p}[\mathcal{G}(x_i)],x_i\in \mathcal{D}^p,\mathcal{M}^p\in \mathcal{M}<br>$$<br>$y_{true}$是输入的正确标签，$\mathcal{M}$是目标模型集合。</p>
-<p><img src="/../images/Attack/5_3.png" alt="image-20240625210741743"></p>
-<p>$E_t$是CLIP的文本编码器$E_i$是CLIP的图像编码器，$X_t&#x3D;{x^0_t,x_t^1,…,x_t^{C-1}}$是为每一类标签c生成的文本嵌入。</p>
-<p><img src="/../images/Attack/5_4.png" alt="image-20240625211301518"></p>
-<p>$\mathcal{P}(.)$是文本输入的提示调整函数。</p>
+            <p>title:Yolo-World<br>mathjax: true<br>date: 2025-4-12 11:42:09<br>tags: CV<br>category: CV</p>
+<h2 id="一、Online-Vocabulary-and-Offline-Vocabulary"><a href="#一、Online-Vocabulary-and-Offline-Vocabulary" class="headerlink" title="一、Online Vocabulary and Offline Vocabulary"></a>一、Online Vocabulary and Offline Vocabulary</h2><ol>
+<li><p>Online Vocabulary</p>
+<p>这里其实和VLP里的ITC训练一样，抛弃了原先训练yolo时需要固定类和图像，现在就是直接大规模数据集训练。</p>
+<p>1）定义</p>
 <ul>
-<li>优化$\mathcal{G}$是通过最小化干净图像和对抗图像的余弦相似度实现。</li>
-<li>优化$\mathcal{P}$是通过调整$\mathcal{P}(x_t)$使其能重新和对抗图像匹配上。</li>
-<li>通过迭代训练获得一个扰动网络$\mathcal{G}$</li>
+<li><strong>训练阶段动态构建的词汇</strong>，每个训练批次（batch）都会根据当前样本的标注信息 <strong>动态选择</strong> 相关的类别名称或名词短语。</li>
+<li>词汇内容会 <strong>随训练数据变化</strong>，模型需要实时计算文本嵌入（Text Embeddings）。</li>
 </ul>
-<h3 id="Visual-Attack-with-Semantic-Perturbation"><a href="#Visual-Attack-with-Semantic-Perturbation" class="headerlink" title="Visual Attack with Semantic Perturbation"></a>Visual Attack with Semantic Perturbation</h3><h4 id="一"><a href="#一" class="headerlink" title="一"></a>一</h4><p><img src="/../images/Attack/5_5.png" alt="image-20240625212053259"></p>
-<p>这一步通过最大化CLIP图像编码器所提取出的扰动图像特征和干净特征的相似度来实现，使用MSE损失。</p>
-<h4 id="二"><a href="#二" class="headerlink" title="二"></a>二</h4><p>通过一个给定的prompt和标签来构造文本输入，然后使用CLIP的文本编码器提取表征按照如下公式进行最大化特征</p>
-<p><img src="/../images/Attack/5_6.png" alt="image-20240625215727594"></p>
-<p>先选择出与干净文本输入最不接近的扰动文本，拉近扰动的图像特征和它的距离，$\alpha$用于设定扰动的图像表征和正确答案的距离不能过低也不会过高。</p>
-<h4 id="三"><a href="#三" class="headerlink" title="三"></a>三</h4><p><img src="/../images/Attack/5_7.png" alt="image-20240625221851353"></p>
-<p>分类损失，$H_{CE}(.)$是标准交叉熵损失，Clip(.)是输出的概率</p>
-<h3 id="Textual-Defense-with-Prompt-Updating"><a href="#Textual-Defense-with-Prompt-Updating" class="headerlink" title="Textual Defense with Prompt Updating"></a>Textual Defense with Prompt Updating</h3><p><img src="/../images/Attack/5_8.png" alt="image-20240625223940463"></p>
-<p><img src="/../images/Attack/5_9.png" alt="image-20240625225705746"></p>
+<p>2）工作原理</p>
+<ol>
+<li><strong>数据加载时</strong>：<ul>
+<li>对每个 mosaic 数据增强样本（通常包含 4 张图像），收集所有 <strong>正样本名词</strong>（出现在图像中的类别）。</li>
+<li>同时随机采样一些 <strong>负样本名词</strong>（未出现在当前图像中的类别），以增强模型的判别能力。</li>
+</ul>
+</li>
+<li><strong>词汇构建</strong>：<ul>
+<li>最终词汇表大小限制为 <strong>最多 M 个名词</strong>（默认 M&#x3D;80，类似 COCO 的类别数）。</li>
+<li>例如，如果当前 batch 包含 “dog”, “cat”, “car”，则词汇可能为：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Vocabulary = [&quot;dog&quot;, &quot;cat&quot;, &quot;car&quot;, &quot;person&quot;, &quot;tree&quot;, ...]  # 正样本 + 负样本</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><strong>文本编码</strong>：<ul>
+<li>使用 <strong>CLIP 文本编码器</strong> 实时计算这些名词的嵌入（Text Embeddings）。</li>
+<li>这些嵌入会用于计算 <strong>区域-文本对比损失（Region-Text Contrastive Loss）</strong>，优化模型对齐视觉和语言特征。</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><p>Offline Vocabulary</p>
+<p>（1）定义</p>
 <ul>
-<li>$X_l&#x3D;&lt;CLASS(c)&gt;,X_p&#x3D;{v_1,v_2,…,v_m}$。文本输入其实由这两部分组成，即标签和提示模板，在更新时按照如下方式更新：</li>
+<li><strong>推理阶段预先编码的固定词汇</strong>，用户提前定义好所有可能的类别或描述，并 <strong>提前计算</strong> 其文本嵌入。</li>
+<li>模型推理时 <strong>无需实时编码文本</strong>，直接使用缓存的嵌入，极大提升效率。</li>
 </ul>
-<p><img src="/../images/Attack/5_10.png" alt="image-20240625225631640"></p>
+<p>（2）工作原理</p>
+<ol>
+<li><p><strong>用户定义词汇</strong>：</p>
 <ul>
-<li>只更新提示模板，通过最大化扰动图像嵌入和这个文本的距离找到最合适的提示模板。（<strong>相当于每一个lable一个句子，然后只优化每个句子后面的模板部分</strong>）由于直接学习每一个文本的最佳标记是不合适的，因此通过计算突出得分，选取合适的单词：</li>
+<li>在实际应用前，用户提供 <strong>自定义类别列表</strong>，例如：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Categories = [&quot;dog&quot;, &quot;cat&quot;, &quot;person&quot;, &quot;car&quot;, &quot;traffic light&quot;]</span><br></pre></td></tr></table></figure></li>
+<li>也可以是更复杂的描述，如：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Descriptions = [&quot;a red car&quot;, &quot;a person wearing glasses&quot;]</span><br></pre></td></tr></table></figure></li>
 </ul>
-<p><img src="/../images/Attack/5_11.png" alt="image-20240626170443398"></p>
-<p>（Generating Natural Language Adversarial Examples through Probability Weighted Word Saliency）</p>
+</li>
+<li><p><strong>离线编码</strong>：</p>
 <ul>
-<li>将其中得分超过阈值的token放到一个集合中，从一个候选集合中替换更新集合的单词（这里是使用GPT-2生成候选单词）：</li>
+<li>使用 <strong>CLIP 文本编码器</strong> 提前计算这些类别的嵌入，并存储为模型的一部分。</li>
 </ul>
-<p><img src="/../images/Attack/5_12.png" alt="image-20240626173342235"></p>
-<p>这里应该是括号位置错了，目的应该是替换后的句子的正确概率和mask句子的概率之差的最大，因为差的越大说明这个替换越接近，也就是防御了。</p>
-<h2 id="Experience"><a href="#Experience" class="headerlink" title="Experience"></a>Experience</h2><ul>
-<li>消融实验</li>
+</li>
+<li><p><strong>推理优化</strong>：</p>
+<ul>
+<li>通过 <strong>重新参数化（Reparameterization）</strong> 技术，将文本嵌入转换为模型权重（如 1×1 卷积的 kernel），从而完全移除文本编码器的计算。</li>
+<li>例如：<ul>
+<li>T-CSPLayer 的文本引导注意力可以转换为一个固定卷积操作。</li>
+<li>文本对比头的计算可以直接复用预计算的嵌入。</li>
 </ul>
-<p><img src="/../images/Attack/5_13.png" alt="image-20240626173844932"></p>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+<h2 id="二、重参数化"><a href="#二、重参数化" class="headerlink" title="二、重参数化"></a>二、重参数化</h2><h3 id="文本嵌入作为卷积权重的原理详解"><a href="#文本嵌入作为卷积权重的原理详解" class="headerlink" title="文本嵌入作为卷积权重的原理详解"></a>文本嵌入作为卷积权重的原理详解</h3><ol>
+<li>数学等价性证明</li>
+</ol>
+<p>​	原始相似度计算</p>
+<p>给定：</p>
+<ul>
+<li>视觉特征 $F \in \mathbb{R}^{H \times W \times D}$</li>
+<li>文本嵌入 $T \in \mathbb{R}^{C \times D}$</li>
+</ul>
+<p>相似度计算：<br>$$S &#x3D; F \times T^T \in \mathbb{R}^{H \times W \times C}$$</p>
+<p><strong>1×1卷积等效计算</strong></p>
+<p>卷积核权重设置：<br>$$W_{conv} \in \mathbb{R}^{C \times D \times 1 \times 1}, \quad W_{conv}[c,d,0,0] &#x3D; T[c,d]$$</p>
+<p>则卷积输出：<br>$$O[h,w,c] &#x3D; \sum_{d&#x3D;1}^D F[h,w,d] \cdot W_{conv}[c,d,0,0]$$</p>
+<p><strong>两者完全等价</strong>。</p>
+<p>其实可以理解为线性层最好。</p>
+<h2 id="二、模型架构"><a href="#二、模型架构" class="headerlink" title="二、模型架构"></a>二、模型架构</h2><p><img src="/../images/CV/yolo_world1.png" alt="image-20250412114235660"></p>
+<ol>
+<li><p><strong>Text Encoder</strong></p>
+<p>采用CLIP的文本编码器作为文本encoder，训练方式和上面说过的一样，将文本嵌入和图像类别特征计算相似度。<br>$$<br>s_{k,j} &#x3D; \alpha \cdot \underbrace{\text{L2-Norm}(e_k)}<em>{\text{归一化物体特征}} \cdot \underbrace{\text{L2-Norm}(w_j)^\top}</em>{\text{归一化文本特征}} + \beta \tag{1}<br>$$</p>
+<ul>
+<li>物体嵌入 $e_k \in \mathbb{R}^D$（第$k$个检测目标的特征）</li>
+<li>文本嵌入 $w_j \in \mathbb{R}^D$（第$j$个类别的文本特征）</li>
+</ul>
+</li>
+<li><p><strong>Re-parameterizable Vision-Language PAN</strong></p>
+</li>
+</ol>
+<p><img src="/../images/CV/yolo_world2.png" alt="image-20250412114302612"></p>
+<p>​	<strong>Text-guided CSPLayer</strong></p>
+<p>​		Text-guided CSPLayer是YOLO-World在传统YOLO架构上最重要的创新之一，它本质上是		YOLOv8中CSPLayer（也叫C2f模块）的升级版，通过引入文本引导机制，实现了视觉特征和		语言特征的深度融合。</p>
+<p>​		(1) 核心创新点</p>
+<p>​			传统CSPLayer只处理视觉特征，而T-CSPLayer的创新在于：</p>
+<p>​				a. 增加了文本嵌入输入通道</p>
+<p>​				b. 设计了文本-图像动态交互机制</p>
+<p>​				c. 保持了YOLO原有的高效特性</p>
+<p>​		(2) 关键计算步骤</p>
+<p>​			① 相似度计算：<br>​				将图像特征图(H×W×D)与文本嵌入(C×D)做矩阵乘法，得到每个卷积区域位置对应				所有文本类别的相似度分数(H×W×C)</p>
+<p>​			② 注意力生成：</p>
+<p>​				对C个类别维度取最大值操作，再通过Sigmoid激活，生成空间注意力图(H×W)</p>
+<p>​							$X_l’&#x3D;X_l⋅δ(max_{j\in(1..C)}(X_lW_j^T))^T$</p>
+<p>​				$X_lW_j^T$是$H\times W$的矩阵，里面的元素代表相似度。对C个类别取最大值每个位置保				留与最相关文本类别的相似度。然后点乘原始图像表征就行。</p>
+<ol start="3">
+<li><strong>Image-Pooling Attention</strong></li>
+</ol>
+<p>​		1. 核心功能</p>
+<p>​			Image-Pooling Attention 是 YOLO-World 中用于增强文本嵌入的视觉感知能力的模			块，其核心思想是：让文本特征能够动态感知图像内容，从而提升开放词汇检测的准确			性。</p>
+<p>​		2. 计算流程</p>
+<p>​			假设输入为多尺度图像特征 ${X_3, X_4, X_5}$ 和文本嵌入 $W \in \mathbb{R}^{C \times D}$，计算步骤如下：</p>
+<p>​			（1）多尺度特征池化</p>
+<p>​				对每个层级的特征图进行自适应最大池化，统一到固定尺寸（3×3）：</p>
+<p>$$<br>\tilde{X}_l &#x3D; \text{MaxPool}(X_l, \text{output_size}&#x3D;3) \quad \text{其中} \ l \in {3,4,5}<br>$$</p>
+<p>​				<strong>输出形状</strong>：每层得到 $3 \times 3 \times D$ 的特征</p>
+<p>​				<strong>示例</strong>：</p>
+<p>​					$X_3$ (80×80×256) → 池化后 → 3×3×256</p>
+<p>​					$X_4$ (40×40×512) → 池化后 → 3×3×512 </p>
+<p>​					$X_5$ (20×20×1024) → 池化后 → 3×3×1024</p>
+<p>​			（2）特征拼接与扁平化</p>
+<p>​				将多尺度池化结果拼接并展平：</p>
+<p>$$<br>\tilde{X} &#x3D; \text{Flatten}(\text{Concat}[\tilde{X}_3, \tilde{X}_4, \tilde{X}_5])<br>$$</p>
+<p>​				<strong>输出形状</strong>：$27 \times D$<br>​				（3层级×3×3&#x3D;27个空间位置，每个位置D维特征）</p>
+<p>​			（3）视觉-文本交互</p>
+<p>​				计算文本嵌入的视觉感知更新：</p>
+<p>$$<br>W’ &#x3D; W + \text{Softmax}(W \tilde{X}^\top)\tilde{X}<br>$$<br>​				<strong>Softmax权重表示不同尺度不同图像区域对文本的重要性</strong></p>
+<h2 id="三、预训练流程"><a href="#三、预训练流程" class="headerlink" title="三、预训练流程"></a>三、预训练流程</h2><ol>
+<li><p><strong>训练目标函数</strong></p>
+<h3 id="多任务损失"><a href="#多任务损失" class="headerlink" title="多任务损失"></a>多任务损失</h3><p>​		$$\mathcal{L}(I) &#x3D; \mathcal{L}<em>{\text{con}} + \lambda_I \cdot (\mathcal{L}</em>{\text{iou}} + \mathcal{L}_{\text{dfl}})$$</p>
+<ul>
+<li>对比损失：$\mathcal{L}_{\text{con}}$</li>
+<li>distributed focal loss：$\mathcal{L}_{\text{dfl}}$</li>
+<li>IoU损失：$L_{iou}$</li>
+</ul>
+</li>
+</ol>
 
         </div>
 
@@ -406,7 +491,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2024/06/27/Mutual-Modality_Adversarial_Attack_with_Semantic_Perturbation/">http://example.com/2024/06/27/Mutual-Modality_Adversarial_Attack_with_Semantic_Perturbation/</a></span>
+                        <span><a href="http://example.com/2025/04/12/yolo-world1/">http://example.com/2025/04/12/yolo-world1/</a></span>
                     </p>
                 
                 
@@ -429,10 +514,6 @@
                 <span>Tag(s):</span>
                 <span class="tag">
                     
-                    
-                        <a href="/tags/Attack/"># Attack</a>
-                    
-                        
                 </span>
             </div>
             <div>
@@ -443,10 +524,10 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2025/04/12/yolo-world1/"></a>
+                <a class="prev" rel="prev" href="/2025/04/12/yolo-world/">yolo_world</a>
             
             
-            <a class="next" rel="next" href="/2024/06/27/FDA/">FDA</a>
+            <a class="next" rel="next" href="/2024/06/27/Mutual-Modality_Adversarial_Attack_with_Semantic_Perturbation/">m</a>
             
         </section>
 
