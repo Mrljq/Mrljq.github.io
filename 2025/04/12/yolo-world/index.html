@@ -427,10 +427,10 @@
 <li>视觉特征 $F \in \mathbb{R}^{H \times W \times D}$</li>
 <li>文本嵌入 $T \in \mathbb{R}^{C \times D}$</li>
 </ul>
-<p>相似度计算：<br>$$S &#x3D; F \times T^T \in \mathbb{R}^{H \times W \times C}$$</p>
+<p>相似度计算：<br>$S &#x3D; F \times T^T \in \mathbb{R}^{H \times W \times C}$</p>
 <p><strong>1×1卷积等效计算</strong></p>
-<p>卷积核权重设置：<br>$$W_{conv} \in \mathbb{R}^{C \times D \times 1 \times 1}, \quad W_{conv}[c,d,0,0] &#x3D; T[c,d]$$</p>
-<p>则卷积输出：<br>$$O[h,w,c] &#x3D; \sum_{d&#x3D;1}^D F[h,w,d] \cdot W_{conv}[c,d,0,0]$$</p>
+<p>卷积核权重设置：<br>$W_{conv} \in \mathbb{R}^{C \times D \times 1 \times 1}, \quad W_{conv}[c,d,0,0] &#x3D; T[c,d]$</p>
+<p>则卷积输出：<br>$O[h,w,c] &#x3D; \sum_{d&#x3D;1}^D F[h,w,d] \cdot W_{conv}[c,d,0,0]$</p>
 <p><strong>两者完全等价</strong>。</p>
 <p>其实可以理解为线性层最好。</p>
 <h2 id="二、模型架构"><a href="#二、模型架构" class="headerlink" title="二、模型架构"></a>二、模型架构</h2><p><img src="/../images/CV/yolo_world1.png" alt="image-20250412114235660"></p>
@@ -483,7 +483,7 @@
 <p>$$<br>W’ &#x3D; W + \text{Softmax}(W \tilde{X}^\top)\tilde{X}<br>$$<br>​				<strong>Softmax权重表示不同尺度不同图像区域对文本的重要性</strong></p>
 <h2 id="三、预训练流程"><a href="#三、预训练流程" class="headerlink" title="三、预训练流程"></a>三、预训练流程</h2><ol>
 <li><p><strong>训练目标函数</strong></p>
-<h3 id="多任务损失"><a href="#多任务损失" class="headerlink" title="多任务损失"></a>多任务损失</h3><p>​		$$\mathcal{L}(I) &#x3D; \mathcal{L}<em>{\text{con}} + \lambda_I \cdot (\mathcal{L}</em>{\text{iou}} + \mathcal{L}_{\text{dfl}})$$</p>
+<h3 id="多任务损失"><a href="#多任务损失" class="headerlink" title="多任务损失"></a>多任务损失</h3><p>​		$\mathcal{L}(I) &#x3D; \mathcal{L}<em>{\text{con}} + \lambda_I \cdot (\mathcal{L}</em>{\text{iou}} + \mathcal{L}_{\text{dfl}})$</p>
 <ul>
 <li>对比损失：$\mathcal{L}_{\text{con}}$</li>
 <li>distributed focal loss：$\mathcal{L}_{\text{dfl}}$</li>
