@@ -437,8 +437,7 @@
 <ol>
 <li><p><strong>Text Encoder</strong></p>
 <p>采用CLIP的文本编码器作为文本encoder，训练方式和上面说过的一样，将文本嵌入和图像类别特征计算相似度。</p>
-<p>​									$s_{k,j} &#x3D; \alpha \cdot \underbrace{\text{L2-Norm}(e_k)}<em>{\text{归一化物体特征}} \cdot \underbrace{\text{L2-Norm}(w_j)^\top}</em>{\text{归一化文本特征}} + \beta \tag{1}$<br>$$</p>
-<p>$$</p>
+<p>$s_{k,j} &#x3D; \alpha \cdot \underbrace{\text{L2-Norm}(e_k)}<em>{\text{归一化物体特征}} \cdot \underbrace{\text{L2-Norm}(w_j)^\top}</em>{\text{归一化文本特征}} + \beta \tag{1}$</p>
 <ul>
 <li>物体嵌入 $e_k \in \mathbb{R}^D$（第$k$个检测目标的特征）</li>
 <li>文本嵌入 $w_j \in \mathbb{R}^D$（第$j$个类别的文本特征）</li>
@@ -486,7 +485,7 @@
 <p>​				<strong>Softmax权重表示不同尺度不同图像区域对文本的重要性</strong></p>
 <h2 id="三、预训练流程"><a href="#三、预训练流程" class="headerlink" title="三、预训练流程"></a>三、预训练流程</h2><ol>
 <li><p><strong>训练目标函数</strong></p>
-<h3 id="多任务损失"><a href="#多任务损失" class="headerlink" title="多任务损失"></a>多任务损失</h3><p>​		$\mathcal{L}(I) &#x3D; \mathcal{L}<em>{\text{con}} + \lambda_I \cdot (\mathcal{L}</em>{\text{iou}} + \mathcal{L}_{\text{dfl}})$</p>
+<h3 id="多任务损失"><a href="#多任务损失" class="headerlink" title="多任务损失"></a>多任务损失</h3><p>$\mathcal{L}(I) &#x3D; \mathcal{L}<em>{\text{con}} + \lambda_I \cdot (\mathcal{L}</em>{\text{iou}} + \mathcal{L}_{\text{dfl}})$</p>
 <ul>
 <li>对比损失：$\mathcal{L}_{\text{con}}$</li>
 <li>distributed focal loss：$\mathcal{L}_{\text{dfl}}$</li>
