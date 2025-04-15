@@ -436,7 +436,9 @@
 <h2 id="二、模型架构"><a href="#二、模型架构" class="headerlink" title="二、模型架构"></a>二、模型架构</h2><p><img src="/../images/CV/yolo_world1.png" alt="image-20250412114235660"></p>
 <ol>
 <li><p><strong>Text Encoder</strong></p>
-<p>采用CLIP的文本编码器作为文本encoder，训练方式和上面说过的一样，将文本嵌入和图像类别特征计算相似度。<br>$$<br>s_{k,j} &#x3D; \alpha \cdot \underbrace{\text{L2-Norm}(e_k)}<em>{\text{归一化物体特征}} \cdot \underbrace{\text{L2-Norm}(w_j)^\top}</em>{\text{归一化文本特征}} + \beta \tag{1}<br>$$</p>
+<p>采用CLIP的文本编码器作为文本encoder，训练方式和上面说过的一样，将文本嵌入和图像类别特征计算相似度。</p>
+<p>​									$s_{k,j} &#x3D; \alpha \cdot \underbrace{\text{L2-Norm}(e_k)}<em>{\text{归一化物体特征}} \cdot \underbrace{\text{L2-Norm}(w_j)^\top}</em>{\text{归一化文本特征}} + \beta \tag{1}$<br>$$</p>
+<p>$$</p>
 <ul>
 <li>物体嵌入 $e_k \in \mathbb{R}^D$（第$k$个检测目标的特征）</li>
 <li>文本嵌入 $w_j \in \mathbb{R}^D$（第$j$个类别的文本特征）</li>
@@ -447,23 +449,23 @@
 </ol>
 <p><img src="/../images/CV/yolo_world2.png" alt="image-20250412114302612"></p>
 <p>​	<strong>Text-guided CSPLayer</strong></p>
-<p>​		Text-guided CSPLayer是YOLO-World在传统YOLO架构上最重要的创新之一，它本质上是		YOLOv8中CSPLayer（也叫C2f模块）的升级版，通过引入文本引导机制，实现了视觉特征和		语言特征的深度融合。</p>
+<p>​		Text-guided CSPLayer是YOLO-World在传统YOLO架构上最重要的创新之一，它本质上是YOLOv8中CSPLayer（也叫C2f模块）的升级版，通过引入文本引导机制，实现了视觉特征语言特征的深度融合。</p>
 <p>​		(1) 核心创新点</p>
 <p>​			传统CSPLayer只处理视觉特征，而T-CSPLayer的创新在于：</p>
 <p>​				a. 增加了文本嵌入输入通道</p>
 <p>​				b. 设计了文本-图像动态交互机制</p>
 <p>​				c. 保持了YOLO原有的高效特性</p>
 <p>​		(2) 关键计算步骤</p>
-<p>​			① 相似度计算：<br>​				将图像特征图(H×W×D)与文本嵌入(C×D)做矩阵乘法，得到每个卷积区域位置对应				所有文本类别的相似度分数(H×W×C)</p>
+<p>​			① 相似度计算：<br>​				将图像特征图(H×W×D)与文本嵌入(C×D)做矩阵乘法，得到每个卷积区域位置对应所有文本类别的相似度分数(H×W×C)</p>
 <p>​			② 注意力生成：</p>
 <p>​				对C个类别维度取最大值操作，再通过Sigmoid激活，生成空间注意力图(H×W)</p>
 <p>​							$X_l’&#x3D;X_l⋅δ(max_{j\in(1..C)}(X_lW_j^T))^T$</p>
-<p>​				$X_lW_j^T$是$H\times W$的矩阵，里面的元素代表相似度。对C个类别取最大值每个位置保				留与最相关文本类别的相似度。然后点乘原始图像表征就行。</p>
+<p>​				$X_lW_j^T$是$H\times W$的矩阵，里面的元素代表相似度。对C个类别取最大值每个位置保留与最相关文本类别的相似度。然后点乘原始图像表征就行。</p>
 <ol start="3">
 <li><strong>Image-Pooling Attention</strong></li>
 </ol>
 <p>​		1. 核心功能</p>
-<p>​			Image-Pooling Attention 是 YOLO-World 中用于增强文本嵌入的视觉感知能力的模			块，其核心思想是：让文本特征能够动态感知图像内容，从而提升开放词汇检测的准确			性。</p>
+<p>​			Image-Pooling Attention 是 YOLO-World 中用于增强文本嵌入的视觉感知能力的模块，其核心思想是：让文本特征能够动态感知图像内容，从而提升开放词汇检测的准确性。</p>
 <p>​		2. 计算流程</p>
 <p>​			假设输入为多尺度图像特征 ${X_3, X_4, X_5}$ 和文本嵌入 $W \in \mathbb{R}^{C \times D}$，计算步骤如下：</p>
 <p>​			（1）多尺度特征池化</p>
@@ -476,11 +478,12 @@
 <p>​					$X_5$ (20×20×1024) → 池化后 → 3×3×1024</p>
 <p>​			（2）特征拼接与扁平化</p>
 <p>​				将多尺度池化结果拼接并展平：</p>
-<p>$$<br>\tilde{X} &#x3D; \text{Flatten}(\text{Concat}[\tilde{X}_3, \tilde{X}_4, \tilde{X}_5])<br>$$</p>
+<p>​					$\tilde{X} &#x3D; \text{Flatten}(\text{Concat}[\tilde{X}_3, \tilde{X}_4, \tilde{X}_5])$</p>
 <p>​				<strong>输出形状</strong>：$27 \times D$<br>​				（3层级×3×3&#x3D;27个空间位置，每个位置D维特征）</p>
 <p>​			（3）视觉-文本交互</p>
 <p>​				计算文本嵌入的视觉感知更新：</p>
-<p>$$<br>W’ &#x3D; W + \text{Softmax}(W \tilde{X}^\top)\tilde{X}<br>$$<br>​				<strong>Softmax权重表示不同尺度不同图像区域对文本的重要性</strong></p>
+<p>​				$W’ &#x3D; W + \text{Softmax}(W \tilde{X}^\top)\tilde{X}$</p>
+<p>​				<strong>Softmax权重表示不同尺度不同图像区域对文本的重要性</strong></p>
 <h2 id="三、预训练流程"><a href="#三、预训练流程" class="headerlink" title="三、预训练流程"></a>三、预训练流程</h2><ol>
 <li><p><strong>训练目标函数</strong></p>
 <h3 id="多任务损失"><a href="#多任务损失" class="headerlink" title="多任务损失"></a>多任务损失</h3><p>​		$\mathcal{L}(I) &#x3D; \mathcal{L}<em>{\text{con}} + \lambda_I \cdot (\mathcal{L}</em>{\text{iou}} + \mathcal{L}_{\text{dfl}})$</p>
@@ -543,7 +546,7 @@
         <section class="post-nav">
             
             
-            <a class="next" rel="next" href="/2025/04/12/yolo-world1/"></a>
+            <a class="next" rel="next" href="/2024/06/27/Mutual-Modality_Adversarial_Attack_with_Semantic_Perturbation/">m</a>
             
         </section>
 
