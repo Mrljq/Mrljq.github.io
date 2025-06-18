@@ -13,7 +13,7 @@
 
 
 
-<title>Hexo</title>
+<title>AlignRec：Aligning and Training in Multimodal Recommendations | Hexo</title>
 
 
 
@@ -257,76 +257,11 @@
                 <div class="container">
     
     
-        <div class="post-toc">
-    <div class="tocbot-list">
-    </div>
-    <div class="tocbot-list-menu">
-        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
-        <a onclick="go_top()">Back to top</a>
-        <a onclick="go_bottom()">Go to bottom</a>
-    </div>
-</div>
-
-<script>
-    var tocbot_timer;
-    var DEPTH_MAX = 6; // 为 6 时展开所有
-    var tocbot_default_config = {
-        tocSelector: '.tocbot-list',
-        contentSelector: '.post-content',
-        headingSelector: 'h1, h2, h3, h4, h5',
-        orderedList: false,
-        scrollSmooth: true,
-        onClick: extend_click,
-    };
-
-    function extend_click() {
-        clearTimeout(tocbot_timer);
-        tocbot_timer = setTimeout(function() {
-            tocbot.refresh(obj_merge(tocbot_default_config, {
-                hasInnerContainers: true
-            }));
-        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
-    }
-
-    document.ready(function() {
-        tocbot.init(obj_merge(tocbot_default_config, {
-            collapseDepth: 1
-        }));
-    });
-
-    function expand_toc() {
-        var b = document.querySelector('.tocbot-toc-expand');
-        var expanded = b.getAttribute('data-expanded');
-        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
-        tocbot.refresh(obj_merge(tocbot_default_config, {
-            collapseDepth: expanded ? 1 : DEPTH_MAX
-        }));
-        b.innerText = expanded ? 'Expand all' : 'Collapse all';
-    }
-
-    function go_top() {
-        window.scrollTo(0, 0);
-    }
-
-    function go_bottom() {
-        window.scrollTo(0, document.body.scrollHeight);
-    }
-
-    function obj_merge(target, source) {
-        for (var item in source) {
-            if (source.hasOwnProperty(item)) {
-                target[item] = source[item];
-            }
-        }
-        return target;
-    }
-</script>
-    
 
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title"></h1>
+            <h1 class="post-title">AlignRec：Aligning and Training in Multimodal Recommendations</h1>
             
                 <div class="post-meta">
                     
@@ -335,7 +270,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">June 4, 2025&nbsp;&nbsp;15:57:47</a>
+                        Date: <a href="#">June 18, 2025&nbsp;&nbsp;12:58:24</a>
                         </span>
                     
                     
@@ -344,20 +279,7 @@
         </header>
 
         <div class="post-content">
-            <h1 id="Harnessing-Multimodal-Large-Language-Models-for-Multimodal-Sequential-Recommendation-（AAAI）"><a href="#Harnessing-Multimodal-Large-Language-Models-for-Multimodal-Sequential-Recommendation-（AAAI）" class="headerlink" title="Harnessing Multimodal Large Language Models for Multimodal Sequential Recommendation （AAAI）"></a>Harnessing Multimodal Large Language Models for Multimodal Sequential Recommendation （AAAI）</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>现存工作主要关注于将用户的偏好文档转化为文本prompt结合指令调优技术使得LLM能执行推荐任务。</p>
-<p>该文首先使用基于MLLM的<strong>项目摘要器</strong>来提取给定item的图像特征，并将图像转换为文本。然后，采用基于LLM的User摘要器利用循环用户摘要生成策略来捕获用户偏好的动态变化。</p>
-<h2 id="Problem-Definition"><a href="#Problem-Definition" class="headerlink" title="Problem Definition"></a>Problem Definition</h2><p>数据集包含User和Item的交互记录,给定用户$u$其交互记录定义为$S_u&#x3D;[I_u^1,…,I_u^n]$,其中$I^i$代表$u$通过点击购买或者观看交互的第$i$个Item，$n$代表用户的行为序列长度。每一个Item对应一个文本描述$W$和图像$I$。</p>
-<h4 id="多模态序列推荐"><a href="#多模态序列推荐" class="headerlink" title="多模态序列推荐"></a>多模态序列推荐</h4><p>给定一个$u$和其对应的历史交互记录$S_u$，以及一个候选Item:$I_c$，目的是预测$u$和这个候选Item在下一个交互时的概率（例如，点击的概率）。</p>
-<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><p><img src="C:\Users\lijia\AppData\Roaming\Typora\typora-user-images\image-20250610125108182.png" alt="image-20250610125108182"></p>
-<ul>
-<li>起始状态，使用独立的prompts（文本摘要和图像描述prompt）来引导MLLM独立处理这些模态，确保特征和信息能够充分提取到，同时为了保证两个模态的平衡，文本摘要和图像描述的输出被调整到相似的长度。</li>
-<li>在独立分析两种模态后，使用fusion prompt将来自文本和图像的信息进行整合。</li>
-<li><strong>将用户的交互序列分成多个块，将长的多模态序列转换为简洁的文本描述。</strong></li>
-</ul>
-<p>收到Item整合信息后传递给LLM让其总结用户的偏好，并像RNN式的循环信息，最终获得整个序列的用户偏好和图中一致。</p>
-<h4 id="微调基于MLLM的推荐模块"><a href="#微调基于MLLM的推荐模块" class="headerlink" title="微调基于MLLM的推荐模块"></a>微调基于MLLM的推荐模块</h4><p>将模型的输出限制为yes or no。通过next token损失来微淘MLLM，使用Lora。<br>$$<br>L&#x3D;-\sum_{i&#x3D;1}^LlogP(v_i|v_{&lt;i},I)<br>$$<br>$v_i$代表prompt的第i个token，L代表prompt的长度，I代表给定的图像。</p>
-<p><img src="C:\Users\lijia\AppData\Roaming\Typora\typora-user-images\image-20250611143349157.png"></p>
-
+            
         </div>
 
         
@@ -371,7 +293,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2025/06/04/Harnessing%20Multimodal%20Large%20Language%20Models%20for%20Multimodal%20Sequential%20Recommendation1/">http://example.com/2025/06/04/Harnessing%20Multimodal%20Large%20Language%20Models%20for%20Multimodal%20Sequential%20Recommendation1/</a></span>
+                        <span><a href="http://example.com/2025/06/18/AlignRec%EF%BC%9AAligning-and-Training-in-Multimodal-Recommendations/">http://example.com/2025/06/18/AlignRec%EF%BC%9AAligning-and-Training-in-Multimodal-Recommendations/</a></span>
                     </p>
                 
                 
@@ -404,10 +326,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2025/06/18/Multimodal-Pre-training-for-Sequential-Recommendation-via-Contrastive-Learning/">Multimodal Pre-training for Sequential Recommendation via Contrastive Learning</a>
             
-            
-            <a class="next" rel="next" href="/2025/06/03/AlignRec%20Aligning%20and%20Training%20in%20Multimodal%20Recommendations/"></a>
+            <a class="next" rel="next" href="/2025/06/18/Multimodal-Pre-training-for-Sequential-Recommendation-via-Contrastive-Learning/">Multimodal Pre-training for Sequential Recommendation via Contrastive Learning</a>
             
         </section>
 
