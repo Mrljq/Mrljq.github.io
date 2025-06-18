@@ -13,7 +13,7 @@
 
 
 
-<title>Yolo_World | Hexo</title>
+<title>Multimodal Pre-training for Sequential Recommendation via Contrastive Learning | Hexo</title>
 
 
 
@@ -326,7 +326,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Yolo_World</h1>
+            <h1 class="post-title">Multimodal Pre-training for Sequential Recommendation via Contrastive Learning</h1>
             
                 <div class="post-meta">
                     
@@ -335,14 +335,14 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">April 12, 2025&nbsp;&nbsp;11:47:08</a>
+                        Date: <a href="#">June 18, 2025&nbsp;&nbsp;12:22:40</a>
                         </span>
                     
                     
                         <span class="post-category">
                     Category:
                             
-                                <a href="/categories/CV/">CV</a>
+                                <a href="/categories/Recommendation/">Recommendation</a>
                             
                         </span>
                     
@@ -351,148 +351,47 @@
         </header>
 
         <div class="post-content">
-            <h2 id="一、Online-Vocabulary-and-Offline-Vocabulary"><a href="#一、Online-Vocabulary-and-Offline-Vocabulary" class="headerlink" title="一、Online Vocabulary and Offline Vocabulary"></a>一、Online Vocabulary and Offline Vocabulary</h2><ol>
-<li><p>Online Vocabulary</p>
-<p>这里其实和VLP里的ITC训练一样，抛弃了原先训练yolo时需要固定类和图像，现在就是直接大规模数据集训练。</p>
-<p>1）定义</p>
-<ul>
-<li><strong>训练阶段动态构建的词汇</strong>，每个训练批次（batch）都会根据当前样本的标注信息 <strong>动态选择</strong> 相关的类别名称或名词短语。</li>
-<li>词汇内容会 <strong>随训练数据变化</strong>，模型需要实时计算文本嵌入（Text Embeddings）。</li>
-</ul>
-<p>2）工作原理</p>
+            <h1 id="Multimodal-Pre-training-for-Sequential-Recommendation-via-Contrastive-Learning"><a href="#Multimodal-Pre-training-for-Sequential-Recommendation-via-Contrastive-Learning" class="headerlink" title="Multimodal Pre-training for Sequential Recommendation via Contrastive Learning"></a>Multimodal Pre-training for Sequential Recommendation via Contrastive Learning</h1><p><img src="/../images/Recommendation/1-1.png" alt="image-20250616104417725"></p>
+<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><h3 id="Task-Setting"><a href="#Task-Setting" class="headerlink" title="Task Setting"></a>Task Setting</h3><p>$I$代表item的集合，$S&#x3D;{i_1,…,i_n}$代表用户行为序列，n项是根据交互的timestamp排序的结果。对于每一个item $i$其包含一个集合的图片$V_i&#x3D;{v_1^i,…,v^i_{|V_i|}}$以及文字说明$T_i&#x3D;{t_1^i,…,t_{|T_i|}^i}$。</p>
+<h3 id="Multimodal-Feature-Extraction"><a href="#Multimodal-Feature-Extraction" class="headerlink" title="Multimodal Feature Extraction"></a>Multimodal Feature Extraction</h3><h4 id="Text-Feature-Extraction"><a href="#Text-Feature-Extraction" class="headerlink" title="Text Feature Extraction"></a>Text Feature Extraction</h4><p>对于$T_i$中的每一个文本，使用BERT获取其的隐藏表征。起始的文本特征$x_i^t$是所有文本特征的堆叠。<br>$$<br>x_i^t&#x3D;stack[BERT(t_1^i),…,BERT(t_{T_i}^i)]<br>$$<br>$x_t^i\in R^{|T_i| \times d}$</p>
+<h4 id="Image-Feature-Extraction"><a href="#Image-Feature-Extraction" class="headerlink" title="Image Feature Extraction"></a>Image Feature Extraction</h4><p>$$<br>f(w) &#x3D; \text{sim} \left( \text{CLIP} \left( v^i_{\ell} \right), \text{CLIP}(w) \right) \quad \forall w \in \mathcal{D},\<br> v^i_{\ell} &#x3D; \text{BERT} \left( \text{concat} \left( \text{TopN} \left( { f(w_1), \ldots, f(w_{|\mathcal{D}|}) }, N \right) \right) \right), \<br> \mathbf{x}^v_i &#x3D; \text{stack} \left[ v^i_1, v^i_2, \ldots, v^i_{|\mathcal{V}_i|} \right],<br>$$</p>
+<p>直接使用image encoder<strong>提取的特征可能包含许多不重要的信息</strong>，因此直接使用CLIP通过计算相似度，直接补充TAG信息，将这些TAG文本作为句子，用BERT模型提取特征并拼接形成图像特征。</p>
+<p>$ \mathbf{x}^v_i \in R^{|V_i| \times d }$，w是word dictionary D中的text token。</p>
+<p><img src="/../images/Recommendation/1-2.png" alt="image-20250616112103406"></p>
+<p>上图展示了使用CLIP补充数据集描述中欠缺的文本信息的示例。</p>
+<h3 id="Multimodal-Mixup-Sequence-Encoder"><a href="#Multimodal-Mixup-Sequence-Encoder" class="headerlink" title="Multimodal Mixup Sequence Encoder"></a>Multimodal Mixup Sequence Encoder</h3><p>为了编码从item中提取的多模式特征编码用户序列，文章提出全新的骨干网络，$M^2SE$。其包含4个关键组件：</p>
 <ol>
-<li><p><strong>数据加载时</strong>：</p>
-<ul>
-<li>对每个 mosaic 数据增强样本（通常包含 4 张图像），收集所有 <strong>正样本名词</strong>（出现在图像中的类别）。</li>
-<li>同时随机采样一些 <strong>负样本名词</strong>（未出现在当前图像中的类别），以增强模型的判别能力。</li>
-</ul>
-</li>
-<li><p><strong>词汇构建</strong>：</p>
-<ul>
-<li><p>最终词汇表大小限制为 <strong>最多 M 个名词</strong>（默认 M&#x3D;80，类似 COCO 的类别数）。</p>
-</li>
-<li><p>例如，如果当前 batch 包含 “dog”, “cat”, “car”，则词汇可能为：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Vocabulary = [&quot;dog&quot;, &quot;cat&quot;, &quot;car&quot;, &quot;person&quot;, &quot;tree&quot;, ...]  # 正样本 + 负样本</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p><strong>文本编码</strong>：</p>
-<ul>
-<li>使用 <strong>CLIP 文本编码器</strong> 实时计算这些名词的嵌入（Text Embeddings）。</li>
-<li>这些嵌入会用于计算 <strong>区域-文本对比损失（Region-Text Contrastive Loss）</strong>，优化模型对齐视觉和语言特征。</li>
-</ul>
-</li>
+<li>sequence random dropout </li>
+<li>text and image encoders</li>
+<li>complementary sequence mixup</li>
+<li>transformer layers</li>
 </ol>
-</li>
-<li><p>Offline Vocabulary</p>
-<p>（1）定义</p>
+<h4 id="Sequence-Random-Dropout"><a href="#Sequence-Random-Dropout" class="headerlink" title="Sequence Random Dropout"></a>Sequence Random Dropout</h4><p>该模块按照drop ratio参数随机消除掉序列中的一部分items。</p>
+<h4 id="Text-and-Image-Encoders"><a href="#Text-and-Image-Encoders" class="headerlink" title="Text and Image Encoders"></a>Text and Image Encoders</h4><ul>
+<li><strong>文本编码器</strong></li>
+</ul>
+<p>在文本编码器中，每个项目 $$i \in \hat{S}$$ 由其初始文本特征 $$x^t_i$$ 表示。注意力层由两个线性变换组成，用于融合 $$i$$ 的句子级嵌入，计算如下：</p>
+<p>$$<br>\alpha^t &#x3D; \text{softmax} \left( (x^t_i W^t_1 + b^t_1) W^t_2 + b^t_2 \right),<br>$$</p>
+<p>$$<br>e^t_i &#x3D; \sum_{j&#x3D;1}^{|T_i|} \alpha^t_j x^t_i[j, :],<br>$$</p>
+<p>其中 $$W^t_1 \in \mathbb{R}^{d \times d_a}$$，$$W^t_2 \in \mathbb{R}^{d_a}$$，$$b^t_1 \in \mathbb{R}^{d_a}$$，和 $$b^t_2 \in \mathbb{R}$$ 是可学习的参数。$$d_a$$ 是注意力维度大小。$$\alpha^t_j$$ 是 $$\alpha^t$$ 的第j个元素，$$x^t_i[j, :]$$ 表示特征矩阵 $$x^t_i$$ 的第j行。$e^t_i\in R^{d}$其相当于自注意力后的特征。</p>
+<p>然后，使用MoE来增加模型适应融合模态表示 $$e^t_i$$ 的能力。每个专家网络由一个线性变换、一个dropout层和一个归一化层组成。令 $$E_k(e^t_i) \in \mathbb{R}^{d_0}$$ <strong>表示第k个专家网络的输出</strong>，$$g^t \in \mathbb{R}^O$$ 表示门控网络的输出，计算如下：</p>
+<p>$$<br>E_k(e^t_i) &#x3D; \text{LayerNorm} \left( \text{Dropout} \left( e^t_i W^t_k \right) \right),<br>$$</p>
+<p>$$<br>g^t &#x3D; \text{softmax} \left( e^t_i W^t_3 \right),<br>$$</p>
+<p>其中 $$W^t_3 \in \mathbb{R}^{d \times O}$$ 和 $$W^t_k \in \mathbb{R}^{d \times d_0}$$ 是可学习的参数，O是专家的数量，$$d_0$$ 是隐藏嵌入的维度。然后，MoE网络对项目i的输出如下：<br>$$<br>z^t_i &#x3D; \sum_{k&#x3D;1}^O g^t_k E_k(e^t_i),<br>$$</p>
+<p>其中 $$z^t_i \in \mathbb{R}^{d_0}$$，$$g^t_k$$ 是来自第k个门控路由器的权重。这里为了简化，省略了方程中的偏置项。MoE网络对 $$\hat{S}$$ 中所有项目的输出被堆叠形成文本编码器的输出，记为 $$Z^t &#x3D; \text{stack}[z^t_1, z^t_2, \ldots, z^t_{|\hat{S}|}]$$。</p>
+<p>MOE其实就是加权多个模型的输出结果。</p>
 <ul>
-<li><strong>推理阶段预先编码的固定词汇</strong>，用户提前定义好所有可能的类别或描述，并 <strong>提前计算</strong> 其文本嵌入。</li>
-<li>模型推理时 <strong>无需实时编码文本</strong>，直接使用缓存的嵌入，极大提升效率。</li>
+<li>图像编码器</li>
 </ul>
-<p>（2）工作原理</p>
-<ol>
-<li><p><strong>用户定义词汇</strong>：</p>
-<ul>
-<li><p>在实际应用前，用户提供 <strong>自定义类别列表</strong>，例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Categories = [&quot;dog&quot;, &quot;cat&quot;, &quot;person&quot;, &quot;car&quot;, &quot;traffic light&quot;]</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>也可以是更复杂的描述，如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Descriptions = [&quot;a red car&quot;, &quot;a person wearing glasses&quot;]</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p><strong>离线编码</strong>：</p>
-<ul>
-<li>使用 <strong>CLIP 文本编码器</strong> 提前计算这些类别的嵌入，并存储为模型的一部分。</li>
-</ul>
-</li>
-<li><p><strong>推理优化</strong>：</p>
-<ul>
-<li>通过 <strong>重新参数化（Reparameterization）</strong> 技术，将文本嵌入转换为模型权重（如 1×1 卷积的 kernel），从而完全移除文本编码器的计算。</li>
-<li>例如：<ul>
-<li>T-CSPLayer 的文本引导注意力可以转换为一个固定卷积操作。</li>
-<li>文本对比头的计算可以直接复用预计算的嵌入。</li>
-</ul>
-</li>
-</ul>
-</li>
-</ol>
-</li>
-</ol>
-<h2 id="二、重参数化"><a href="#二、重参数化" class="headerlink" title="二、重参数化"></a>二、重参数化</h2><h3 id="文本嵌入作为卷积权重的原理详解"><a href="#文本嵌入作为卷积权重的原理详解" class="headerlink" title="文本嵌入作为卷积权重的原理详解"></a>文本嵌入作为卷积权重的原理详解</h3><ol>
-<li>数学等价性证明</li>
-</ol>
-<p>​	原始相似度计算</p>
-<p>给定：</p>
-<ul>
-<li>视觉特征 $F \in \mathbb{R}^{H \times W \times D}$</li>
-<li>文本嵌入 $T \in \mathbb{R}^{C \times D}$</li>
-</ul>
-<p>相似度计算：<br>$S &#x3D; F \times T^T \in \mathbb{R}^{H \times W \times C}$</p>
-<p><strong>1×1卷积等效计算</strong></p>
-<p>卷积核权重设置：<br>$W_{conv} \in \mathbb{R}^{C \times D \times 1 \times 1}, \quad W_{conv}[c,d,0,0] &#x3D; T[c,d]$</p>
-<p>则卷积输出：<br>$O[h,w,c] &#x3D; \sum_{d&#x3D;1}^D F[h,w,d] \cdot W_{conv}[c,d,0,0]$</p>
-<p><strong>两者完全等价</strong>。</p>
-<p>其实可以理解为线性层最好。</p>
-<h2 id="二、模型架构"><a href="#二、模型架构" class="headerlink" title="二、模型架构"></a>二、模型架构</h2><p><img src="/../images/CV/yolo_world1.png" alt="image-20250412114235660"></p>
-<ol>
-<li><p><strong>Text Encoder</strong></p>
-<p>采用CLIP的文本编码器作为文本encoder，训练方式和上面说过的一样，将文本嵌入和图像类别特征计算相似度。</p>
-<p>$s_{k,j} &#x3D; \alpha \cdot \underbrace{\text{L2-Norm}(e_k)}<em>{\text{归一化物体特征}} \cdot \underbrace{\text{L2-Norm}(w_j)^\top}</em>{\text{归一化文本特征}} + \beta \tag{1}$</p>
-<ul>
-<li>物体嵌入 $e_k \in \mathbb{R}^D$（第$k$个检测目标的特征）</li>
-<li>文本嵌入 $w_j \in \mathbb{R}^D$（第$j$个类别的文本特征）</li>
-</ul>
-</li>
-<li><p><strong>Re-parameterizable Vision-Language PAN</strong></p>
-</li>
-</ol>
-<p><img src="/../images/CV/yolo_world2.png" alt="image-20250412114302612"></p>
-<p>​	<strong>Text-guided CSPLayer</strong></p>
-<p>​		Text-guided CSPLayer是YOLO-World在传统YOLO架构上最重要的创新之一，它本质上是YOLOv8中CSPLayer（也叫C2f模块）的升级版，通过引入文本引导机制，实现了视觉特征语言特征的深度融合。</p>
-<p>​		(1) 核心创新点</p>
-<p>​			传统CSPLayer只处理视觉特征，而T-CSPLayer的创新在于：</p>
-<p>​				a. 增加了文本嵌入输入通道</p>
-<p>​				b. 设计了文本-图像动态交互机制</p>
-<p>​				c. 保持了YOLO原有的高效特性</p>
-<p>​		(2) 关键计算步骤</p>
-<p>​			① 相似度计算：<br>​				将图像特征图(H×W×D)与文本嵌入(C×D)做矩阵乘法，得到每个卷积区域位置对应所有文本类别的相似度分数(H×W×C)</p>
-<p>​			② 注意力生成：</p>
-<p>​				对C个类别维度取最大值操作，再通过Sigmoid激活，生成空间注意力图(H×W)</p>
-<p>​							$X_l’&#x3D;X_l⋅δ(max_{j\in(1..C)}(X_lW_j^T))^T$</p>
-<p>​				$X_lW_j^T$是$H\times W$的矩阵，里面的元素代表相似度。对C个类别取最大值每个位置保留与最相关文本类别的相似度。然后点乘原始图像表征就行。</p>
-<ol start="3">
-<li><strong>Image-Pooling Attention</strong></li>
-</ol>
-<p>​		1. 核心功能</p>
-<p>​			Image-Pooling Attention 是 YOLO-World 中用于增强文本嵌入的视觉感知能力的模块，其核心思想是：让文本特征能够动态感知图像内容，从而提升开放词汇检测的准确性。</p>
-<p>​		2. 计算流程</p>
-<p>​			假设输入为多尺度图像特征 ${X_3, X_4, X_5}$ 和文本嵌入 $W \in \mathbb{R}^{C \times D}$，计算步骤如下：</p>
-<p>​			（1）多尺度特征池化</p>
-<p>​				对每个层级的特征图进行自适应最大池化，统一到固定尺寸（3×3）：</p>
-<p>$$<br>\tilde{X}_l &#x3D; \text{MaxPool}(X_l, \text{output_size}&#x3D;3) \quad \text{其中} \ l \in {3,4,5}<br>$$</p>
-<p>​				<strong>输出形状</strong>：每层得到 $3 \times 3 \times D$ 的特征</p>
-<p>​				<strong>示例</strong>：</p>
-<p>​					$X_3$ (80×80×256) → 池化后 → 3×3×256</p>
-<p>​					$X_4$ (40×40×512) → 池化后 → 3×3×512 </p>
-<p>​					$X_5$ (20×20×1024) → 池化后 → 3×3×1024</p>
-<p>​			（2）特征拼接与扁平化</p>
-<p>​				将多尺度池化结果拼接并展平：</p>
-<p>​					$\tilde{X} &#x3D; \text{Flatten}(\text{Concat}[\tilde{X}_3, \tilde{X}_4, \tilde{X}_5])$</p>
-<p>​				<strong>输出形状</strong>：$27 \times D$<br>​				（3层级×3×3&#x3D;27个空间位置，每个位置D维特征）</p>
-<p>​			（3）视觉-文本交互</p>
-<p>​				计算文本嵌入的视觉感知更新：</p>
-<p>​				$W’ &#x3D; W + \text{Softmax}(W \tilde{X}^\top)\tilde{X}$</p>
-<p>​				<strong>Softmax权重表示不同尺度不同图像区域对文本的重要性</strong></p>
-<h2 id="三、预训练流程"><a href="#三、预训练流程" class="headerlink" title="三、预训练流程"></a>三、预训练流程</h2><ol>
-<li><p><strong>训练目标函数</strong></p>
-<h3 id="多任务损失"><a href="#多任务损失" class="headerlink" title="多任务损失"></a>多任务损失</h3><p>$\mathcal{L}(I) &#x3D; \mathcal{L}<em>{\text{con}} + \lambda_I \cdot (\mathcal{L}</em>{\text{iou}} + \mathcal{L}_{\text{dfl}})$</p>
-<ul>
-<li>对比损失：$\mathcal{L}_{\text{con}}$</li>
-<li>distributed focal loss：$\mathcal{L}_{\text{dfl}}$</li>
-<li>IoU损失：$L_{iou}$</li>
-</ul>
-</li>
-</ol>
+<p>计算方式与上面的情况一致。</p>
+<h4 id="Complement-Sequence-Mixup"><a href="#Complement-Sequence-Mixup" class="headerlink" title="Complement Sequence Mixup"></a>Complement Sequence Mixup</h4><p>解决两种不同模态序列的表征差异。实现逻辑就是设置一个混合比率$p$在0到0.5之间，根据比率将另一模态在上一阶段提取到的嵌入嵌入到本序列中。</p>
+<h4 id="Transformer-Layers"><a href="#Transformer-Layers" class="headerlink" title="Transformer Layers"></a>Transformer Layers</h4><p>就是一个L层的多头注意力，并将第L层输出的最后一行作为两种混合模态表征。</p>
+<h3 id="Pre-training-Objectives"><a href="#Pre-training-Objectives" class="headerlink" title="Pre-training Objectives"></a>Pre-training Objectives</h3><p>为了更好地捕获不同模态表示之间的相关性，我们提出了两个优化目标，即模态特定的下一项预测和跨模态对比学习，基于混合模态序列表示对骨干模型进行预训练。预训练阶段的工作流程如图1(c)所示。设 $\mathcal{B} &#x3D; {(S_j, i_j)}_{j&#x3D;1}^{|\mathcal{B}|}$ 表示一批预训练数据，其中 $S_j$ 表示用户的行为序列，$i_j$ 是其在 $S_j$ 之后的下一个交互项目。利用 M$^2$SE，我们可以获得 $S_j$ 的两个混合模态序列表示 $h^t_j$ 和 $h^v_j$。由于 $h^t_j$ 和 $h^v_j$ 是通过混合模态获得的，我们首先使用两个线性变换将它们映射到文本特征空间和图像特征空间，以便分别计算预训练损失：<br>$$<br>\tilde{m}_j^t &#x3D; h_j^t W_t + b_t,<br>\</p>
+<p>\tilde{m}_j^v &#x3D; h_j^v W_v + b_v,<br>\</p>
+<p>\tilde{m}_j^{v’} &#x3D; h_j^t W_t + b_v,<br>\<br>\tilde{m}_j^{t’} &#x3D; h_j^v W_v + b_t,<br>$$<br>其中 $W_t, W_v \in \mathbb{R}^{d_0 \times d_0}$ 和 $b_t, b_v \in \mathbb{R}^{d_0}$ 是可学习的参数。受模型预训练中对比学习成功的启发，我们以对比的方式定义预训练目标函数。</p>
+<h4 id="Modality-specific-Next-Item-Prediction"><a href="#Modality-specific-Next-Item-Prediction" class="headerlink" title="Modality-specific Next Item Prediction."></a>Modality-specific Next Item Prediction.</h4><p>文本特征空间中的下一项预测损失定义如下：</p>
+<p>$$<br>L_{NIP}^{(t)} &#x3D; - \sum_{j&#x3D;1}^{|B|} \log \frac{f(\tilde{m}_j^t, z_j^t) + f(\tilde{m}<em>j^v, z_j^t)}{\sum</em>{j’&#x3D;1}^{|B|} [f(\tilde{m}<em>j^t, z</em>{j’}^t) + f(\tilde{m}<em>j^v, z</em>{j’}^t)]},<br>$$</p>
+<p>其中$f(s, z) &#x3D; \exp(\text{sim}(s, z)&#x2F;\tau)$，$\tau$ 是温度超参数。类似地，我们也可以定义图像特征空间中的下一项预测损失 $L_{NIP}^{v}$。这一项损失的意义就是使得图像和文本表征和下一个item的表征接近。利用对比学习</p>
 
         </div>
 
@@ -507,7 +406,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2025/04/12/yolo-world/">http://example.com/2025/04/12/yolo-world/</a></span>
+                        <span><a href="http://example.com/2025/06/18/Multimodal-Pre-training-for-Sequential-Recommendation-via-Contrastive-Learning/">http://example.com/2025/06/18/Multimodal-Pre-training-for-Sequential-Recommendation-via-Contrastive-Learning/</a></span>
                     </p>
                 
                 
@@ -531,7 +430,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/CV/"># CV</a>
+                        <a href="/tags/Recommendation/"># Recommendation</a>
                     
                         
                 </span>
@@ -544,10 +443,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2025/06/18/Multimodal-Pre-training-for-Sequential-Recommendation-via-Contrastive-Learning/">Multimodal Pre-training for Sequential Recommendation via Contrastive Learning</a>
             
-            
-            <a class="next" rel="next" href="/2024/06/27/Mutual-Modality_Adversarial_Attack_with_Semantic_Perturbation/">m</a>
+            <a class="next" rel="next" href="/2025/04/12/yolo-world/">Yolo_World</a>
             
         </section>
 
