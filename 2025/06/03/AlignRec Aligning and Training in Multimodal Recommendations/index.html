@@ -13,7 +13,7 @@
 
 
 
-<title>Multimodal Pre-training for Sequential Recommendation via Contrastive Learning | Hexo</title>
+<title>Hexo</title>
 
 
 
@@ -326,7 +326,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Multimodal Pre-training for Sequential Recommendation via Contrastive Learning</h1>
+            <h1 class="post-title"></h1>
             
                 <div class="post-meta">
                     
@@ -335,63 +335,70 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">June 18, 2025&nbsp;&nbsp;12:22:40</a>
+                        Date: <a href="#">June 3, 2025&nbsp;&nbsp;12:58:17</a>
                         </span>
                     
-                    
-                        <span class="post-category">
-                    Category:
-                            
-                                <a href="/categories/Recommendation/">Recommendation</a>
-                            
-                        </span>
                     
                 </div>
             
         </header>
 
         <div class="post-content">
-            <h1 id="Multimodal-Pre-training-for-Sequential-Recommendation-via-Contrastive-Learning"><a href="#Multimodal-Pre-training-for-Sequential-Recommendation-via-Contrastive-Learning" class="headerlink" title="Multimodal Pre-training for Sequential Recommendation via Contrastive Learning"></a>Multimodal Pre-training for Sequential Recommendation via Contrastive Learning</h1><p><img src="/../images/Recommendation/1-1.png" alt="image-20250616104417725"></p>
-<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><h3 id="Task-Setting"><a href="#Task-Setting" class="headerlink" title="Task Setting"></a>Task Setting</h3><p>$I$代表item的集合，$S&#x3D;{i_1,…,i_n}$代表用户行为序列，n项是根据交互的timestamp排序的结果。对于每一个item $i$其包含一个集合的图片$V_i&#x3D;{v_1^i,…,v^i_{|V_i|}}$以及文字说明$T_i&#x3D;{t_1^i,…,t_{|T_i|}^i}$。</p>
-<h3 id="Multimodal-Feature-Extraction"><a href="#Multimodal-Feature-Extraction" class="headerlink" title="Multimodal Feature Extraction"></a>Multimodal Feature Extraction</h3><h4 id="Text-Feature-Extraction"><a href="#Text-Feature-Extraction" class="headerlink" title="Text Feature Extraction"></a>Text Feature Extraction</h4><p>对于$T_i$中的每一个文本，使用BERT获取其的隐藏表征。起始的文本特征$x_i^t$是所有文本特征的堆叠。<br>$$<br>x_i^t&#x3D;stack[BERT(t_1^i),…,BERT(t_{T_i}^i)]<br>$$<br>$x_t^i\in R^{|T_i| \times d}$</p>
-<h4 id="Image-Feature-Extraction"><a href="#Image-Feature-Extraction" class="headerlink" title="Image Feature Extraction"></a>Image Feature Extraction</h4><p>$$<br>f(w) &#x3D; \text{sim} \left( \text{CLIP} \left( v^i_{\ell} \right), \text{CLIP}(w) \right) \quad \forall w \in \mathcal{D},\<br> v^i_{\ell} &#x3D; \text{BERT} \left( \text{concat} \left( \text{TopN} \left( { f(w_1), \ldots, f(w_{|\mathcal{D}|}) }, N \right) \right) \right), \<br> \mathbf{x}^v_i &#x3D; \text{stack} \left[ v^i_1, v^i_2, \ldots, v^i_{|\mathcal{V}_i|} \right],<br>$$</p>
-<p>直接使用image encoder<strong>提取的特征可能包含许多不重要的信息</strong>，因此直接使用CLIP通过计算相似度，直接补充TAG信息，将这些TAG文本作为句子，用BERT模型提取特征并拼接形成图像特征。</p>
-<p>$ \mathbf{x}^v_i \in R^{|V_i| \times d }$，w是word dictionary D中的text token。</p>
-<p><img src="/../images/Recommendation/1-2.png" alt="image-20250616112103406"></p>
-<p>上图展示了使用CLIP补充数据集描述中欠缺的文本信息的示例。</p>
-<h3 id="Multimodal-Mixup-Sequence-Encoder"><a href="#Multimodal-Mixup-Sequence-Encoder" class="headerlink" title="Multimodal Mixup Sequence Encoder"></a>Multimodal Mixup Sequence Encoder</h3><p>为了编码从item中提取的多模式特征编码用户序列，文章提出全新的骨干网络，$M^2SE$。其包含4个关键组件：</p>
-<ol>
-<li>sequence random dropout </li>
-<li>text and image encoders</li>
-<li>complementary sequence mixup</li>
-<li>transformer layers</li>
-</ol>
-<h4 id="Sequence-Random-Dropout"><a href="#Sequence-Random-Dropout" class="headerlink" title="Sequence Random Dropout"></a>Sequence Random Dropout</h4><p>该模块按照drop ratio参数随机消除掉序列中的一部分items。</p>
-<h4 id="Text-and-Image-Encoders"><a href="#Text-and-Image-Encoders" class="headerlink" title="Text and Image Encoders"></a>Text and Image Encoders</h4><ul>
-<li><strong>文本编码器</strong></li>
+            <h1 id="AlignRec：Aligning-and-Training-in-Multimodal-Recommendations（CCF-B）"><a href="#AlignRec：Aligning-and-Training-in-Multimodal-Recommendations（CCF-B）" class="headerlink" title="AlignRec：Aligning and Training in Multimodal Recommendations（CCF-B）"></a>AlignRec：Aligning and Training in Multimodal Recommendations（CCF-B）</h1><p>将ID-based features视作一种新的模态：类别模态</p>
+<h3 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h3><ul>
+<li>多模态推荐的输入不仅包含图像和文本这样的内容模态，还包含多种ID特征。这些模态在自己的特征空间保持自己的分布。</li>
+<li>对于内容模态的学习需要大量的时间，而对于类别特征的学习只需要几轮就可以完成，如果联合训练很难处理这样的不平衡速率问题。</li>
+<li>多模态中不同模态对推荐的影响未得到充分研究，不一定都有用。缺乏视力特征可以获得相对12.1％的召回率@20。</li>
 </ul>
-<p>在文本编码器中，每个项目 $$i \in \hat{S}$$ 由其初始文本特征 $$x^t_i$$ 表示。注意力层由两个线性变换组成，用于融合 $$i$$ 的句子级嵌入，计算如下：</p>
-<p>$$<br>\alpha^t &#x3D; \text{softmax} \left( (x^t_i W^t_1 + b^t_1) W^t_2 + b^t_2 \right),<br>$$</p>
-<p>$$<br>e^t_i &#x3D; \sum_{j&#x3D;1}^{|T_i|} \alpha^t_j x^t_i[j, :],<br>$$</p>
-<p>其中 $$W^t_1 \in \mathbb{R}^{d \times d_a}$$，$$W^t_2 \in \mathbb{R}^{d_a}$$，$$b^t_1 \in \mathbb{R}^{d_a}$$，和 $$b^t_2 \in \mathbb{R}$$ 是可学习的参数。$$d_a$$ 是注意力维度大小。$$\alpha^t_j$$ 是 $$\alpha^t$$ 的第j个元素，$$x^t_i[j, :]$$ 表示特征矩阵 $$x^t_i$$ 的第j行。$e^t_i\in R^{d}$其相当于自注意力后的特征。</p>
-<p>然后，使用MoE来增加模型适应融合模态表示 $$e^t_i$$ 的能力。每个专家网络由一个线性变换、一个dropout层和一个归一化层组成。令 $$E_k(e^t_i) \in \mathbb{R}^{d_0}$$ <strong>表示第k个专家网络的输出</strong>，$$g^t \in \mathbb{R}^O$$ 表示门控网络的输出，计算如下：</p>
-<p>$$<br>E_k(e^t_i) &#x3D; \text{LayerNorm} \left( \text{Dropout} \left( e^t_i W^t_k \right) \right),<br>$$</p>
-<p>$$<br>g^t &#x3D; \text{softmax} \left( e^t_i W^t_3 \right),<br>$$</p>
-<p>其中 $$W^t_3 \in \mathbb{R}^{d \times O}$$ 和 $$W^t_k \in \mathbb{R}^{d \times d_0}$$ 是可学习的参数，O是专家的数量，$$d_0$$ 是隐藏嵌入的维度。然后，MoE网络对项目i的输出如下：<br>$$<br>z^t_i &#x3D; \sum_{k&#x3D;1}^O g^t_k E_k(e^t_i),<br>$$</p>
-<p>其中 $$z^t_i \in \mathbb{R}^{d_0}$$，$$g^t_k$$ 是来自第k个门控路由器的权重。这里为了简化，省略了方程中的偏置项。MoE网络对 $$\hat{S}$$ 中所有项目的输出被堆叠形成文本编码器的输出，记为 $$Z^t &#x3D; \text{stack}[z^t_1, z^t_2, \ldots, z^t_{|\hat{S}|}]$$。</p>
-<p>MOE其实就是加权多个模型的输出结果。</p>
+<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><p><img src="C:\Users\lijia\AppData\Roaming\Typora\typora-user-images\image-20250603153354628.png" alt="image-20250603153354628"></p>
 <ul>
-<li>图像编码器</li>
+<li>多模态编码器将视觉和文本模态知识对齐成一个统一表示</li>
+<li>聚合模块将邻域信息用Graph聚合起来</li>
+<li>融合模块将ID-based表征和多模态表征融合起来推荐</li>
 </ul>
-<p>计算方式与上面的情况一致。</p>
-<h4 id="Complement-Sequence-Mixup"><a href="#Complement-Sequence-Mixup" class="headerlink" title="Complement Sequence Mixup"></a>Complement Sequence Mixup</h4><p>解决两种不同模态序列的表征差异。实现逻辑就是设置一个混合比率$p$在0到0.5之间，根据比率将另一模态在上一阶段提取到的嵌入嵌入到本序列中。</p>
-<h4 id="Transformer-Layers"><a href="#Transformer-Layers" class="headerlink" title="Transformer Layers"></a>Transformer Layers</h4><p>就是一个L层的多头注意力，并将第L层输出的最后一行作为两种混合模态表征。</p>
-<h3 id="Pre-training-Objectives"><a href="#Pre-training-Objectives" class="headerlink" title="Pre-training Objectives"></a>Pre-training Objectives</h3><p>为了更好地捕获不同模态表示之间的相关性，我们提出了两个优化目标，即模态特定的下一项预测和跨模态对比学习，基于混合模态序列表示对骨干模型进行预训练。预训练阶段的工作流程如图1(c)所示。设 $\mathcal{B} &#x3D; {(S_j, i_j)}_{j&#x3D;1}^{|\mathcal{B}|}$ 表示一批预训练数据，其中 $S_j$ 表示用户的行为序列，$i_j$ 是其在 $S_j$ 之后的下一个交互项目。利用 M$^2$SE，我们可以获得 $S_j$ 的两个混合模态序列表示 $h^t_j$ 和 $h^v_j$。由于 $h^t_j$ 和 $h^v_j$ 是通过混合模态获得的，我们首先使用两个线性变换将它们映射到文本特征空间和图像特征空间，以便分别计算预训练损失：<br>$$<br>\tilde{m}_j^t &#x3D; h_j^t W_t + b_t,<br>\</p>
-<p>\tilde{m}_j^v &#x3D; h_j^v W_v + b_v,<br>\</p>
-<p>\tilde{m}_j^{v’} &#x3D; h_j^t W_t + b_v,<br>\<br>\tilde{m}_j^{t’} &#x3D; h_j^v W_v + b_t,<br>$$<br>其中 $W_t, W_v \in \mathbb{R}^{d_0 \times d_0}$ 和 $b_t, b_v \in \mathbb{R}^{d_0}$ 是可学习的参数。受模型预训练中对比学习成功的启发，我们以对比的方式定义预训练目标函数。</p>
-<h4 id="Modality-specific-Next-Item-Prediction"><a href="#Modality-specific-Next-Item-Prediction" class="headerlink" title="Modality-specific Next Item Prediction."></a>Modality-specific Next Item Prediction.</h4><p>文本特征空间中的下一项预测损失定义如下：</p>
-<p>$$<br>L_{NIP}^{(t)} &#x3D; - \sum_{j&#x3D;1}^{|B|} \log \frac{f(\tilde{m}_j^t, z_j^t) + f(\tilde{m}<em>j^v, z_j^t)}{\sum</em>{j’&#x3D;1}^{|B|} [f(\tilde{m}<em>j^t, z</em>{j’}^t) + f(\tilde{m}<em>j^v, z</em>{j’}^t)]},<br>$$</p>
-<p>其中$f(s, z) &#x3D; \exp(\text{sim}(s, z)&#x2F;\tau)$，$\tau$ 是温度超参数。类似地，我们也可以定义图像特征空间中的下一项预测损失 $L_{NIP}^{v}$。这一项损失的意义就是使得图像和文本表征和下一个item的表征接近。利用对比学习</p>
+<p>最终目的是生成item和user表征来进行top-k推荐</p>
+<h2 id="Architecture"><a href="#Architecture" class="headerlink" title="Architecture"></a>Architecture</h2><p>模型的输入就是Text（用户评论），Image（item的图片），User ID，Item ID。输出表征</p>
+<p><img src="C:\Users\lijia\AppData\Roaming\Typora\typora-user-images\image-20250604133623683.png" alt="image-20250604133623683"></p>
+<h3 id="多模态编码器"><a href="#多模态编码器" class="headerlink" title="多模态编码器"></a>多模态编码器</h3><p>采用BEiT3将图像和文本表示成一个多模态融合表征：<br>$$<br>h_{enc}^i&#x3D;MMEnc(i_v,i_t)<br>$$</p>
+<h3 id="聚合模块"><a href="#聚合模块" class="headerlink" title="聚合模块"></a>聚合模块</h3><p>输出user&#x2F;item的多模态隐藏表征$(h^u_{mm},h^i_{mm})$以及基于ID的表征$(h^u_{id},h^i_{id})$<br>$$<br>h^i_{mm},h^u_{mm},h^i_{id},h^u_{id}&#x3D;Aggregator(h^i_{enc},i_{id},u_{id}|G)<br>$$</p>
+<ul>
+<li>LightGCN 聚合基础</li>
+</ul>
+<p>LightGCN 是一种基于图神经网络（GNN）的协同过滤方法，用于推荐系统。其核心思想是通过用户-物品交互图来传播和聚合用户与物品的嵌入表示，从而捕捉用户和物品之间的高阶关系。</p>
+<ul>
+<li>LightGCN 的聚合公式</li>
+</ul>
+<p>在论文中，作者使用 LightGCN 来实现用户和物品的 ID-based 表示的聚合。LightGCN 的聚合过程如下：</p>
+<p><strong>初始嵌入表示</strong></p>
+<p>首先，用户和物品的 ID 特征通过嵌入层（embedding layer）转换为低维的稠密向量表示，记作 (e_{id}^u)（用户嵌入）和 (e_{id}^i)（物品嵌入）。将所有用户和物品的嵌入向量堆叠起来，形成嵌入矩阵 (E_{id})。</p>
+<p><strong>构建归一化邻接矩阵</strong></p>
+<p>用户-物品交互矩阵 (R) 是一个二值矩阵，表示用户与物品之间的交互关系（如点击与否）。基于这个交互矩阵 (R)，构建用户-物品二分图的邻接矩阵 (A)，其形式为：<br>$$<br>A &#x3D; \begin{pmatrix} 0 &amp; R \ R^\top &amp; 0 \end{pmatrix}<br>$$<br>这个邻接矩阵 (A) 表示用户和物品之间的连接关系。为了处理图神经网络中的信息传播，作者使用了归一化的邻接矩阵 (\tilde{A})，它通过对 (A) 进行归一化处理得到。</p>
+<p><strong>LightGCN 传播公式</strong></p>
+<p>LightGCN 通过堆叠 (L) 层图卷积网络（GCN）来聚合邻居节点的信息。每一层的传播公式如下：</p>
+<p>$$<br>H_{id}^{l+1} &#x3D; \tilde{A} H_{id}^l<br>$$<br>其中：</p>
+<ul>
+<li>$(H_{id}^l)$ 表示第 (l) 层的用户和物品嵌入矩阵。</li>
+<li>$(\tilde{A})$ 是归一化后的邻接矩阵，用于在图中传播信息。</li>
+<li>初始时，$(H_{id}^0 &#x3D; E_{id})$，即初始嵌入矩阵。</li>
+</ul>
+<p>最终的嵌入表示</p>
+<p>最终，将每一层的嵌入表示进行平均，得到最终的用户和物品嵌入矩阵 $(H_{id})$：<br>$$<br>H_{id} &#x3D; \frac{1}{L+1} \left( H_{id}^0 + H_{id}^1 + \ldots + H_{id}^L \right)<br>$$<br>这个矩阵 $(H_{id})$ 包含了用户和物品的 ID-based 表示。经过多层的图聚合后，它能够捕捉到用户和物品之间的复杂交互关系。</p>
+<ul>
+<li><p>item侧的多模态隐藏向量$h_{mm}^i$</p>
+<p>$\odot$代表元素乘积，$h^i_{con}$代表融合ID和内容知识，S是通过计算Item的多模态相似度得到的</p>
+<p>*<br>  $$<br>  h_{\text{con}}^i &#x3D; e_{\text{id}}^i \odot \sigma \left( \text{MLP}(h_{\text{enc}}^i) \right),<br>  $$</p>
+<ul>
+<li>$$<br>h_{\text{mm}}^i &#x3D; \sum_{j \in I} S_{ij} h_{\text{con}}^i.<br>$$</li>
+</ul>
+</li>
+<li><p>user侧的多模态隐藏向量$h_{mm}^u$</p>
+<ul>
+<li>$$<br>h^u_{mm}&#x3D;\sum_{j\in I} \tilde{R_{uj}}h_{mm}^j<br>$$</li>
+</ul>
+</li>
+</ul>
+<p>$$<br>h^i&#x3D;h^i_{mm}+h^i_{id},h^u&#x3D;h^u_{mm}+h^u_{id}<br>$$</p>
+<p>在做推荐的时候计算相似度$s(u,i)&#x3D;h^i(h^u)^T$取top-K进行推荐。</p>
 
         </div>
 
@@ -406,7 +413,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2025/06/18/Multimodal-Pre-training-for-Sequential-Recommendation-via-Contrastive-Learning/">http://example.com/2025/06/18/Multimodal-Pre-training-for-Sequential-Recommendation-via-Contrastive-Learning/</a></span>
+                        <span><a href="http://example.com/2025/06/03/AlignRec%20Aligning%20and%20Training%20in%20Multimodal%20Recommendations/">http://example.com/2025/06/03/AlignRec%20Aligning%20and%20Training%20in%20Multimodal%20Recommendations/</a></span>
                     </p>
                 
                 
@@ -429,10 +436,6 @@
                 <span>Tag(s):</span>
                 <span class="tag">
                     
-                    
-                        <a href="/tags/Recommendation/"># Recommendation</a>
-                    
-                        
                 </span>
             </div>
             <div>
@@ -443,8 +446,10 @@
         </section>
         <section class="post-nav">
             
+                <a class="prev" rel="prev" href="/2025/06/04/Harnessing%20Multimodal%20Large%20Language%20Models%20for%20Multimodal%20Sequential%20Recommendation1/"></a>
             
-            <a class="next" rel="next" href="/2025/06/04/Harnessing%20Multimodal%20Large%20Language%20Models%20for%20Multimodal%20Sequential%20Recommendation1/"></a>
+            
+            <a class="next" rel="next" href="/2025/04/12/yolo-world/">Yolo_World</a>
             
         </section>
 
