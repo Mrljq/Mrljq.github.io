@@ -13,7 +13,7 @@
 
 
 
-<title>Yolo_World | Hexo</title>
+<title>How Can Recommender Systems Benefit from Large Language Models: A Survey | Hexo</title>
 
 
 
@@ -326,7 +326,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Yolo_World</h1>
+            <h1 class="post-title">How Can Recommender Systems Benefit from Large Language Models: A Survey</h1>
             
                 <div class="post-meta">
                     
@@ -335,14 +335,14 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">April 12, 2025&nbsp;&nbsp;11:47:08</a>
+                        Date: <a href="#">June 18, 2025&nbsp;&nbsp;16:31:24</a>
                         </span>
                     
                     
                         <span class="post-category">
                     Category:
                             
-                                <a href="/categories/CV/">CV</a>
+                                <a href="/categories/Recommendation/">Recommendation</a>
                             
                         </span>
                     
@@ -351,148 +351,66 @@
         </header>
 
         <div class="post-content">
-            <h2 id="一、Online-Vocabulary-and-Offline-Vocabulary"><a href="#一、Online-Vocabulary-and-Offline-Vocabulary" class="headerlink" title="一、Online Vocabulary and Offline Vocabulary"></a>一、Online Vocabulary and Offline Vocabulary</h2><ol>
-<li><p>Online Vocabulary</p>
-<p>这里其实和VLP里的ITC训练一样，抛弃了原先训练yolo时需要固定类和图像，现在就是直接大规模数据集训练。</p>
-<p>1）定义</p>
-<ul>
-<li><strong>训练阶段动态构建的词汇</strong>，每个训练批次（batch）都会根据当前样本的标注信息 <strong>动态选择</strong> 相关的类别名称或名词短语。</li>
-<li>词汇内容会 <strong>随训练数据变化</strong>，模型需要实时计算文本嵌入（Text Embeddings）。</li>
-</ul>
-<p>2）工作原理</p>
+            <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><h3 id="传统推荐系统的问题"><a href="#传统推荐系统的问题" class="headerlink" title="传统推荐系统的问题"></a>传统推荐系统的问题</h3><ol>
+<li>常规推荐系统是基于特定域内离散ID构建的域面向域的系统。因此，<strong>他们缺乏开放域的世界知识来获得更好的建议性能</strong>（例如，增强用户兴趣建模和项目内容的理解），并在不同的域和平台上传递能力。 </li>
+<li>常规推荐系统通常旨在以数据驱动的方式优化特定的用户反馈，例如点击和购买，在这种方式中，用户偏好和基本动机通常是根据在线收集的用户行为进行隐式建模的。结果<strong>，这些系统可能缺乏建议解释性，</strong>并且无法完全理解用户在各种情况下的复杂和<strong>波动意图</strong>。此外，用户无法通过提供自然语言的详细说明来积极指导推荐系统遵循其要求并自定义建议结果</li>
+</ol>
+<h3 id="LLM的应用"><a href="#LLM的应用" class="headerlink" title="LLM的应用"></a>LLM的应用</h3><p>本文从工业推荐系统的整个流水线角度来分析。将LLM的应用分为HOW和WHERE来分析。</p>
+<p><img src="/../images/Recommendation/4-1.png" alt="image-20250619114035380"></p>
+<h2 id="BACKGROUND-AND-PRELIMINARY"><a href="#BACKGROUND-AND-PRELIMINARY" class="headerlink" title="BACKGROUND AND PRELIMINARY"></a>BACKGROUND AND PRELIMINARY</h2><h3 id="现代推荐系统"><a href="#现代推荐系统" class="headerlink" title="现代推荐系统"></a>现代推荐系统</h3><p>推荐系统的核心是为特定用户$u \in U$和特定内容$c$提供items的排名序列$[i_k]^N_{k&#x3D;1},i_k \in I$，其中$I$和$U$是Item和Users的集合。对于下一个item预测场景对应$N&#x3D;1$<br>$$<br>[i_k]^N_{k&#x3D;1} \leftarrow RS(u,c,I),u\in U,i_k \in I<br>$$<br>现代基于深度学习的推荐系统可以被描述为涵盖六个关键阶段的信息周期：</p>
+<p><img src="/../images/Recommendation/4-2.png" alt="image-20250619121618539"></p>
 <ol>
-<li><p><strong>数据加载时</strong>：</p>
-<ul>
-<li>对每个 mosaic 数据增强样本（通常包含 4 张图像），收集所有 <strong>正样本名词</strong>（出现在图像中的类别）。</li>
-<li>同时随机采样一些 <strong>负样本名词</strong>（未出现在当前图像中的类别），以增强模型的判别能力。</li>
-</ul>
-</li>
-<li><p><strong>词汇构建</strong>：</p>
-<ul>
-<li><p>最终词汇表大小限制为 <strong>最多 M 个名词</strong>（默认 M&#x3D;80，类似 COCO 的类别数）。</p>
-</li>
-<li><p>例如，如果当前 batch 包含 “dog”, “cat”, “car”，则词汇可能为：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Vocabulary = [&quot;dog&quot;, &quot;cat&quot;, &quot;car&quot;, &quot;person&quot;, &quot;tree&quot;, ...]  # 正样本 + 负样本</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p><strong>文本编码</strong>：</p>
-<ul>
-<li>使用 <strong>CLIP 文本编码器</strong> 实时计算这些名词的嵌入（Text Embeddings）。</li>
-<li>这些嵌入会用于计算 <strong>区域-文本对比损失（Region-Text Contrastive Loss）</strong>，优化模型对齐视觉和语言特征。</li>
-</ul>
-</li>
+<li>Data Collection：数据收集阶段通过向用户呈现推荐的项目来收集来自在线服务的明确和隐式反馈。显式反馈表示直接的用户响应，例如评分，而隐式反馈源自用户行为，例如点击，下载和购买。除了收集用户反馈外，要收集的数据还包括一系列原始功能，包括项目属性，用户人口统计信息和上下文信息。</li>
+<li>Feature Engineering：特征工程是选择，操纵，转换和扩大在线收集到的原始数据中的结构化数据的过程，这些数据适合作为神经建议模型的输入。Feature Engineering的输出是各种模态数据通过对应模态编码器编码得到。（<strong>可以理解为变成格式化数据</strong>）</li>
+<li>Feature Encoder：将在Feature Engineering阶段得到的输出作为输出生成embedding用于下一阶段的评分和排序。</li>
+<li>Scoring&#x2F;Ranking function：该阶段是推荐系统的核心部分，根据嵌入精准估计用户的偏好和行为。</li>
+<li>User Interaction：用户互动是指我们向目标用户表示推荐的项目的方式，以及用户将反馈还给推荐系统的方式。</li>
+<li>Recommendation Pipeline Control：监视并控制上述整个recommendation pipeline的操作。</li>
 </ol>
-</li>
-<li><p>Offline Vocabulary</p>
-<p>（1）定义</p>
-<ul>
-<li><strong>推理阶段预先编码的固定词汇</strong>，用户提前定义好所有可能的类别或描述，并 <strong>提前计算</strong> 其文本嵌入。</li>
-<li>模型推理时 <strong>无需实时编码文本</strong>，直接使用缓存的嵌入，极大提升效率。</li>
-</ul>
-<p>（2）工作原理</p>
+<p><strong>也就是对于我们写论文只需要考虑：3和4.最多加一个2</strong></p>
+<h3 id="Where-to-adapt-LLM"><a href="#Where-to-adapt-LLM" class="headerlink" title="Where to adapt LLM"></a>Where to adapt LLM</h3><p><img src="/../images/Recommendation/4-3.png" alt="image-20250619112522325"></p>
+<h4 id="LLM-for-Feature-Engineering"><a href="#LLM-for-Feature-Engineering" class="headerlink" title="LLM for Feature Engineering"></a>LLM for Feature Engineering</h4><p>这一阶段将原始feature输入LLM并生成具有各种目标的数据增强的辅助文本功能。例如丰富训练数据，缓解长尾问题。</p>
+<p>采用不同的prompt策略来充分利用LLM展示的开放世界知识和推理能力。根据数据的类型，该行的研究工作可以主要分为两类：（1）用户和项目级功能增强，（2）实例级别培训样本生成。</p>
 <ol>
-<li><p><strong>用户定义词汇</strong>：</p>
-<ul>
-<li><p>在实际应用前，用户提供 <strong>自定义类别列表</strong>，例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Categories = [&quot;dog&quot;, &quot;cat&quot;, &quot;person&quot;, &quot;car&quot;, &quot;traffic light&quot;]</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>也可以是更复杂的描述，如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Descriptions = [&quot;a red car&quot;, &quot;a person wearing glasses&quot;]</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p><strong>离线编码</strong>：</p>
-<ul>
-<li>使用 <strong>CLIP 文本编码器</strong> 提前计算这些类别的嵌入，并存储为模型的一部分。</li>
-</ul>
-</li>
-<li><p><strong>推理优化</strong>：</p>
-<ul>
-<li>通过 <strong>重新参数化（Reparameterization）</strong> 技术，将文本嵌入转换为模型权重（如 1×1 卷积的 kernel），从而完全移除文本编码器的计算。</li>
-<li>例如：<ul>
-<li>T-CSPLayer 的文本引导注意力可以转换为一个固定卷积操作。</li>
-<li>文本对比头的计算可以直接复用预计算的嵌入。</li>
-</ul>
-</li>
-</ul>
-</li>
+<li>User- and Item-level Feature Augmentation.：<strong>提供更好的用户偏好建模和项目内容的理解。</strong>作为代表，KAR [242]采用LLM来生成用户端的首选项知识和项目侧事实知识，这些知识是下游常规推荐模型的插件功能。 SAGCN [124]引入了一种基于链条的提示方法，以发现语义方面感知的交互，该方法在细粒度的语义层面上提供了对用户行为的更清晰的见解。 <strong>Cup [201]根据用户评论文本采用CHATGPT，用一些简短的关键字来总结每个用户的兴趣。</strong>通过这种方式，用户分析数据在128个令牌之内被凝结，因此可以用小尺度语言模型进一步编码，这些模型受到上下文Windows大小的约束（例如，对于Bert [31]）。</li>
+<li>Instance-level Sample Generation.：<strong>LLM还被利用来生成合成样品，从而丰富培训数据集并提高模型预测质量。</strong></li>
 </ol>
-</li>
-</ol>
-<h2 id="二、重参数化"><a href="#二、重参数化" class="headerlink" title="二、重参数化"></a>二、重参数化</h2><h3 id="文本嵌入作为卷积权重的原理详解"><a href="#文本嵌入作为卷积权重的原理详解" class="headerlink" title="文本嵌入作为卷积权重的原理详解"></a>文本嵌入作为卷积权重的原理详解</h3><ol>
-<li>数学等价性证明</li>
-</ol>
-<p>​	原始相似度计算</p>
-<p>给定：</p>
-<ul>
-<li>视觉特征 $F \in \mathbb{R}^{H \times W \times D}$</li>
-<li>文本嵌入 $T \in \mathbb{R}^{C \times D}$</li>
-</ul>
-<p>相似度计算：<br>$S &#x3D; F \times T^T \in \mathbb{R}^{H \times W \times C}$</p>
-<p><strong>1×1卷积等效计算</strong></p>
-<p>卷积核权重设置：<br>$W_{conv} \in \mathbb{R}^{C \times D \times 1 \times 1}, \quad W_{conv}[c,d,0,0] &#x3D; T[c,d]$</p>
-<p>则卷积输出：<br>$O[h,w,c] &#x3D; \sum_{d&#x3D;1}^D F[h,w,d] \cdot W_{conv}[c,d,0,0]$</p>
-<p><strong>两者完全等价</strong>。</p>
-<p>其实可以理解为线性层最好。</p>
-<h2 id="二、模型架构"><a href="#二、模型架构" class="headerlink" title="二、模型架构"></a>二、模型架构</h2><p><img src="/../images/CV/yolo_world1.png" alt="image-20250412114235660"></p>
+<h3 id="LLM-as-Feature-Encoder"><a href="#LLM-as-Feature-Encoder" class="headerlink" title="LLM as Feature Encoder"></a>LLM as Feature Encoder</h3><p>传统方法一般采用嵌入层获得致密嵌入，LLM可以为后续的推荐模型丰富User&#x2F;Item表示，利用文本作为桥梁实现跨域推荐。</p>
 <ol>
-<li><p><strong>Text Encoder</strong></p>
-<p>采用CLIP的文本编码器作为文本encoder，训练方式和上面说过的一样，将文本嵌入和图像类别特征计算相似度。</p>
-<p>$s_{k,j} &#x3D; \alpha \cdot \underbrace{\text{L2-Norm}(e_k)}<em>{\text{归一化物体特征}} \cdot \underbrace{\text{L2-Norm}(w_j)^\top}</em>{\text{归一化文本特征}} + \beta \tag{1}$</p>
-<ul>
-<li>物体嵌入 $e_k \in \mathbb{R}^D$（第$k$个检测目标的特征）</li>
-<li>文本嵌入 $w_j \in \mathbb{R}^D$（第$j$个类别的文本特征）</li>
-</ul>
-</li>
-<li><p><strong>Re-parameterizable Vision-Language PAN</strong></p>
-</li>
+<li>Representation Enhancement：Item的内容通常是静态的，用户的兴趣是动态的，需要对用户的行为和基本偏好进行顺序建模。U-BERT将评论文本编码为一系列向量来改善用户表示。LLM4ARec使用GPT2来提取个性化的方面术语和潜在向量。</li>
+<li>Unified Cross-domain Recommendation：在UNISREC [67]中，通过固定的BERT模型学习了跨域顺序推荐的项目表示，然后是轻质MOE增强网络。基于UNISREC，VQ-REC [66]引入了向量量化技术，以更好地使LLM生成的文本嵌入到建议空间。 Uni-CTR [47]利用从共享LLM的层面语义表示来充分捕获不同域之间的共同点，从而导致更好的多域建议。其他作品[52，199]利用固定LLM（例如Chatglm [40]，Sheared-llama [243]）的统一跨域文本嵌入式嵌入，以使用冷启动的用户&#x2F;物品或低频率的长尾型特征来解决场景。</li>
 </ol>
-<p><img src="/../images/CV/yolo_world2.png" alt="image-20250412114302612"></p>
-<p>​	<strong>Text-guided CSPLayer</strong></p>
-<p>​		Text-guided CSPLayer是YOLO-World在传统YOLO架构上最重要的创新之一，它本质上是YOLOv8中CSPLayer（也叫C2f模块）的升级版，通过引入文本引导机制，实现了视觉特征语言特征的深度融合。</p>
-<p>​		(1) 核心创新点</p>
-<p>​			传统CSPLayer只处理视觉特征，而T-CSPLayer的创新在于：</p>
-<p>​				a. 增加了文本嵌入输入通道</p>
-<p>​				b. 设计了文本-图像动态交互机制</p>
-<p>​				c. 保持了YOLO原有的高效特性</p>
-<p>​		(2) 关键计算步骤</p>
-<p>​			① 相似度计算：<br>​				将图像特征图(H×W×D)与文本嵌入(C×D)做矩阵乘法，得到每个卷积区域位置对应所有文本类别的相似度分数(H×W×C)</p>
-<p>​			② 注意力生成：</p>
-<p>​				对C个类别维度取最大值操作，再通过Sigmoid激活，生成空间注意力图(H×W)</p>
-<p>​							$X_l’&#x3D;X_l⋅δ(max_{j\in(1..C)}(X_lW_j^T))^T$</p>
-<p>​				$X_lW_j^T$是$H\times W$的矩阵，里面的元素代表相似度。对C个类别取最大值每个位置保留与最相关文本类别的相似度。然后点乘原始图像表征就行。</p>
+<h3 id="LLM-as-Scoring-Ranking-Function"><a href="#LLM-as-Scoring-Ranking-Function" class="headerlink" title="LLM as Scoring&#x2F;Ranking Function"></a>LLM as Scoring&#x2F;Ranking Function</h3><p>根据LLM解决的不同任务，可以将工作分为3类：</p>
+<ol>
+<li>item scoring task</li>
+<li>item generation task</li>
+<li>hybrid task</li>
+</ol>
+<h4 id="Item-Scoring-Task"><a href="#Item-Scoring-Task" class="headerlink" title="Item Scoring Task"></a>Item Scoring Task</h4><p>$$<br>C \leftarrow Pre_filter(u,I),\<br>[i_k]^N_{k&#x3D;1} \leftarrow Sort({F(u,i)| \forall i \in I})<br>$$</p>
+<p>pre_filter函数用于减少候选item的数量减轻计算量，最终的排名结果可以通过将LLM生成的得分进行排名得到。<br>$$<br>h&#x3D;LLM(x),\<br>s&#x3D;LM_Head(h)\in R^V,\<br>p&#x3D;softmax(s) \in R^V,\<br>\hat{t} - p<br>$$<br>其中h是final representation，V是vocabulary size，$\hat{t}$是从概率分布p采样的预测token</p>
+<p>但是，项目评分任务要求模型对给定的用户项目对（u，i）进行pointwise评分，并且输出应为实数$\hat y &#x3D; f(u，i)$，而不是生成的离散令牌$\hat t$。输出 应属于一定数值范围内，以指示用户偏好，例如，对于点击率（ctr）估计，$\hat y∈[0，1]$和$\hat y∈[0，5]$进行评级预测。有三种主要的方法来解决这样一个问题，即输出需要连续数值，而LLM会产生离散令牌。</p>
+<ol>
+<li>直接将LM_Head(.)替换为一个MLP用下面的公式计算：</li>
+</ol>
+<p>$$<br>\hat y &#x3D;F(u,i)&#x3D;MLP(h)<br>$$</p>
+<ol start="2">
+<li>依然是舍弃LM_Head(.)但是采用了双塔结构来获取用户和项目的representation，并使用距离度量来计算得分：</li>
+</ol>
+<p>$$<br>\hat y &#x3D;F(u,i)&#x3D;d(T_u(x_u),T_i(x_i))<br>$$</p>
 <ol start="3">
-<li><strong>Image-Pooling Attention</strong></li>
+<li><strong>最后的方法保留LM_Head(.)利用预测概率来计算得分，将用户倾向的二分问题添加到文本描述后，将得分任务变成二进制问题回答问题。</strong></li>
 </ol>
-<p>​		1. 核心功能</p>
-<p>​			Image-Pooling Attention 是 YOLO-World 中用于增强文本嵌入的视觉感知能力的模块，其核心思想是：让文本特征能够动态感知图像内容，从而提升开放词汇检测的准确性。</p>
-<p>​		2. 计算流程</p>
-<p>​			假设输入为多尺度图像特征 ${X_3, X_4, X_5}$ 和文本嵌入 $W \in \mathbb{R}^{C \times D}$，计算步骤如下：</p>
-<p>​			（1）多尺度特征池化</p>
-<p>​				对每个层级的特征图进行自适应最大池化，统一到固定尺寸（3×3）：</p>
-<p>$$<br>\tilde{X}_l &#x3D; \text{MaxPool}(X_l, \text{output_size}&#x3D;3) \quad \text{其中} \ l \in {3,4,5}<br>$$</p>
-<p>​				<strong>输出形状</strong>：每层得到 $3 \times 3 \times D$ 的特征</p>
-<p>​				<strong>示例</strong>：</p>
-<p>​					$X_3$ (80×80×256) → 池化后 → 3×3×256</p>
-<p>​					$X_4$ (40×40×512) → 池化后 → 3×3×512 </p>
-<p>​					$X_5$ (20×20×1024) → 池化后 → 3×3×1024</p>
-<p>​			（2）特征拼接与扁平化</p>
-<p>​				将多尺度池化结果拼接并展平：</p>
-<p>​					$\tilde{X} &#x3D; \text{Flatten}(\text{Concat}[\tilde{X}_3, \tilde{X}_4, \tilde{X}_5])$</p>
-<p>​				<strong>输出形状</strong>：$27 \times D$<br>​				（3层级×3×3&#x3D;27个空间位置，每个位置D维特征）</p>
-<p>​			（3）视觉-文本交互</p>
-<p>​				计算文本嵌入的视觉感知更新：</p>
-<p>​				$W’ &#x3D; W + \text{Softmax}(W \tilde{X}^\top)\tilde{X}$</p>
-<p>​				<strong>Softmax权重表示不同尺度不同图像区域对文本的重要性</strong></p>
-<h2 id="三、预训练流程"><a href="#三、预训练流程" class="headerlink" title="三、预训练流程"></a>三、预训练流程</h2><ol>
-<li><p><strong>训练目标函数</strong></p>
-<h3 id="多任务损失"><a href="#多任务损失" class="headerlink" title="多任务损失"></a>多任务损失</h3><p>$\mathcal{L}(I) &#x3D; \mathcal{L}<em>{\text{con}} + \lambda_I \cdot (\mathcal{L}</em>{\text{iou}} + \mathcal{L}_{\text{dfl}})$</p>
-<ul>
-<li>对比损失：$\mathcal{L}_{\text{con}}$</li>
-<li>distributed focal loss：$\mathcal{L}_{\text{dfl}}$</li>
-<li>IoU损失：$L_{iou}$</li>
-</ul>
-</li>
+<p>$$<br>\hat y&#x3D;\frac{exp(p_{yes})}{exp(p_{yes})+exp(p_{no})}<br>$$</p>
+<h4 id="Item-Generation-Task"><a href="#Item-Generation-Task" class="headerlink" title="Item Generation Task"></a>Item Generation Task</h4><p>在这项任务中LLM作为一个生成函数$F(u)$来直接通过一次forward就得到item序列。根据是否为LLM提供候选items可以将该任务分为两类：（1）open-set item generation （2）closed-set item generation</p>
+<ol>
+<li>open-set item generation：由于只有用户的信息喂给了LLM而缺乏候选item集合。因此生成的序列和正常的Item pool不能精确匹配。因此除了设计输入prompt模板，微调算法外，item match等后处理也需要被引入来解决幻觉问题。</li>
 </ol>
+<p>$$<br>[\hat{i_k}]<em>{k&#x3D;1}^N \leftarrow LLM(x_u)\<br>[i_k]</em>{k&#x3D;1}^N \leftarrow Match([\hat{i_k}]_{k&#x3D;1}^N,I)<br>$$</p>
+<ol start="2">
+<li>closed-set item generation: 先使用一个轻量的检索模型来将items pool缩减到一个较小的候选items序列中，一般大小为20，受限于LLM的内容窗口。LlamaRec采用LRURec作为检索器，之后微调LLaMA2来对预处理的Items进行过滤.</li>
+</ol>
+<p>$$<br>C \leftarrow Pre_filter(u,I)\<br>[i_k]_{k&#x3D;1}^N \leftarrow LLM(u,C)<br>$$</p>
+<h4 id="Hybrid-Task"><a href="#Hybrid-Task" class="headerlink" title="Hybrid Task"></a>Hybrid Task</h4><p>得益于LLM的多任务能力，单个的LLM就可以通过不同的Prompt处理生成任务以及scoring任务等。</p>
 
         </div>
 
@@ -507,7 +425,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2025/04/12/yolo-world/">http://example.com/2025/04/12/yolo-world/</a></span>
+                        <span><a href="http://example.com/2025/06/18/How-Can-Recommender-Systems-Benefit-from-Large-Language-Models-A-Survey/">http://example.com/2025/06/18/How-Can-Recommender-Systems-Benefit-from-Large-Language-Models-A-Survey/</a></span>
                     </p>
                 
                 
@@ -531,7 +449,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/CV/"># CV</a>
+                        <a href="/tags/Recommendation/"># Recommendation</a>
                     
                         
                 </span>
@@ -544,10 +462,10 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2025/06/18/Multimodal-Pre-training-for-Sequential-Recommendation-via-Contrastive-Learning/">Multimodal Pre-training for Sequential Recommendation via Contrastive Learning</a>
+                <a class="prev" rel="prev" href="/2025/06/19/How-Can-Recommender-Systems-Benefit-from-Large-Language-Models-A-Survey-1/">How Can Recommender Systems Benefit from Large Language Models: A Survey</a>
             
             
-            <a class="next" rel="next" href="/2024/06/27/Mutual-Modality_Adversarial_Attack_with_Semantic_Perturbation/">m</a>
+            <a class="next" rel="next" href="/2025/06/18/Harnessing-Multimodal-Large-Language-Models-for-Multimodal-Sequential-Recommendation/">Harnessing Multimodal Large Language Models for Multimodal Sequential Recommendation</a>
             
         </section>
 

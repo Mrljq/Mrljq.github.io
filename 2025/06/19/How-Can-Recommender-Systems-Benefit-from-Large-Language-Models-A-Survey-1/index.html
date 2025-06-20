@@ -13,7 +13,7 @@
 
 
 
-<title>Hexo</title>
+<title>How Can Recommender Systems Benefit from Large Language Models: A Survey | Hexo</title>
 
 
 
@@ -257,76 +257,11 @@
                 <div class="container">
     
     
-        <div class="post-toc">
-    <div class="tocbot-list">
-    </div>
-    <div class="tocbot-list-menu">
-        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
-        <a onclick="go_top()">Back to top</a>
-        <a onclick="go_bottom()">Go to bottom</a>
-    </div>
-</div>
-
-<script>
-    var tocbot_timer;
-    var DEPTH_MAX = 6; // 为 6 时展开所有
-    var tocbot_default_config = {
-        tocSelector: '.tocbot-list',
-        contentSelector: '.post-content',
-        headingSelector: 'h1, h2, h3, h4, h5',
-        orderedList: false,
-        scrollSmooth: true,
-        onClick: extend_click,
-    };
-
-    function extend_click() {
-        clearTimeout(tocbot_timer);
-        tocbot_timer = setTimeout(function() {
-            tocbot.refresh(obj_merge(tocbot_default_config, {
-                hasInnerContainers: true
-            }));
-        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
-    }
-
-    document.ready(function() {
-        tocbot.init(obj_merge(tocbot_default_config, {
-            collapseDepth: 1
-        }));
-    });
-
-    function expand_toc() {
-        var b = document.querySelector('.tocbot-toc-expand');
-        var expanded = b.getAttribute('data-expanded');
-        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
-        tocbot.refresh(obj_merge(tocbot_default_config, {
-            collapseDepth: expanded ? 1 : DEPTH_MAX
-        }));
-        b.innerText = expanded ? 'Expand all' : 'Collapse all';
-    }
-
-    function go_top() {
-        window.scrollTo(0, 0);
-    }
-
-    function go_bottom() {
-        window.scrollTo(0, document.body.scrollHeight);
-    }
-
-    function obj_merge(target, source) {
-        for (var item in source) {
-            if (source.hasOwnProperty(item)) {
-                target[item] = source[item];
-            }
-        }
-        return target;
-    }
-</script>
-    
 
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title"></h1>
+            <h1 class="post-title">How Can Recommender Systems Benefit from Large Language Models: A Survey</h1>
             
                 <div class="post-meta">
                     
@@ -335,7 +270,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">June 3, 2025&nbsp;&nbsp;12:58:17</a>
+                        Date: <a href="#">June 19, 2025&nbsp;&nbsp;11:03:11</a>
                         </span>
                     
                     
@@ -344,62 +279,7 @@
         </header>
 
         <div class="post-content">
-            <h1 id="AlignRec：Aligning-and-Training-in-Multimodal-Recommendations（CCF-B）"><a href="#AlignRec：Aligning-and-Training-in-Multimodal-Recommendations（CCF-B）" class="headerlink" title="AlignRec：Aligning and Training in Multimodal Recommendations（CCF-B）"></a>AlignRec：Aligning and Training in Multimodal Recommendations（CCF-B）</h1><p>将ID-based features视作一种新的模态：类别模态</p>
-<h3 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h3><ul>
-<li>多模态推荐的输入不仅包含图像和文本这样的内容模态，还包含多种ID特征。这些模态在自己的特征空间保持自己的分布。</li>
-<li>对于内容模态的学习需要大量的时间，而对于类别特征的学习只需要几轮就可以完成，如果联合训练很难处理这样的不平衡速率问题。</li>
-<li>多模态中不同模态对推荐的影响未得到充分研究，不一定都有用。缺乏视力特征可以获得相对12.1％的召回率@20。</li>
-</ul>
-<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><p><img src="C:\Users\lijia\AppData\Roaming\Typora\typora-user-images\image-20250603153354628.png" alt="image-20250603153354628"></p>
-<ul>
-<li>多模态编码器将视觉和文本模态知识对齐成一个统一表示</li>
-<li>聚合模块将邻域信息用Graph聚合起来</li>
-<li>融合模块将ID-based表征和多模态表征融合起来推荐</li>
-</ul>
-<p>最终目的是生成item和user表征来进行top-k推荐</p>
-<h2 id="Architecture"><a href="#Architecture" class="headerlink" title="Architecture"></a>Architecture</h2><p>模型的输入就是Text（用户评论），Image（item的图片），User ID，Item ID。输出表征</p>
-<p><img src="C:\Users\lijia\AppData\Roaming\Typora\typora-user-images\image-20250604133623683.png" alt="image-20250604133623683"></p>
-<h3 id="多模态编码器"><a href="#多模态编码器" class="headerlink" title="多模态编码器"></a>多模态编码器</h3><p>采用BEiT3将图像和文本表示成一个多模态融合表征：<br>$$<br>h_{enc}^i&#x3D;MMEnc(i_v,i_t)<br>$$</p>
-<h3 id="聚合模块"><a href="#聚合模块" class="headerlink" title="聚合模块"></a>聚合模块</h3><p>输出user&#x2F;item的多模态隐藏表征$(h^u_{mm},h^i_{mm})$以及基于ID的表征$(h^u_{id},h^i_{id})$<br>$$<br>h^i_{mm},h^u_{mm},h^i_{id},h^u_{id}&#x3D;Aggregator(h^i_{enc},i_{id},u_{id}|G)<br>$$</p>
-<ul>
-<li>LightGCN 聚合基础</li>
-</ul>
-<p>LightGCN 是一种基于图神经网络（GNN）的协同过滤方法，用于推荐系统。其核心思想是通过用户-物品交互图来传播和聚合用户与物品的嵌入表示，从而捕捉用户和物品之间的高阶关系。</p>
-<ul>
-<li>LightGCN 的聚合公式</li>
-</ul>
-<p>在论文中，作者使用 LightGCN 来实现用户和物品的 ID-based 表示的聚合。LightGCN 的聚合过程如下：</p>
-<p><strong>初始嵌入表示</strong></p>
-<p>首先，用户和物品的 ID 特征通过嵌入层（embedding layer）转换为低维的稠密向量表示，记作 (e_{id}^u)（用户嵌入）和 (e_{id}^i)（物品嵌入）。将所有用户和物品的嵌入向量堆叠起来，形成嵌入矩阵 (E_{id})。</p>
-<p><strong>构建归一化邻接矩阵</strong></p>
-<p>用户-物品交互矩阵 (R) 是一个二值矩阵，表示用户与物品之间的交互关系（如点击与否）。基于这个交互矩阵 (R)，构建用户-物品二分图的邻接矩阵 (A)，其形式为：<br>$$<br>A &#x3D; \begin{pmatrix} 0 &amp; R \ R^\top &amp; 0 \end{pmatrix}<br>$$<br>这个邻接矩阵 (A) 表示用户和物品之间的连接关系。为了处理图神经网络中的信息传播，作者使用了归一化的邻接矩阵 (\tilde{A})，它通过对 (A) 进行归一化处理得到。</p>
-<p><strong>LightGCN 传播公式</strong></p>
-<p>LightGCN 通过堆叠 (L) 层图卷积网络（GCN）来聚合邻居节点的信息。每一层的传播公式如下：</p>
-<p>$$<br>H_{id}^{l+1} &#x3D; \tilde{A} H_{id}^l<br>$$<br>其中：</p>
-<ul>
-<li>$(H_{id}^l)$ 表示第 (l) 层的用户和物品嵌入矩阵。</li>
-<li>$(\tilde{A})$ 是归一化后的邻接矩阵，用于在图中传播信息。</li>
-<li>初始时，$(H_{id}^0 &#x3D; E_{id})$，即初始嵌入矩阵。</li>
-</ul>
-<p>最终的嵌入表示</p>
-<p>最终，将每一层的嵌入表示进行平均，得到最终的用户和物品嵌入矩阵 $(H_{id})$：<br>$$<br>H_{id} &#x3D; \frac{1}{L+1} \left( H_{id}^0 + H_{id}^1 + \ldots + H_{id}^L \right)<br>$$<br>这个矩阵 $(H_{id})$ 包含了用户和物品的 ID-based 表示。经过多层的图聚合后，它能够捕捉到用户和物品之间的复杂交互关系。</p>
-<ul>
-<li><p>item侧的多模态隐藏向量$h_{mm}^i$</p>
-<p>$\odot$代表元素乘积，$h^i_{con}$代表融合ID和内容知识，S是通过计算Item的多模态相似度得到的</p>
-<p>*<br>  $$<br>  h_{\text{con}}^i &#x3D; e_{\text{id}}^i \odot \sigma \left( \text{MLP}(h_{\text{enc}}^i) \right),<br>  $$</p>
-<ul>
-<li>$$<br>h_{\text{mm}}^i &#x3D; \sum_{j \in I} S_{ij} h_{\text{con}}^i.<br>$$</li>
-</ul>
-</li>
-<li><p>user侧的多模态隐藏向量$h_{mm}^u$</p>
-<ul>
-<li>$$<br>h^u_{mm}&#x3D;\sum_{j\in I} \tilde{R_{uj}}h_{mm}^j<br>$$</li>
-</ul>
-</li>
-</ul>
-<p>$$<br>h^i&#x3D;h^i_{mm}+h^i_{id},h^u&#x3D;h^u_{mm}+h^u_{id}<br>$$</p>
-<p>在做推荐的时候计算相似度$s(u,i)&#x3D;h^i(h^u)^T$取top-K进行推荐。</p>
-
+            
         </div>
 
         
@@ -413,7 +293,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2025/06/03/AlignRec%20Aligning%20and%20Training%20in%20Multimodal%20Recommendations/">http://example.com/2025/06/03/AlignRec%20Aligning%20and%20Training%20in%20Multimodal%20Recommendations/</a></span>
+                        <span><a href="http://example.com/2025/06/19/How-Can-Recommender-Systems-Benefit-from-Large-Language-Models-A-Survey-1/">http://example.com/2025/06/19/How-Can-Recommender-Systems-Benefit-from-Large-Language-Models-A-Survey-1/</a></span>
                     </p>
                 
                 
@@ -446,10 +326,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2025/06/18/Multimodal-Pre-training-for-Sequential-Recommendation-via-Contrastive-Learning/">Multimodal Pre-training for Sequential Recommendation via Contrastive Learning</a>
             
-            
-            <a class="next" rel="next" href="/2025/04/12/yolo-world/">Yolo_World</a>
+            <a class="next" rel="next" href="/2025/06/18/How-Can-Recommender-Systems-Benefit-from-Large-Language-Models-A-Survey/">How Can Recommender Systems Benefit from Large Language Models: A Survey</a>
             
         </section>
 
