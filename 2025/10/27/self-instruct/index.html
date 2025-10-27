@@ -13,7 +13,7 @@
 
 
 
-<title>Recommender Systems with Generative Retrieval | Hexo</title>
+<title>self-instruct | Hexo</title>
 
 
 
@@ -326,7 +326,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Recommender Systems with Generative Retrieval</h1>
+            <h1 class="post-title">self-instruct</h1>
             
                 <div class="post-meta">
                     
@@ -335,14 +335,14 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">June 21, 2025&nbsp;&nbsp;14:06:09</a>
+                        Date: <a href="#">October 27, 2025&nbsp;&nbsp;22:15:54</a>
                         </span>
                     
                     
                         <span class="post-category">
                     Category:
                             
-                                <a href="/categories/Recommendation/">Recommendation</a>
+                                <a href="/categories/LLM/">LLM</a>
                             
                         </span>
                     
@@ -351,28 +351,51 @@
         </header>
 
         <div class="post-content">
-            <h1 id="Recommender-Systems-with-Generative-Retrieval"><a href="#Recommender-Systems-with-Generative-Retrieval" class="headerlink" title="Recommender Systems with Generative Retrieval"></a>Recommender Systems with Generative Retrieval</h1><p><img src="/../images/Recommendation/5-1.png" alt="image-20250621150649291"></p>
-<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>现代推荐系统采用retrieve-and-rank机制。在检索阶段先选出一组候选者，然后在rank阶段对其进行排名，因为rank阶段只能看到候选者，因此检索阶段的候选者必须要保证高度相关。</p>
-<p>检索模型：</p>
-<ol>
-<li>利用矩阵分解来在相同空间学习query和candidate的embeddings。</li>
-<li>dual-encoder 架构（一个用于query另一个用于candidate），使用inner-product将query和candidate embeddings嵌入在同一空间中。在推理阶段，将所有candidate的embeddings提前计算出来，</li>
+            <h1 id="self-instruct"><a href="#self-instruct" class="headerlink" title="self-instruct"></a>self-instruct</h1><p>指令数据定义：</p>
+<p>${I_t} \$ 代表要生成的instructions集合，$t$代表task。</p>
+<p>$ {(X_{t,i},Y_{t,j})}^{n_t}_{i&#x3D;1}$代表每个task $t$包括$n_t$个input-output instances。</p>
+<p>$M(I_t,X_{t,i})&#x3D;Y_{t,i}$代表对于模型$M$给定instruction 和 input ，期望其生成对应的output, $i\in {1,…,n_t}$</p>
+<h3 id="数据生成"><a href="#数据生成" class="headerlink" title="数据生成"></a>数据生成</h3><ol>
+<li><p><strong>生成instruction</strong></p>
+<p>针对self-instruct，我们首先初始化一个任务池包含175个tasks，在生成instruction环节，我们随机抽取8个instruction（6个是原始instruction seed 2个采样自新生成的instruction），按照下面的prompt格式来生成</p>
+<p><img src="/../images/LLM/2_1.png" alt="image-20251027222023036"></p>
+</li>
+<li><p><strong>instance 生成</strong></p>
+<p>给定指令和他们的任务类型，然后独立的为这些instruction生成instances。</p>
+<p>第一种方法是输入优先的方法，首先根据指令提出输入字段，然后生成相应的输出。</p>
+<p>input-first</p>
+<p><img src="/../images/LLM/2_2.png" alt="image-20251027222028820"></p>
+<p>对偏向于一个标签的输入进行评分，特别是对于分类任务（例如，对于语法错误检测，它通常生成语法输入）。因此，self-instruct还提出了一种用于分类任务的输出优先方法，其中self-instruct首先生成可能的类标签，然后根据每个类标签调节输入生成。</p>
+<p>output-first</p>
+<p><img src="/../images/LLM/2_3.png" alt="image-20251027222035895"></p>
+</li>
 </ol>
+<h3 id="数据过滤"><a href="#数据过滤" class="headerlink" title="数据过滤"></a>数据过滤</h3><p>为了鼓励多样性，只有当新指令与任何现有指令的 ROUGE-L 相似度小于 0.7 时，才会将新指令添加到任务池中。</p>
+<h3 id="模型微调"><a href="#模型微调" class="headerlink" title="模型微调"></a>模型微调</h3><p>将指令和实例输入连接起来作为提示，并训练模型以标准监督方式生成实例输出。为了使模型对不同格式具有鲁棒性，我们使用多个模板将指令和实例输入一起编码。<strong>例如，指令可以加或不加“Task:”前缀，输入可以加或不加“Input:”前缀，提示末尾可以加或不加“Output:”，中间可以放不同数量的换行符等。</strong></p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><h3 id="多样性"><a href="#多样性" class="headerlink" title="多样性"></a>多样性</h3><p>这段话的意思是，研究人员使用了一个名为 Berkeley Neural Parser (伯克利神经句法分析器) 的工具，来分析他们数据集中 52,445 条指令的语法结构。 他们这样做的目的是为了从每条指令中提取一个核心的“动词 + 名词”组合。 具体提取过程如下： </p>
 <ul>
-<li>Maximum Inner Product Search (MIPS) space：旨在最大化查询与带检索数据项之间的内积。可以用下面的公式表示出来：$argmax_{i \in S}&lt;x_i,q&gt;$，在一组labes $S$上定义的向量数据库$x_i$</li>
+<li>$\textbf{句法分析 (Parse):}$ 用分析器处理每条指令，得到一个语法树。    </li>
+<li>$\textbf{提取动词:} $找到离语法树“根节点”最近的那个动词 (这通常是句子的主要动词)。  </li>
+<li>$\textbf{提取宾语:}$ 找到这个动词的第一个直接名词宾语 (即动作的直接承受者)。</li>
 </ul>
-<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><p><img src="/../images/Recommendation/5-2.png" alt="image-20250621161646641"></p>
-<h3 id="Semantic-ID-generation-using-content-features"><a href="#Semantic-ID-generation-using-content-features" class="headerlink" title="Semantic ID generation using content features"></a>Semantic ID generation using content features</h3><p>这一阶段涉及将item content features编码成embeddings然后将embedding量化到语义codeword元组中。</p>
+<p><strong>最终结果是：</strong> 在 52,445 条指令中，有 26,559 条 (大约一半) 包含了这种清晰的“(主)动词 + (其)直接名词宾语”结构。<strong>举个例子:</strong> </p>
 <ul>
-<li>Semantic ID Generation</li>
+<li>$\textbf{指令：}$ “Create a brief summary of the solar system.’’ </li>
+<li>$\textbf{分析：} $       </li>
+<li>$\textbf{根动词:} $”Create’’ (创建)        </li>
+<li>$\textbf{直接名词宾语:} $”summary’’ (摘要)        </li>
+<li>$\textbf{结果：} $这条指令$\textbf{包含}$该结构。    </li>
+<li>$\textbf{指令：}$”Is the sky blue?’’    </li>
+<li>$\textbf{分析：}$        <ul>
+<li>$\textbf{根动词:}$ “Is’’ (是)        </li>
+<li>$\textbf{直接名词宾语:} $(无)</li>
 </ul>
-<p>​	我们假设每一个item都和捕获了有用的语义信息的content features相关联（图片，title等），然后<strong>使用通用的文本编码器：	BERT、Sentence-T5来将item的文本features编码为embedding</strong>。将语义ID定义为长度为m的codewords元组。元组中的每一个codeword来自不同的codebook。因此其能唯一表示的item数量等于codebook size的乘积。同时相似的item希望能有相近的语义ID，例如 (10,21,35)和(10,23,32)更相似。</p>
-<p><img src="/../images/Recommendation/5-3.png" alt="image-20250621161646641">	</p>
-<p>量化过程采用Residual-Quantized Variational AutoEncoder (RQ-VAE)，其计算方式见上图，DNN编码器的向量输出，例如R0（由蓝色棒代表），被馈送到量化器中，首先，在第一级代码簿中找到了最接近R0的向量。让此最接近的向量为EC0（由红色棒表示）。然后，将残差误差计算为R1：&#x3D; R0  -  EC0。将其馈入量化器的第二级，然后重复该过程：在第二级中发现了最接近R1的向量，例如EC1（由绿色条表示），然后将第二级残差误差计算为R2 &#x3D; R1 -E’C1。然后，在R2上第三次重复该过程。语义代码在其各自的代码簿中计算为EC0，EC1和EC2的索引。在图中所示的示例中，这将在代码（7、1、4）中产生。</p>
-<h3 id="Training-a-generative-recommender-system-on-Semantic-IDs"><a href="#Training-a-generative-recommender-system-on-Semantic-IDs" class="headerlink" title="Training a generative recommender system on Semantic IDs"></a>Training a generative recommender system on Semantic IDs</h3><p>在获得Semantic ID$(c_0,…,c_{m-1})$后，表征$z$被量化为$\hat{z}&#x3D;\sum_{d&#x3D;0}^{m-1}e_{c_i}$这里的e就是codebook中的向量，然后将$\hat z$输入的decoder里尝试重建输入$x$。因此训练loss为如下形式：<br>$$<br>L(x)&#x3D;L_{recon}+L_{rqvac}\<br>L_{recon} &#x3D; ||x-\hat{x}||^2\<br>L_{rqvac} &#x3D; \sum_{d&#x3D;0}^{m-1}||sg[r_i]-e_{c_i}||^2+\beta||r_i-sg[e_{c_i}]||^2<br>$$<br><strong>sg代表stop-gradient operation</strong>。这个loss联合训练encoder，decoder以及codebook。</p>
-<p>同时为了防止输入被映射到少量的codebook向量中的codebook collapse，在第一个训练batch中应用k-means算法，并使用质心作为初始化。</p>
-<h4 id="Generative-Retrieval-with-Semantic-IDs"><a href="#Generative-Retrieval-with-Semantic-IDs" class="headerlink" title="Generative Retrieval with Semantic IDs"></a>Generative Retrieval with Semantic IDs</h4><p>将用户的交互序列定义为：$(item_1,item_2,…,item_n)$，推荐的目标就是预测出下一个item $item_{n+1}$对于$item_i$其会有如下的semantic id $(c_{i,0},…,c_{i,m-1})$那么其交互序列可表示为： $(c_{1,0},…,c_{1,m-1},c_{2,0},…,c_{2,m-1},c_{n,0},…,c_{n,m-1})$</p>
-<p>将其输入并直接生成$(c_{n+1,0},…,c_{n+1,m-1})$</p>
+</li>
+<li>$\textbf{结果：}$ 这条指令$\textbf{不包含}$该结构。</li>
+</ul>
+<p><img src="/../images/LLM/2_4.png" alt="image-20251027224956635"></p>
+<p>同时测试了生成的内容和175个种子instruction的ROUGE-L分数</p>
+<p><img src="/../images/LLM/2_5.png" alt="image-20251027225020807"></p>
 
         </div>
 
@@ -387,7 +410,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2025/06/21/Recommender-Systems-with-Generative-Retrieval/">http://example.com/2025/06/21/Recommender-Systems-with-Generative-Retrieval/</a></span>
+                        <span><a href="http://example.com/2025/10/27/self-instruct/">http://example.com/2025/10/27/self-instruct/</a></span>
                     </p>
                 
                 
@@ -411,7 +434,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/Recommendation/"># Recommendation</a>
+                        <a href="/tags/LLM/"># LLM</a>
                     
                         
                 </span>
@@ -424,10 +447,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2025/07/01/HLLM-Enhancing-Sequential-Recommendations-via-Hierarchical-Large-Language-Models-for-Item-and-User-Modeling/">HLLM: Enhancing Sequential Recommendations via Hierarchical Large Language Models for Item and User Modeling</a>
             
-            
-            <a class="next" rel="next" href="/2025/06/18/How-Can-Recommender-Systems-Benefit-from-Large-Language-Models-A-Survey/">How Can Recommender Systems Benefit from Large Language Models: A Survey</a>
+            <a class="next" rel="next" href="/2025/08/27/JARVIS-1-Open-World-Multi-task-Agents-with-Memory-Augmented-Multimodal-Language-Models/">JARVIS-1: Open-World Multi-task Agents with Memory-Augmented Multimodal Language Models</a>
             
         </section>
 

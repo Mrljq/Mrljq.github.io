@@ -13,7 +13,7 @@
 
 
 
-<title>Recommender Systems with Generative Retrieval | Hexo</title>
+<title>HLLM: Enhancing Sequential Recommendations via Hierarchical Large Language Models for Item and User Modeling | Hexo</title>
 
 
 
@@ -326,7 +326,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Recommender Systems with Generative Retrieval</h1>
+            <h1 class="post-title">HLLM: Enhancing Sequential Recommendations via Hierarchical Large Language Models for Item and User Modeling</h1>
             
                 <div class="post-meta">
                     
@@ -335,7 +335,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">June 21, 2025&nbsp;&nbsp;14:06:09</a>
+                        Date: <a href="#">July 1, 2025&nbsp;&nbsp;11:02:21</a>
                         </span>
                     
                     
@@ -351,28 +351,11 @@
         </header>
 
         <div class="post-content">
-            <h1 id="Recommender-Systems-with-Generative-Retrieval"><a href="#Recommender-Systems-with-Generative-Retrieval" class="headerlink" title="Recommender Systems with Generative Retrieval"></a>Recommender Systems with Generative Retrieval</h1><p><img src="/../images/Recommendation/5-1.png" alt="image-20250621150649291"></p>
-<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>现代推荐系统采用retrieve-and-rank机制。在检索阶段先选出一组候选者，然后在rank阶段对其进行排名，因为rank阶段只能看到候选者，因此检索阶段的候选者必须要保证高度相关。</p>
-<p>检索模型：</p>
-<ol>
-<li>利用矩阵分解来在相同空间学习query和candidate的embeddings。</li>
-<li>dual-encoder 架构（一个用于query另一个用于candidate），使用inner-product将query和candidate embeddings嵌入在同一空间中。在推理阶段，将所有candidate的embeddings提前计算出来，</li>
-</ol>
-<ul>
-<li>Maximum Inner Product Search (MIPS) space：旨在最大化查询与带检索数据项之间的内积。可以用下面的公式表示出来：$argmax_{i \in S}&lt;x_i,q&gt;$，在一组labes $S$上定义的向量数据库$x_i$</li>
-</ul>
-<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><p><img src="/../images/Recommendation/5-2.png" alt="image-20250621161646641"></p>
-<h3 id="Semantic-ID-generation-using-content-features"><a href="#Semantic-ID-generation-using-content-features" class="headerlink" title="Semantic ID generation using content features"></a>Semantic ID generation using content features</h3><p>这一阶段涉及将item content features编码成embeddings然后将embedding量化到语义codeword元组中。</p>
-<ul>
-<li>Semantic ID Generation</li>
-</ul>
-<p>​	我们假设每一个item都和捕获了有用的语义信息的content features相关联（图片，title等），然后<strong>使用通用的文本编码器：	BERT、Sentence-T5来将item的文本features编码为embedding</strong>。将语义ID定义为长度为m的codewords元组。元组中的每一个codeword来自不同的codebook。因此其能唯一表示的item数量等于codebook size的乘积。同时相似的item希望能有相近的语义ID，例如 (10,21,35)和(10,23,32)更相似。</p>
-<p><img src="/../images/Recommendation/5-3.png" alt="image-20250621161646641">	</p>
-<p>量化过程采用Residual-Quantized Variational AutoEncoder (RQ-VAE)，其计算方式见上图，DNN编码器的向量输出，例如R0（由蓝色棒代表），被馈送到量化器中，首先，在第一级代码簿中找到了最接近R0的向量。让此最接近的向量为EC0（由红色棒表示）。然后，将残差误差计算为R1：&#x3D; R0  -  EC0。将其馈入量化器的第二级，然后重复该过程：在第二级中发现了最接近R1的向量，例如EC1（由绿色条表示），然后将第二级残差误差计算为R2 &#x3D; R1 -E’C1。然后，在R2上第三次重复该过程。语义代码在其各自的代码簿中计算为EC0，EC1和EC2的索引。在图中所示的示例中，这将在代码（7、1、4）中产生。</p>
-<h3 id="Training-a-generative-recommender-system-on-Semantic-IDs"><a href="#Training-a-generative-recommender-system-on-Semantic-IDs" class="headerlink" title="Training a generative recommender system on Semantic IDs"></a>Training a generative recommender system on Semantic IDs</h3><p>在获得Semantic ID$(c_0,…,c_{m-1})$后，表征$z$被量化为$\hat{z}&#x3D;\sum_{d&#x3D;0}^{m-1}e_{c_i}$这里的e就是codebook中的向量，然后将$\hat z$输入的decoder里尝试重建输入$x$。因此训练loss为如下形式：<br>$$<br>L(x)&#x3D;L_{recon}+L_{rqvac}\<br>L_{recon} &#x3D; ||x-\hat{x}||^2\<br>L_{rqvac} &#x3D; \sum_{d&#x3D;0}^{m-1}||sg[r_i]-e_{c_i}||^2+\beta||r_i-sg[e_{c_i}]||^2<br>$$<br><strong>sg代表stop-gradient operation</strong>。这个loss联合训练encoder，decoder以及codebook。</p>
-<p>同时为了防止输入被映射到少量的codebook向量中的codebook collapse，在第一个训练batch中应用k-means算法，并使用质心作为初始化。</p>
-<h4 id="Generative-Retrieval-with-Semantic-IDs"><a href="#Generative-Retrieval-with-Semantic-IDs" class="headerlink" title="Generative Retrieval with Semantic IDs"></a>Generative Retrieval with Semantic IDs</h4><p>将用户的交互序列定义为：$(item_1,item_2,…,item_n)$，推荐的目标就是预测出下一个item $item_{n+1}$对于$item_i$其会有如下的semantic id $(c_{i,0},…,c_{i,m-1})$那么其交互序列可表示为： $(c_{1,0},…,c_{1,m-1},c_{2,0},…,c_{2,m-1},c_{n,0},…,c_{n,m-1})$</p>
-<p>将其输入并直接生成$(c_{n+1,0},…,c_{n+1,m-1})$</p>
+            <h1 id="HLLM-Enhancing-Sequential-Recommendations-via-Hierarchical-Large-Language-Models-for-Item-and-User-Modeling"><a href="#HLLM-Enhancing-Sequential-Recommendations-via-Hierarchical-Large-Language-Models-for-Item-and-User-Modeling" class="headerlink" title="HLLM: Enhancing Sequential Recommendations via Hierarchical Large Language  Models for Item and User Modeling"></a>HLLM: Enhancing Sequential Recommendations via Hierarchical Large Language  Models for Item and User Modeling</h1><h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h2><p>LLM有着强大的语言能力，但是简单的将用户行为历史作为文本输入会产生很长的序列，但是LLM的复杂度与序列长度呈二次方关系。</p>
+<h2 id="Methond"><a href="#Methond" class="headerlink" title="Methond"></a>Methond</h2><p>本文提出层次化大语言模型，即使用两个LLM，第一个作为提取item表征的Item LLM，第二个作为提取用户兴趣的User LLM。</p>
+<p><img src="C:\Users\lijia\AppData\Roaming\Typora\typora-user-images\image-20250701112904007.png" alt="image-20250701112904007"></p>
+<h3 id="Item-LLM"><a href="#Item-LLM" class="headerlink" title="Item LLM"></a>Item LLM</h3><p>对于item $I$首先将其对应的文本描述展平成句子$T$，之后将其输入给tokenizer并在最后额外添加一个特殊的标记[ITEM]，因此输入给LLM的token序列可以被表示为：${t_1,t_2,…,t_m,[ITEM]}$，m代表文本token的长度。最后一层输出的与[ITEM]对应的hidden state被作为item的嵌入。</p>
+<h3 id="User-LLM"><a href="#User-LLM" class="headerlink" title="User LLM"></a>User LLM</h3><p>原始的用户历史$U&#x3D;{I_1,…,I_n}$被Item LLM转换为特征序列${E_1,E_2,…,E_n}$之后</p>
 
         </div>
 
@@ -387,7 +370,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2025/06/21/Recommender-Systems-with-Generative-Retrieval/">http://example.com/2025/06/21/Recommender-Systems-with-Generative-Retrieval/</a></span>
+                        <span><a href="http://example.com/2025/07/01/HLLM-Enhancing-Sequential-Recommendations-via-Hierarchical-Large-Language-Models-for-Item-and-User-Modeling/">http://example.com/2025/07/01/HLLM-Enhancing-Sequential-Recommendations-via-Hierarchical-Large-Language-Models-for-Item-and-User-Modeling/</a></span>
                     </p>
                 
                 
@@ -424,10 +407,10 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2025/07/01/HLLM-Enhancing-Sequential-Recommendations-via-Hierarchical-Large-Language-Models-for-Item-and-User-Modeling/">HLLM: Enhancing Sequential Recommendations via Hierarchical Large Language Models for Item and User Modeling</a>
+                <a class="prev" rel="prev" href="/2025/07/24/CRAFT-CUSTOMIZING-LLMS-BY-CREATING-AND-RETRIEVING-FROM-SPECIALIZED-TOOLSETS/">CRAFT: CUSTOMIZING LLMS BY CREATING AND RETRIEVING FROM SPECIALIZED TOOLSETS</a>
             
             
-            <a class="next" rel="next" href="/2025/06/18/How-Can-Recommender-Systems-Benefit-from-Large-Language-Models-A-Survey/">How Can Recommender Systems Benefit from Large Language Models: A Survey</a>
+            <a class="next" rel="next" href="/2025/06/21/Recommender-Systems-with-Generative-Retrieval/">Recommender Systems with Generative Retrieval</a>
             
         </section>
 

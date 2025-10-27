@@ -355,7 +355,7 @@
 <p>该文首先使用基于MLLM的<strong>项目摘要器</strong>来提取给定item的图像特征，并将图像转换为文本。然后，采用基于LLM的User摘要器利用循环用户摘要生成策略来捕获用户偏好的动态变化。</p>
 <h2 id="Problem-Definition"><a href="#Problem-Definition" class="headerlink" title="Problem Definition"></a>Problem Definition</h2><p>数据集包含User和Item的交互记录,给定用户$u$其交互记录定义为$S_u&#x3D;[I_u^1,…,I_u^n]$,其中$I^i$代表$u$通过点击购买或者观看交互的第$i$个Item，$n$代表用户的行为序列长度。每一个Item对应一个文本描述$W$和图像$I$。</p>
 <h4 id="多模态序列推荐"><a href="#多模态序列推荐" class="headerlink" title="多模态序列推荐"></a>多模态序列推荐</h4><p>给定一个$u$和其对应的历史交互记录$S_u$，以及一个候选Item:$I_c$，目的是预测$u$和这个候选Item在下一个交互时的概率（例如，点击的概率）。</p>
-<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><p><img src="C:\Githubpage\myblog\source\images\Recommendation\2-2.png" alt="image-20250610125108182"></p>
+<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><p><img src="/../images/Recommendation/2-2.png" alt="image-20250610125108182"></p>
 <ul>
 <li>起始状态，使用独立的prompts（文本摘要和图像描述prompt）来引导MLLM独立处理这些模态，确保特征和信息能够充分提取到，同时为了保证两个模态的平衡，文本摘要和图像描述的输出被调整到相似的长度。</li>
 <li>在独立分析两种模态后，使用fusion prompt将来自文本和图像的信息进行整合。</li>
