@@ -351,7 +351,7 @@
         </header>
 
         <div class="post-content">
-            <p><img src="C:\Users\lijia\AppData\Roaming\Typora\typora-user-images\image-20251031103317761.png" alt="image-20251031103317761"></p>
+            <p><img src="/../images/jailbreak_defence/2_1.png" alt="image-20251031103317761"></p>
 <h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><p>给定$P_{VLM}$代表视觉语言模型，可以看作是词汇表$V$中先前标记序列的概率分布。令$x_t&#x3D;{x_{t_1},…,x_{t_n}}$代表文本标记，$x_v&#x3D;{x_{v_1},…,x_{v_m}}$代表视觉标记来生成回复$r&#x3D;{r_1,…,r_o}$。按照下面的方式来生成回复中的第$i$个token：<br>$$<br>r_i \sim \mathcal{P}<em>{\text{VLM}}(\cdot \mid x</em>{v_1}, \dots, x_{v_m}, x_{t_1}, \dots, x_{t_n}, r_1, \dots, r_{i-1})<br>$$</p>
 <h3 id="转移向量构建"><a href="#转移向量构建" class="headerlink" title="转移向量构建"></a>转移向量构建</h3><ul>
 <li><p><strong>对抗图像归因</strong></p>
@@ -375,7 +375,7 @@
 <p>​	利用来自代理模型 $\hat{f}$ 的 $Topk$ 归因分数与<strong>空用户查询</strong>配对的视觉标记来构建转向向量。</p>
 <p>​	给定数据集$D:(x_v,Mask(x_v))$以及包含空query的文本tokens模板$x_{template}$， $x_v$是输入的视觉token，$Mask(x_v)$是按照前Topk	个token屏蔽过的输入视觉token。</p>
 <p>​	<br>$$<br>v^l &#x3D; \frac{1}{|\mathcal{D}|} \sum_{(x_v, \text{Mask}(x_v)) \in \mathcal{D}} a^l(x_v, x_{\text{template}}) - a^l(\text{Mask}(x_v), x_{\text{template}})<br>$$<br>​	$a^l$就是第$l$层最后一个token的激活。</p>
-<p><img src="C:\Users\lijia\AppData\Roaming\Typora\typora-user-images\image-20251031111902293.png" alt="image-20251031111902293"></p>
+<p><img src="/../images/jailbreak_defence/2_2.png" alt="image-20251031111902293"></p>
 <h3 id="自适应激活转向"><a href="#自适应激活转向" class="headerlink" title="自适应激活转向"></a>自适应激活转向</h3><p>原先的方法通过直接在推理过程中添加转移向量来操控模型输出<br>$$<br>h^l &#x3D;h^l- \alpha \times \frac{v^l}{||v^l||}<br>$$<br>但是这样会导致正常的输入也会被转向，因此固定的放缩系数$\alpha$是不够的。</p>
 <p>为了解决上面的问题，文章提出了一种自适应的方式<br>$$<br>h^l&#x3D;h^l- \alpha*max(\frac{(h^l)^Tv^l}{||h^l||||v^l||},0)*\frac{v^l}{||v^l||}<br>$$<br>当激活不包含任何转移向量（有害方向）的正分量时候，最大项为0，不移动激活。从而减轻了对良性性能的影响。</p>
 <p>由于 $h_l$ 和 $v_l$ 之间的角度对于自适应投影很重要，因此我们必须确保它能够有效地区分 $l$ 层的有害和良性激活。然而，我们注意到不同输入的激活可能聚集在远离原点的点周围。因此，这些向量之间的角度可能都变得相似。如图2（b）<br>$$<br>h^l&#x3D;h^l- \alpha<em>max(\frac{(h^l-h_0^l)^Tv^l}{||h^l-h_0^l||||v^l||}</em>||h^l||,0)*\frac{v^l}{||v^l||}<br>$$<br>因此文章提出使用矫正，为了获得第$l$层的校准激活$h^l_0$，我们从大量测试数据中收集图像-文本查询，并计算生成的token特征在$l$层的平均值，得到$h^l_0$。</p>
