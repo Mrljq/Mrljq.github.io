@@ -13,7 +13,7 @@
 
 
 
-<title>Steering Llama 2 via Contrastive Activation Addition | Hexo</title>
+<title>Steering Away from Harm: An Adaptive Approach to Defending Vision Language Model Against Jailbreaks | Hexo</title>
 
 
 
@@ -326,7 +326,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Steering Llama 2 via Contrastive Activation Addition</h1>
+            <h1 class="post-title">Steering Away from Harm: An Adaptive Approach to Defending Vision Language Model Against Jailbreaks</h1>
             
                 <div class="post-meta">
                     
@@ -335,7 +335,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">October 30, 2025&nbsp;&nbsp;16:01:10</a>
+                        Date: <a href="#">October 31, 2025&nbsp;&nbsp;10:32:33</a>
                         </span>
                     
                     
@@ -351,47 +351,35 @@
         </header>
 
         <div class="post-content">
-            <h1 id="Steering-Llama-2-via-Contrastive-Activation-Addition"><a href="#Steering-Llama-2-via-Contrastive-Activation-Addition" class="headerlink" title="Steering Llama 2 via Contrastive Activation Addition"></a>Steering Llama 2 via Contrastive Activation Addition</h1><h2 id="什么是steering-vectors"><a href="#什么是steering-vectors" class="headerlink" title="什么是steering vectors"></a>什么是steering vectors</h2><p>在transformer的残差流中，正面示例和反面示例的激活差异就构成了激活向量。</p>
-<ul>
-<li><p>激活差异：</p>
-<p>对于选定的层 $l$，提取正面和负面样例在该层最后一个token的激活，并计算其差值作为激活差异。<br>$$<br>\Delta a_j^l&#x3D;a^l_{jail}-a^l_{base}<br>$$</p>
-</li>
-<li><p>mean difference method：</p>
-<p>数据集上的所有正样本和负样本的差异的平均值就是转移向量。对于每个越狱类型 $j$ 和第 $l$ 层，我们取数据集 $D$ 中越狱和非越狱提示之间最后一个指令令牌处残差流激活的平均差异。这样，我们就每个越狱类型 $j$ 获得一个越狱向量 $v_j^l$ 的 $l$ 层<br>$$<br>v_j^l&#x3D;\frac{1}{|D|}\sum \Delta a^l_j<br>$$</p>
-</li>
-</ul>
-<h2 id="abstract"><a href="#abstract" class="headerlink" title="abstract"></a>abstract</h2><p>在推理过程中，通过利用正负样例获得的转移向量在模型prompt后的所有token位置进行相加或者相减，从而控制模型的输出。</p>
-<h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h2><p>大模型对齐方法有很多包括 RLHF、指令微调、prompt工程等。然而仍然存在许多问题，包括为目标行为收集多样化和具有代表性的数据集、防止幻觉以及减轻分布外失败。此外，这些方法的工作方式通常是不透明的。</p>
-<p>通过对模型激活进行针对性扰动的工作称之为“activation engineering” or “representation engineering”。</p>
-<h2 id="method"><a href="#method" class="headerlink" title="method"></a>method</h2><p><img src="/../images/jailbreak_defence/1_1.png" alt="image-20251030202333710"></p>
-<p>这篇论文以选择题来构建转移向量，prompt对由多项选择题组成，末尾附加答案字母（“A”或“B”）。这两个提示包含相同的问题，但以不同的答案结尾;“正面”提示以与相关行为相对应的字母结尾，“负面”提示以与其相反行为相对应的字母结尾</p>
-<p>给定数据集$D$（prompt $p$，正例$c_p$，已经负例$c_n$），$L$层的转移向量按照下面的方式构建（$a_L()$代表给定提示和答案在第$L$层的激活，在<strong>答案的标记位置的特定层提取的激活</strong>。）：<br>$$<br>v_{MD}&#x3D;\frac{1}{|D|}\sum_{p,c_p,c_n \in D} a_L(p,c_p)-a_L(p,c_n)<br>$$<br>这个<strong>转移向量会在推理时在模型的每一个token位置进行相加从而控制模型输出。</strong></p>
-<p><img src="/../images/jailbreak_defence/1_2.png" alt="image-20251030202316055"></p>
-<p>如图2（a）所示，由于在提示模板的影响下，激活本身就具有原始的分离（A，B）。但是在第10层开始突然出现了明显的语义分离，这表明越高的层提取到了越高的表征特征。</p>
-<h3 id="转移向量的作用探究"><a href="#转移向量的作用探究" class="headerlink" title="转移向量的作用探究"></a>转移向量的作用探究</h3><ul>
-<li>重要层探究</li>
-</ul>
-<p>为了找到转向的最佳层，我们扫描所有层并<strong>执行乘数为 -1 和 1 的 CAA</strong>，评估对保留测试问题的效应大小。这些扫描的图表如图 3 所示。每行对应不同的行为。我们找到了一组具有最显着效应大小的最佳层。在 7B 模型中，这对应于第 13 层和相邻层。13B 模型中的最佳层通常是 14 或 15。</p>
-<p><img src="/../images/jailbreak_defence/1_3.png" alt="image-20251030204023031"></p>
-<ul>
-<li><p>开放生成问题</p>
-<p>这里的开放生成问题其实就是把选择题的问题去掉得到的，因此它的转移向量也是按照上面的方式来的。</p>
-<p>如下图</p>
+            <p><img src="C:\Users\lijia\AppData\Roaming\Typora\typora-user-images\image-20251031103317761.png" alt="image-20251031103317761"></p>
+<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><p>给定$P_{VLM}$代表视觉语言模型，可以看作是词汇表$V$中先前标记序列的概率分布。令$x_t&#x3D;{x_{t_1},…,x_{t_n}}$代表文本标记，$x_v&#x3D;{x_{v_1},…,x_{v_m}}$代表视觉标记来生成回复$r&#x3D;{r_1,…,r_o}$。按照下面的方式来生成回复中的第$i$个token：<br>$$<br>r_i \sim \mathcal{P}<em>{\text{VLM}}(\cdot \mid x</em>{v_1}, \dots, x_{v_m}, x_{t_1}, \dots, x_{t_n}, r_1, \dots, r_{i-1})<br>$$</p>
+<h3 id="转移向量构建"><a href="#转移向量构建" class="headerlink" title="转移向量构建"></a>转移向量构建</h3><ul>
+<li><p><strong>对抗图像归因</strong></p>
+<p>文章的观点为不是每一个视觉token在模型越狱上的贡献都是一致的。</p>
+<p>通过将视觉token进行随机掩码来评测该token的效果。</p>
+<p>$\text{Ablate}(x_v, g)$代表消融视觉标记$x_v$，$g \sim {0,1}^m$代表消融向量，0代表被遮盖的token。在给定$g$的情况下通过计算生成特定回复$r: Sure, …$  的对数概率来量化影响。<br>$$<br>f(g):&#x3D;logP_{VLM}(r|Ablate(x_v,g),x_t)<br>$$<br>$x_t$代表有害指令的文本标记，$P_{VLM}(r|Ablate(x_v,g),x_t)$代表生成特定回复的概率乘积。</p>
 </li>
 </ul>
-<p>​	<img src="/../images/jailbreak_defence/1_4.png" alt="image-20251030184223912"></p>
-<p>​	并且更大的乘数会导致生成效果下降</p>
+<p>​	</p>
+<p>​	<strong>代理模型：</strong></p>
+<p>​	但是在推理过程中你不可能按照这个方式一个一个实验，所有文章引入一个线性代理模型$\hat{f}$来拟合这个得分。</p>
+<p>​	训练步骤：</p>
+<p>​		1. 我们采样了一个消融向量数据集并计算对应的$f(g_i)$</p>
+<p>​		2. 在$(g_i,f(g_i))$对上，通过Lasso来训练替代模型从而近似拟合</p>
+<p>​	最后，我们可以得到一个代理模型 $\hat{f}$，其权重可以解释为触发越狱的归因分数。<strong>分数越高，令牌导致越狱的相关性就越大。</strong></p>
+<p>​	</p>
+<p>​	</p>
 <ul>
-<li>转移向量和每个token激活的相似度</li>
+<li><strong>有害特征提取</strong></li>
 </ul>
-<p><img src="/../images/jailbreak_defence/1_5.png" alt="image-20251030210456332"></p>
-<p>通过计算转移向量和token激活之间的相似度，可以发现与转移向量相似度大的（蓝色），反应出更强烈的行为动机。</p>
-<ul>
-<li><p>不同层转移向量的关系</p>
-<p><img src="/../images/jailbreak_defence/1_6.png" alt="image-20251030213710689"></p>
-</li>
-</ul>
-<p>当从第13层提取的向量应用于其他层时，效果会转移。此外，对于一些早期的层，这种效应更为显著，表明<strong>CAA产生的激活方向不是特定于层的，而是目标行为的一般表示</strong>。然而，在第 17 层左右，效果大小急剧下降。这可能表明，在某个时候，有关抽象表示的相关信息已被用于进一步处理，并且不能再以相同的方式进行作</p>
+<p>​	利用来自代理模型 $\hat{f}$ 的 $Topk$ 归因分数与<strong>空用户查询</strong>配对的视觉标记来构建转向向量。</p>
+<p>​	给定数据集$D:(x_v,Mask(x_v))$以及包含空query的文本tokens模板$x_{template}$， $x_v$是输入的视觉token，$Mask(x_v)$是按照前Topk	个token屏蔽过的输入视觉token。</p>
+<p>​	<br>$$<br>v^l &#x3D; \frac{1}{|\mathcal{D}|} \sum_{(x_v, \text{Mask}(x_v)) \in \mathcal{D}} a^l(x_v, x_{\text{template}}) - a^l(\text{Mask}(x_v), x_{\text{template}})<br>$$<br>​	$a^l$就是第$l$层最后一个token的激活。</p>
+<p><img src="C:\Users\lijia\AppData\Roaming\Typora\typora-user-images\image-20251031111902293.png" alt="image-20251031111902293"></p>
+<h3 id="自适应激活转向"><a href="#自适应激活转向" class="headerlink" title="自适应激活转向"></a>自适应激活转向</h3><p>原先的方法通过直接在推理过程中添加转移向量来操控模型输出<br>$$<br>h^l &#x3D;h^l- \alpha \times \frac{v^l}{||v^l||}<br>$$<br>但是这样会导致正常的输入也会被转向，因此固定的放缩系数$\alpha$是不够的。</p>
+<p>为了解决上面的问题，文章提出了一种自适应的方式<br>$$<br>h^l&#x3D;h^l- \alpha*max(\frac{(h^l)^Tv^l}{||h^l||||v^l||},0)*\frac{v^l}{||v^l||}<br>$$<br>当激活不包含任何转移向量（有害方向）的正分量时候，最大项为0，不移动激活。从而减轻了对良性性能的影响。</p>
+<p>由于 $h_l$ 和 $v_l$ 之间的角度对于自适应投影很重要，因此我们必须确保它能够有效地区分 $l$ 层的有害和良性激活。然而，我们注意到不同输入的激活可能聚集在远离原点的点周围。因此，这些向量之间的角度可能都变得相似。如图2（b）<br>$$<br>h^l&#x3D;h^l- \alpha<em>max(\frac{(h^l-h_0^l)^Tv^l}{||h^l-h_0^l||||v^l||}</em>||h^l||,0)*\frac{v^l}{||v^l||}<br>$$<br>因此文章提出使用矫正，为了获得第$l$层的校准激活$h^l_0$，我们从大量测试数据中收集图像-文本查询，并计算生成的token特征在$l$层的平均值，得到$h^l_0$。</p>
+<p><strong>在推理过程中，我们仅对新生成的令牌的激活应用转向，而输入令牌的激活保持不变。</strong></p>
 
         </div>
 
@@ -406,7 +394,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://example.com/2025/10/30/Steering-Llama-2-via-Contrastive-Activation-Addition/">http://example.com/2025/10/30/Steering-Llama-2-via-Contrastive-Activation-Addition/</a></span>
+                        <span><a href="http://example.com/2025/10/31/Steering-Away-from-Harm-An-Adaptive-Approach-to-Defending-Vision-Language-Model-Against-Jailbreaks/">http://example.com/2025/10/31/Steering-Away-from-Harm-An-Adaptive-Approach-to-Defending-Vision-Language-Model-Against-Jailbreaks/</a></span>
                     </p>
                 
                 
@@ -443,10 +431,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2025/10/31/Steering-Away-from-Harm-An-Adaptive-Approach-to-Defending-Vision-Language-Model-Against-Jailbreaks/">Steering Away from Harm: An Adaptive Approach to Defending Vision Language Model Against Jailbreaks</a>
             
-            
-            <a class="next" rel="next" href="/2025/10/28/Speculating-LLMs-Chinese-Training-Data-Pollution-from-Their-Tokens/">Speculating LLMs Chinese Training Data Pollution from Their Tokens</a>
+            <a class="next" rel="next" href="/2025/10/30/Steering-Llama-2-via-Contrastive-Activation-Addition/">Steering Llama 2 via Contrastive Activation Addition</a>
             
         </section>
 
